@@ -1,0 +1,49 @@
+name: myapp
+description: A new Flutter project.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Core Firebase
+  firebase_core:
+  firebase_auth:
+  cloud_firestore:
+  firebase_storage:
+
+  # Google Services
+  google_sign_in:
+  google_maps_flutter:
+
+  # Location
+  geolocator:
+  permission_handler:
+  location:
+
+  # UI & Utilities
+  google_fonts:
+  font_awesome_flutter:
+  provider:
+  flutter_rating_bar:
+  image_picker:
+  rxdart:
+  package_info_plus:
+  url_launcher:
+  xml:
+  slide_to_act:
+  geoflutterfire_plus:
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/

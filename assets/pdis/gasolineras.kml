@@ -1,0 +1,4349 @@
+<?xml version="1.0" encoding="utf-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <Placemark>
+      
+        
+      <name>APARCAMIENTO LIBRE  / Córdoba </name>
+      
+        
+      <description>Aparcamiento libre mixto detrás de gasolinera  Cepsa</description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -4.785841,37.862062,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA BP ⛽  / Carcedo (Oviedo)</name>
+      
+        
+      <description>N-632, Km. 109, 33459, Asturias map.bp.com +34 985 53 10 25</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -6.0258868,43.5415942,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA REPSOL ⛽ / Melgar de Fernamental (Burgos)</name>
+      
+        
+      <description>N-120, 162, 09100 Melgar de Fernamental, Burgos www.gasolinerasien.com +34 947 37 24 61</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -4.23805,42.4028555,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA REPSOL ⛽ / Valdecarpinteros (Salamanca)</name>
+      
+        
+      <description>CR N-620 P.K. VALDECARPINTEROS, Salamanca www.repsol.es +34 923 48 03 13</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -6.4377245,40.6633525,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA REPSOL ⛽️ / Quintana de la Serena / Badajoz ( Extremadura)</name>
+      
+        
+      <description>EX-346, 06450 Quintana de la Serena, Badajoz www.repsol.es +34 924 77 70 72 </description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -5.6803689,38.748486,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA REPSOL ⛽️/ Cerro Muriano ( Córdoba)</name>
+      
+        
+      <description>N-432, 252 DE, 14320 Cerro Muriano, Córdoba www.repsol.es +34 957 35 05 11</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -4.7740829,38.0089529,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA REPSOL ⛽️ / Rosal de La Frontera ( Huelva)</name>
+      
+        
+      <description>C. Almeria, 9, Rosal de la Frontera, Huelva www.repsol.es +34 959 14 11 20</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -7.2157224,37.968884,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA CEPSA DKV ⛽️ / Montijo (Badajoz)</name>
+      
+        
+      <description>TARJETAS DKV / Gasolinera en  Montijo Badajoz.</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -6.60556,38.908876,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA CEPSA DKV / La Fuente de S. Esteban (Salamanca)</name>
+      
+        
+      <description><![CDATA[N-620, PK: 291, 6, 37200 La Fuente de San Esteban, Salamanca <br>www.cercadeti.cepsa.es <br>+34 923 44 01 36]]></description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -6.2500713,40.7890661,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA GALP / Reguengos de Monsaraz (PO)</name>
+      
+        
+      <description><![CDATA[Rua de Évora E.N. 256 Km 20, Reguengos de Monsaraz, Portugal <br>www.galp.com <br>+351 266 502 476]]></description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -7.5417942,38.4258823,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Cartagena (Murcia)</name>
+      
+        
+      <description>Esplanada de tierra para hacer la espera detrás gasolinera</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -0.968174,37.5948675,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA REPSOL / Santa Olalla del Cala (Huelva)</name>
+      
+        
+      <description>C. Marina Española, S.N, D, 21260 Santa Olalla del Cala, Huelva www.repsol.es +34 959 08 93 65</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -6.2216563,37.9044587,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Mellizo / Sangonera La Seca (Murcia)</name>
+      
+        
+      <description>Autocares Mellizo / detrás gasolinera.</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -1.2554621,37.9464041,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA REPSOL / Sangonera la Seca (Murcia)</name>
+      
+        
+      <description>Avenida Puntarron Local G 29 D, 30834 Sangonera la Seca, Murcia www.repsol.es +34 868 17 79 90</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -1.2649173,37.9411978,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA GALP ⛽️ / Gavião (PO)</name>
+      
+        
+      <description>R. Dr. Eusébio Leão, 6040-118 Gavião, Portugal www.galp.com +351 241 632 240</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -7.9376711,39.4649213,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol Adblue ⛽ / Benabarre (Huesca)</name>
+      
+        
+      <description>Gasolinera Repsol con Adblue/ N-230, km 65, 5 D, 22580 Benabarre, Huesca www.repsol.es +34 974 54 32 22</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            0.4854991,42.1007569,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Cepsa ⛽ / La Roda (Albacete)</name>
+      
+        
+      <description>C. Mártires, S/N, 02630 La Roda, Albacetecercadeti.cepsa.es. +34 967 44 34 44</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -2.1716377,39.2126057,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>LAVADERO Automático 💧/ Madrid </name>
+      
+        
+      <description>Lavadero automático en Gasolinera Repsol</description>
+      
+        
+      <styleUrl>#icon-1702-0097A7</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.7188323,40.3784178,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>REPSOL Solred - DKV ⛽️ / Fátima  (PO)</name>
+      
+        
+      <description>Gasolinera Solred y DKV Afueras de Fátima.</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -8.6852288,39.6430745,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Solred Adblue ⛽ / Torrecillas de la Tiesa (Cáceres)
+</name>
+      
+        
+      <description>REPSOL CON ADBLUE / A-5, Km 240, 10252 Torrecillas de la Tiesa, Cáceres www.repsol.es +34 927 33 82 423.9</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -5.832607,39.5651197,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol ⛽️ / Sietamo (Huesca) </name>
+      
+        
+      <description>Diseminado Afueras Sietamo, 170, 22120 Huesca www.repsol.es +34 974 26 22 06</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -0.2718357,42.1232289,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>RESTAURANTE El Faro 🍽 / Balaguer (Lérida)</name>
+      
+        
+      <description><![CDATA[Restaurante El Faro, afueras de Balaguer al lado de Gasolinera. ACEPTAN grupos. / Carretera de Tàrrega, km 2, 25600 Balaguer, Lleida <br>www.restaurantelfaro.com <br>+34 973 44 50 23]]></description>
+      
+        
+      <styleUrl>#icon-1577-795548</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            0.8295759,41.7857828,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol ⛽️ / Palos de la Frontera (Huelva)</name>
+      
+        
+      <description>Gasolonera Repsol (ADBLUE) / Cr A-494 P.K. 17,40 I, 21810 Palos de la Frontera, Huelva www.repsol.es +34 959 53 01 69</description>
+      
+        
+      <styleUrl>#icon-1581-097138</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -6.8729909,37.1973806,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA REPSOL⛽️ / Majadahonda (Madrid)</name>
+      
+        
+      <description>Gasolinera Repsol con ADBLUE / C. el Barbero de Sevilla, 2, 28222 Majadahonda, Madrid+34 917 52 59 64 </description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.8813396,40.4506038,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ADBLUE ⛽️ / San Clemente (Cuenca)</name>
+      
+        
+      <description>Gasolinera Cepsa con Adblue A-43, KM. 430,1. Dirección Ciudad Real - A4 Junto a la estación CEPSA, 16600 San Clemente, Cuenca www.carrefour.es +34 914 90 89 00</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -2.4085512,39.3953607,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ADBLUE ⛽️ / San Clemente (Cuenca</name>
+      
+        
+      <description>A-43, KM. 430,1. Dirección Levante - A3 Junto a la estación CEPSA, 16600 San Clemente, Cuenca / +34 914 90 89 00</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -2.4084527,39.3936472,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ADBLUE / Gasolinera Repsol ⛽️ / Manzanares (Ciudad Real)</name>
+      
+        
+      <description><![CDATA[Gasolinera Repsol con Adblue / CR N-4 P.K. 171,10 I, 13200 Manzanares, Ciudad Real <br>www.repsol.es <br>+34 926 61 00 ]]></description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.3735049,39.0228398,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ADBLUE Gasolinera Repsol ⛽️ / Valdepeñas (Ciudad Real)</name>
+      
+        
+      <description>Gasolinera Repsol con Adblue / NO te Dan ni una botella de agua aunque reportes 500 litros/ Pero bueno... no están obligados. Pero un detalle siempre biene bien / Cm-412, 84,8 DE, 13300 Valdepeñas, Ciudad Real www.repsol.es +34 926 52 18 50</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.3983972,38.7662853,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA ☕️ / Cáceres </name>
+      
+        
+      <description>Esplanada de Tierra, Zona de Espera al lado Gasolinera supermercado cerca, por si tienes que comprar bebidas.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -6.3840578,39.4546005,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>LAVADERO 💧 / Mataró (Barcelona)</name>
+      
+        
+      <description>Lavadero con monedas en Gasolinera Shell </description>
+      
+        
+      <styleUrl>#icon-1702-0097A7</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.4279081,41.5259766,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol ⛽️ /Barcelona </name>
+      
+        
+      <description>Repsol en el lateral del Litoral Av. del Litoral, 49, Sant Martí, 08005 Barcelonawww.repsol.es+34 932 25 51 35</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.2042612,41.3928662,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol Adblue ⛽️ / Maçanet de la Selva (Girona)</name>
+      
+        
+      <description>Gasolinera Repsol en AP7 con Adblue.</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.7403448,41.7724212,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA San Jerónimo ⛽️ / Sevilla</name>
+      
+        
+      <description><![CDATA[<img src="https://mymaps.usercontent.google.com/hostedimage/m/*/3AKcrxGTjwfp3aL5OlhOMqS8IInmVLyNTkMQx1mTetImQDS8rHIKjgYTEQWfHrn654ICjtJdmHfn83Q98g0Esj-FAzgxMH5AUqWpuq0L6ueSiEwRuCNRvBUIld3miS323kSh5i-55xHoD7r6q7NbdDDnhZLDhZNwVEdAlJRHhvrWpvrQG8U_YPaOt-PFb4AHS0lM3-_gsf6N9LGZ2szMsfJ7r1pphnBxRpVzbvJLSj1ifD78LmBnDkNLmQQMbC7w?authuser=0&fife=s16383" height="200" width="auto" /><br><br>Gasolinera San Jerónimo ADBLUE / Horario de 6h a 22h de lunes a viernes  y de 7h a 22h sábados y domingos / C. Medina y Galnares, 74, Norte, 41015 Sevilla / Instagram @esssanjeronimo  <br><br><img src="https://mymaps.usercontent.google.com/hostedimage/m/*/3AKcrxGQGDj015F0t2qup915lQv2YylmjPPIqfnAWKwH3_61EQGBrgl0wTfMAMXDjerArPne4IHPMRBM_GpBhnHALOzSce7gfX6g1wxt1l9jU63KDRLYbRbKS0XBYWKgdd5lV5BNYgoWg5lVAB9AOlqRez7HW68YQkQiLtKCDImAUBQvVg2odc_tUeEOdZde9rUFtuD_9nw2enWempeEcWhk8VhrJohSRimyIrG6Zwl0yt9UDJcKP_bJmtczwZUw?authuser=0&fife=s16383" height="200" width="auto" /><br><br><img src="https://mymaps.usercontent.google.com/hostedimage/m/*/3AKcrxGTcaBFtSOfXAyyNtERZAGYFe7ZmPBPfvfNt82K9vGoeiMSyA8nEKwyLskcDKIyHY10wbeqNe0RayBjc0I-m1SxPjPZVxPJ6uCSnA7pAhCp5wdhar_oTe5sy0zf4fI1LfbFT39nlmMe5GoVajnkahpnQ9ZM2W-ZG6KlPfnkb59FrVZa0NM3M3REKjVrnEeMAu9dRHEg-fUJorpecTpRZuIXLq1j-qYj-CASXKGMpbXsogqLCUurwy2nvnas?authuser=0&fife=s16383" height="200" width="auto" />]]></description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <ExtendedData>
+        
+          
+        <Data name="gx_media_links">
+          
+            
+          <value><![CDATA[https://mymaps.usercontent.google.com/hostedimage/m/*/3AKcrxGTjwfp3aL5OlhOMqS8IInmVLyNTkMQx1mTetImQDS8rHIKjgYTEQWfHrn654ICjtJdmHfn83Q98g0Esj-FAzgxMH5AUqWpuq0L6ueSiEwRuCNRvBUIld3miS323kSh5i-55xHoD7r6q7NbdDDnhZLDhZNwVEdAlJRHhvrWpvrQG8U_YPaOt-PFb4AHS0lM3-_gsf6N9LGZ2szMsfJ7r1pphnBxRpVzbvJLSj1ifD78LmBnDkNLmQQMbC7w?authuser=0&fife=s16383 https://mymaps.usercontent.google.com/hostedimage/m/*/3AKcrxGQGDj015F0t2qup915lQv2YylmjPPIqfnAWKwH3_61EQGBrgl0wTfMAMXDjerArPne4IHPMRBM_GpBhnHALOzSce7gfX6g1wxt1l9jU63KDRLYbRbKS0XBYWKgdd5lV5BNYgoWg5lVAB9AOlqRez7HW68YQkQiLtKCDImAUBQvVg2odc_tUeEOdZde9rUFtuD_9nw2enWempeEcWhk8VhrJohSRimyIrG6Zwl0yt9UDJcKP_bJmtczwZUw?authuser=0&fife=s16383 https://mymaps.usercontent.google.com/hostedimage/m/*/3AKcrxGTcaBFtSOfXAyyNtERZAGYFe7ZmPBPfvfNt82K9vGoeiMSyA8nEKwyLskcDKIyHY10wbeqNe0RayBjc0I-m1SxPjPZVxPJ6uCSnA7pAhCp5wdhar_oTe5sy0zf4fI1LfbFT39nlmMe5GoVajnkahpnQ9ZM2W-ZG6KlPfnkb59FrVZa0NM3M3REKjVrnEeMAu9dRHEg-fUJorpecTpRZuIXLq1j-qYj-CASXKGMpbXsogqLCUurwy2nvnas?authuser=0&fife=s16383]]></value>
+          
+          
+        </Data>
+        
+        
+      </ExtendedData>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -5.980236,37.4306635,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol ADBLUE ⛽️ / Teià (Barcelona)</name>
+      
+        
+      <description>Gasolinera Repsol con ADBLUE  / C-32 Teià (Barcelona)</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.333673,41.4916814,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol ADBLUE ⛽️ / La Roca del Vallès (Barcelona)</name>
+      
+        
+      <description><![CDATA[Gasolinera Repsol con Adblue / antes de entrar en la AP7 CR C-60 P.K. 8,70 D (NORTE, 08430 La Roca del Vallès, Barcelona <br>www.repsol.es <br>+34 938 42 40 77]]></description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.343185,41.5933369,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Cepsa Adblue ⛽️ / Daimiel (Ciudad Real)</name>
+      
+        
+      <description>N-420, PK: 236, 6, 13250 Daimiel, Ciudad Real www.cercadeti.cepsa.es +34 926 69 30 84</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.5498431,39.1073652,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol Adblue ⛽️ / Daimiel (Ciudad Real)</name>
+      
+        
+      <description>Gasolinera Repsol con Adblue / C. Don Tiburcio, 98, D, 13250 Daimiel, Ciudad Real www.repsol.es +34 926 85 26 13</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.617972,39.0622958,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol Adblue ⛽️ / Villamalea (Albacete)</name>
+      
+        
+      <description>Gasolinera Repsol con surtidor de Adblue . Tienes que moverlo para repostarlo pero en un caso extremo se puede. Cm-3201, 22,7 DE, 02270 Villamalea, Albacete www.repsol.es +34 967 48 30 163.9</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -1.5927904,39.3667745,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol Adblue ⛽️ / Daimiel (Ciudad Real)</name>
+      
+        
+      <description><![CDATA[Gasolinera Repsol con Adblue muy cerca de la otra Repsol / N-430 Km. 269,90 D, 13250 Daimiel, Ciudad Real <br>www.repsol.es <br>+34 926 85 01 37]]></description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.6189066,39.0605413,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Valcarce Adblue ⛽️ / Daimiel (Ciudad Real)</name>
+      
+        
+      <description><![CDATA[Gasolinera Valcarce con Adblue / Carretera, CM-4114, 40, Km 50, 13250, Daimiel, Ciudad Real<br>+34 926 85 46 61 ]]></description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.6259214,39.0685903,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol Adblue ⛽️ / La Roda (Albacete)</name>
+      
+        
+      <description><![CDATA[Gasolinera Repsol con Adblue / Cm-3114 (Las Peñicas), 0,1 IZ, 02630 La Roda, Albacete<br>www.repsol.es<br>+34 967 44 29 89]]></description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -2.1565664,39.2135962,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA ADBLUE ⛽️ / Lles de la Cerdanya (Lleida)</name>
+      
+        
+      <description>Gadolinera con Adblue / Carretera N-260, Km 205.7, 25726 Lles de Cerdanya, Lleida+34 607 75 24 36</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            1.6813077,42.3643328,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol ADBLUE ⛽️ / Puigcerdà (Girona)</name>
+      
+        
+      <description>Gasolinera Repsol con Adblue / N-152, 171, 17520 Puigcerdà, Girona www.repsol.es +34 972 88 14 48</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            1.9361339,42.4325708,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA DKV / Viena (Austria)</name>
+      
+        
+      <description><![CDATA[VIENA| DKV | Gasolinera dkv cerca del palacio de Sisi en Viena | Felberstraße 102, 1150 Wien, Austria<br>travel.eni.com<br>+43 664 6018788130]]></description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            16.321014,48.193383,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA DKV</name>
+      
+        
+      <description>A10, Autostrada dei Fiori, km 46,722, 17048 Valleggia SV, Italia carburanti.esso.it +39 019 884654</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            8.42316,44.27463,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA CEPSA / Almadén (Ciudad Real)</name>
+      
+        
+      <description>Av. Ramón y Cajal, 71, 13400 Almadén, Ciudad Real cercadeti.cepsa.es +34 926 71 27 77</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -4.8304468,38.7790731,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA REPSOL ⛽️ / Bargas (Toledo)</name>
+      
+        
+      <description>CM-4006, 5, 45593 Bargas, Toledo www.repsol.es +34 925 35 84 55</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -4.0165997,39.9467057,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol Adblue ⛽️ / Quintanar de la Orden (Toledo)</name>
+      
+        
+      <description><![CDATA[Gasolinera Repsol con Adblue / 122 I, N-301, 45800 Quintanar de la Orden, Toledo <br>www.repsol.es <br>+34 925 70 60 41]]></description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.0356957,39.5868885,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol ADBLUE ⛽️ / La Puebla de Alfindén (Zaragoza)</name>
+      
+        
+      <description>Gasolinera Repsol con Adblue /  La Puebla de Alfindén, Zaragoza</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -0.7570612,41.6409512,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Valcarce ADBLUE ⛽️ / lleida</name>
+      
+        
+      <description>Gasolinera con ADBLUE en Área de servicio de Lleida.</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            0.6382971,41.5432391,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLONERA Cepsa ADBLUE ⛽️ / Gurb (Barcelona)</name>
+      
+        
+      <description>Gasolinera con Adblue dirección Vic / C-25, PK: 174,6 | margen derecho, 08503 Gurb, Barcelona www.cercadeti.cepsa.es +34 938 85 39 23</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.1929929,41.9333495,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Cepsa ADBLUE ⛽️ / Gurb (Barcelona)</name>
+      
+        
+      <description>Gasolinera Cepsa con Adblue dirección Manresa C-25 PK: 174,6, 08503 Gurb, Barcelona www.cercadeti.cepsa.es+34 938 89 44 96</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.194622,41.9342661,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>LAVADERO 💧 / Albalate del Arzobispo (Teruel)</name>
+      
+        
+      <description>Lavadero con manguera al lado gasolinera Cepsa a las afueras de la Población de Albalate del Arzobispo. </description>
+      
+        
+      <styleUrl>#icon-1702-0097A7</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -0.5105355,41.1285614,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol (ADBLUE) ⛽️ / Vilademuls (Girona)</name>
+      
+        
+      <description><![CDATA[Gasolinera Repsol con Adblue / <br>N-2, 731 I, 17468 Vilademuls, Girona <br>www.repsol.es]]></description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.8888007,42.0867305,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol  (ADBLUE) ⛽️ / Mataró (Barcelona)</name>
+      
+        
+      <description><![CDATA[Gasolinera Repsol con Adblue. / Cra Barcelona PK 27, 08302 Mataró, Barcelona <br>www.repsol.es ]]></description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.4272636,41.5238632,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Shell (ADBLUE) ⛽️ / Mataró (Barcelona)</name>
+      
+        
+      <description><![CDATA[Gasolinera Shell con Adblue con lavadero a pistola / C/ de la Teixidora, 37, 08302 Mataró, Barcelona <br>www.disagrupo.es <br>+34 938 86 60 70]]></description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.4278838,41.5261298,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol ADBLUE ⛽ / Mataró (Barcelona)</name>
+      
+        
+      <description>Gasolinera Repsol con Adblue en polígono de Mataró </description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.4547094,41.5508259,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Cepsa ADBLUE ⛽ / Sahagun de Campos (León)</name>
+      
+        
+      <description>Gasolinera Cepsa con Adblue / A-231 PK: 50, 24320 Sahagun De Campos, León www.cercadeti.cepsa.es +34 987 78 00 97</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -5.0478628,42.3815236,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol ADBLUE ⛽/ Robledo (Asturias)</name>
+      
+        
+      <description>Gasolinera Repsol con Adblue // AU A-66 P.K. 19,00 D, 33690 Robledo, Asturias www.repsol.es +34 985 77 19 33 </description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -5.7990586,43.4353799,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol ADBLUE ⛽ / Robledo (Asturias)</name>
+      
+        
+      <description>Gasolinera Repsol con Adblue // AU A-66 P.K. 19,00 I, 33690 Robledo, Asturias www.repsol.es +34 985 77 20 82</description>
+      
+        
+      <styleUrl>#icon-1532-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -5.7982544,43.438373,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol ADBLUE ⛽ / Ferrera (Asturias)</name>
+      
+        
+      <description>SURTIDOR 4 / Gasolinera Repsol con Adblue. Detalle botella de agua / AS-I, 33519 Ferrera, Asturias +34 985 97 20 25 </description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -5.6863589,43.3956997,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol (SOLRED) ⛽ / Bemposta (PO)</name>
+      
+        
+      <description>Gasolinera Repsol puedes pagar con tarjeta Solred.</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -8.1393391,39.3524613,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol (ADBLUE) ⛽ / Torres Novas (PO)</name>
+      
+        
+      <description>Gasolinera Repsol puedes pagar con Solred y tiene Adblue. Lugar Lameira Grande, Videla, ZI Zi, 2350-838 Torres Novas, Portugal www.repsol.pt +351 249 822 015</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -8.6235497,39.477854,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>LAVADERO 💧 / Granada </name>
+      
+        
+      <description>Lavadero afueras ciudad en Gasolinera Shell.</description>
+      
+        
+      <styleUrl>#icon-1703-0097A7</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.6030539,37.1455441,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol ADBLUE ⛽ / Mérida (Badajoz)</name>
+      
+        
+      <description>Gasolinera Repsol con Adblue a las afueras de Mérida.Badajozwww.repsol.es  +34 924 30 27 29</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -6.3224754,38.9265983,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol ADBLUE ⛽ / Lubián (Zamora)</name>
+      
+        
+      <description>Gasolinera Repsol ADBLUE / N-525, 103 IZ, 49574 Padornelo, Zamora www.repsol.es +34 980 56 78 15</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -6.8425264,42.0345111,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>RESTAURANTE La Gasolinera 375 🍽️ / Talavera la Real. (Badajoz)</name>
+      
+        
+      <description><![CDATA[Buen sitio para parar / Autovía del Suroeste, 06140 Talavera la Real, Badajoz<br>+34 924 44 13 96]]></description>
+      
+        
+      <styleUrl>#icon-1577-795548</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -6.713499,38.8524349,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol SOLRED ⛽/  Alverca do Ribatejo (PO)</name>
+      
+        
+      <description>Gasolinera Repsol con trajeta SOLRED /  Alverca do Ribatejo, Portugal</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -9.0338391,38.9051641,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>LAVADERO💧 / El Berron (Asturias)</name>
+      
+        
+      <description>Lavadero Manual. Gasolinera cerca de Noreña.</description>
+      
+        
+      <styleUrl>#icon-1702-0097A7</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -5.6997869,43.3809141,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Galp ADBLUE ⛽ / San Martín (Pontevedra)</name>
+      
+        
+      <description>Gasolinera Galp con Adblue / Vr, AG-41, Pk 5,580, 36637 San Martín, Pontevedra  www.galp.com +34 986 71 08 30</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -8.7446133,42.4985,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol Adblue ⛽ / Granada </name>
+      
+        
+      <description><![CDATA[Gasolinera Repsol con Adblue en Av. de las Alpujarras, S/N, Ronda, 18015 Granada <br>www.repsol.es ]]></description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.6244617,37.183303,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol Adblue ⛽ / Peligros (Granada)</name>
+      
+        
+      <description>Gasolinera Repsol con Adblue / CR A-44 P.K. 125, 18210 Peligros, Granada +34 958 40 26 88 </description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.6276154,37.2200794,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol ⛽ / Caldeiro (Pontevedra)</name>
+      
+        
+      <description>Po-549 P.K. 5,9 DE, 36629 Caleiro, Pontevedra www.repsol.es +34 986 56 34 01</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -8.811762,42.5577309,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol ⛽ / Navalmoral de la Mata (Cáceres)</name>
+      
+        
+      <description>Gasolinera Repsol con Adblue en Navalmoral de la Mata.N-5A, 180,8 IZ, 10300 Navalmoral de la Mata, Cáceres www.repsol.es  +34 927 53 20 77</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -5.5439707,39.8960548,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol Adblue ⛽ / Siete Aguas (Valencia)</name>
+      
+        
+      <description>Gasolinera Repsol con Adblue / Autovía del Este, P.K. 306,50 I, 46392 Siete Aguas, Valencia www.repsol.es +34 962 13 80 45</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -0.9042,39.4560447,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol Adblue ⛽ / Siete Aguas (Valencia)</name>
+      
+        
+      <description>Gasolinera Repsol Adblue / Autovía del Este, P.K. 304,00 D, 46392 Siete Aguas, Valencia www.repsol.es +34 962 34 04 01 </description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -0.9294911,39.4508438,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol ⛽ / Yecla (Murcia)</name>
+      
+        
+      <description>Gasolinera Repsol / Cr, Mu-424, 31 I, 30510 Yecla, Murcia  www.repsol.es  +34 968 79 15 89</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -1.1088741,38.6182231,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol Adblue ⛽ / Castillejo de Iniesta (Cuenca)</name>
+      
+        
+      <description><![CDATA[Gasolinera Repsol con Adblue / Autovía del Este, 225 IZ, 16250 Castillejo de Iniesta, Cuenca <br>www.repsol.es <br>+34 606 86 35 63 ]]></description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -1.7525556,39.519303,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol (Adblue) ⛽ / Serrador Daró (Girona)</name>
+      
+        
+      <description>Gasolinera Repsol con Adblue/ Diseminado Afueras, 13, 17133 Serra de Daró, Girona www.repsol.es +34 972 76 03 37</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            3.0655418,42.0289618,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol ⛽ / Lugo</name>
+      
+        
+      <description><![CDATA[Gasolinera Repsol / Salida 552, LU-P-0105, 27738, Lugo<br>www.repsol.es<br>+34 982 14 56 00]]></description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -7.4264945,43.3800539,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>LAVADERO 💧 / Fogars de la Selva (Barcelona)</name>
+      
+        
+      <description>Lavadero pistola a mano al lado gasolinera / BV-5122, PK: 5, 1,Fogars de la Selva, Barcelona www.cercadeti.cepsa.es +34 937 64 41 08</description>
+      
+        
+      <styleUrl>#icon-1702-0097A7</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.6727038,41.7256444,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA BP Adblue ⛽ / Mijas (Málaga)</name>
+      
+        
+      <description>Gasolinera BP en Mijas con Adblue.Avenida de Méjico, Ctra. Mijas-Fuengirola, S/n, 29650 Mijas, Málaga www.map.bp.com +34 952 48 57 98</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -4.6320405,36.599594,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Cepsa (Adblue) ⛽ / Montcada i Reixac (Barcelona)</name>
+      
+        
+      <description>Gasolinera Cepsa con Adblue / Manguera para vehiculos pesados. Pol.Ind. La Ferreria, 08110 Montcada i Reixac, Barcelonacercadeti.cepsa.es+34 935 75 24 52</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.1785066,41.485091,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol Adblue ⛽ / Tremp (Lleida)</name>
+      
+        
+      <description>Gasolinera Repsol con surtidor de Adblue. Av. Pirineus, 1, Tremp, Lleida www.repsol.es +34 973 65 01 04 </description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            0.8951218,42.1713851,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol Adblue ⛽ / La Panadella (Barcelona)</name>
+      
+        
+      <description>Gasolinera Repsol con surtidor de Adblue/ / Carretera Nacional II, 10, I, La Panadella, Barcelona www.repsol.es +34 938 09 20 11</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            1.3995451,41.6175614,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINA Repsol ⛽ / Llerona (Barcelona)</name>
+      
+        
+      <description>CR N-152, P.K. 33,00 I, 08520 LES, Barcelona www.repsol.es +34 938 40 30 40</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.2974801,41.6503541,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol ⛽ / Palol de Revardit (Girona)</name>
+      
+        
+      <description><![CDATA[Gasolinera Repsol sin surtidor de Adblue / C-66, P.K. 36 D, Palol de Revardit, Girona <br>www.repsol.es <br>+34 972 17 17 12]]></description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.8193241,42.0479223,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol (Adblue) ⛽ / La Granada (Barcelona)</name>
+      
+        
+      <description>Gasolinera Repsol con surtidor de Adblue. C-243a, km.7,5, 08792, Barcelona +34 938 97 44 73 </description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            1.7306607,41.378413,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Cepsa ⛽ / Algeciras (Cádiz)</name>
+      
+        
+      <description><![CDATA[Gasolinera Cepsa / ISLA VERDE) ZONA 69-DENTRO DE ZONA PORTUARIA, C. Gaitán de Ayala, S/N, 11207 Algeciras, Cádiz <br>www.cercadeti.cepsa.es<br>+34 956 79 91 60]]></description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -5.4370937,36.1240441,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol ⛽ Ágreda ( Soria)</name>
+      
+        
+      <description>Gasolinera Repsol en N122 NO tiene surtidor de Adblue. N-122, 102 I, 42100 Ágreda,n Soria www.repsol.es +34 876 64 42 43</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -1.9263966,41.8537778,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol ⛽ / Rasquera (Tarragona)</name>
+      
+        
+      <description>Gasolinera Repsol SIN Adblue / C-230, Km. 50,0, 43513 Rasquera, Tarragona www.repsol.es +34 607 63 71 50</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            0.6103091,41.012803,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol (Adblue) ⛽ / Móra La Nova (Tarragona)</name>
+      
+        
+      <description><![CDATA[Gasolinera Repsol con Adblue / C-12, Km. 61, 43770 Móra la Nova, Tarragona <br>www.facebook.com<br>+34 977 40 32 56]]></description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            0.6618724,41.0793729,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol ⛽ / Torroella de Montgrí (Girona)</name>
+      
+        
+      <description><![CDATA[Gasolinera Repsol / Ctra. de l'Estartit, 163, 17257 Torroella de Montgrí, Girona www.repsol.es +34 972 76 13 12]]></description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            3.1411054,42.042334,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol (Adblue) ⛽ / La Jonquera (Girona)</name>
+      
+        
+      <description>Gasolinera Repsol con surtidor de Adblue / CR N-2 P.K. 772,50 I, 17700, La Jonquera, Girona www.repsol.es +34 972 55 60 05</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.88027,42.3984185,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol (Adblue)⛽ / Buitrago de Lozoya (Madrid)</name>
+      
+        
+      <description><![CDATA[Gasolinera Repsol con surtidor de Adblue.Av. de Madrid, S.N. IZ, 28730 Buitrago del Lozoya, Madrid<br>www.repsol.es<br>+34 918 68 03 04]]></description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.6383333,40.9874397,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol ⛽ / Requena (Valencia)</name>
+      
+        
+      <description>AT A-3 P.K. 297,00 I, 46391 Requena, Valencia www.repsol.es +34 962 30 29 15</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -1.0104862,39.4718094,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol ⛽ / Quinto (Zaragoza)</name>
+      
+        
+      <description>N-232, 194 D, 50770 Quinto, Zaragoza www.repsol.es +34 976 17 70 15</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -0.5042233,41.4328675,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol (Adblue )⛽ / Barcelona </name>
+      
+        
+      <description>Gasolinera Repsol con Adblue delante de Mercabarna, por si te pilla cerca y no sabes dónde ir.</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.113846,41.3279939,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol (Adblue) ⛽ / Purullena (Granada)</name>
+      
+        
+      <description>Gasolinera con Adblue /  A-92 KM 292, 18519 Purullena, Granada www.map.bp.com +34 613 25 08 52</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.216805,37.3291095,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol (Adblue) ⛽ / Diezma (Granada)</name>
+      
+        
+      <description>Gasolinera Repsol con Adblue / A-92, 279, I, 18180 Diezma, Granadawww.repsol.es+34 958 68 00 46</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.2968535,37.3222386,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol (Adblue) ⛽ / Diezma (Granada)</name>
+      
+        
+      <description>Gasolinera Repsol con Adblue / A-92, 279 D, 18180 Diezma, Granada www.repsol.es +34 958 68 01 94</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.2976632,37.3209802,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol ⛽ / Montblanc (Tarragona)</name>
+      
+        
+      <description>Gasolinera Repsol con Adblue. Es pequeña pero si vas apurado puedes parar. Muralla de Sta. Tecla, 10, 43400 Montblanc, Tarragona www.repsol.es +34 977 86 00 78</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            1.1645059,41.37428,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol (Adblue)⛽ /Arbucies (Girona)</name>
+      
+        
+      <description>Gasolinera Repsol con Adblue enfrente de supermercado. S.Hilario, Calle Variante, 16, DE, 17401 Arbúcies, Girona www.repsol.es +34 972 86 01 70</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.5201164,41.8177902,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>VÍVERES 🛒 / Arbúcies (Girona)</name>
+      
+        
+      <description>Supermercado Bonpreu para poder comprar provisiones. Puedes aparcar al lado D la gasolinera si no tienes sitio delante.</description>
+      
+        
+      <styleUrl>#icon-1685-A52714</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.5203346,41.818097,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol (Adblue)⛽ / Moraira (Alicante)</name>
+      
+        
+      <description>Cv-743 ,P.K. 6 IZ, 03724 Moraira,  Alicante www.repsol.es +34 965 74 40 383.9</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            0.1347655,38.6897015,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>LAVADERO 💧 / Badajoz </name>
+      
+        
+      <description>Lavadero  a pistola al lado gasolinera afueras de Badajoz.</description>
+      
+        
+      <styleUrl>#icon-1702-0097A7</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -6.9986684,38.8920761,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA ☕️ / Estella</name>
+      
+        
+      <description>Estella | Aparcamiento de Espera | Zona Industrial | Con Restaurante-Repsol-Bar</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -2.027015,42.653562,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Sarria (Lugo)</name>
+      
+        
+      <description>Detrás gasolinera pequeña esplanada de tierra. Otra opción es ir al campo de fútbol pero te pilla más apartado.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -7.4153425,42.7727653,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Sarria (Lugo)</name>
+      
+        
+      <description>Si no encuentras sitio en gasolinera aquí es la otra opción </description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -7.4124975,42.7685239,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA /. San Vicente de la Barquera (Cantabria)</name>
+      
+        
+      <description>Al lado de Gasolinera a las afueras puedes hace la espera</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -4.4126421,43.3871968,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>RESTAURANTE Campano / Ardales</name>
+      
+        
+      <description>En ardales primera salida restaurante campano al lado de gasolinera buenisimo trato con el chofer y super rapidos viene muy bien para hacer el caminito del rey.</description>
+      
+        
+      <styleUrl>#icon-1577-795548</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -4.845142,36.884654,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ÁREA MIRAVALLE / San Cibrao das Viñas (Ourense)</name>
+      
+        
+      <description>Existe una Repsol,Amplios Aparcamientos,Menú del Día,Para Grupos para almuerzos llamar para concertar.Detalle Conductor. TELF. 988 38 28 18 - 988 38 12 74 San Cibrao das Viñas, Ourense</description>
+      
+        
+      <styleUrl>#icon-1577-795548</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -7.8649866,42.2509137,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE Espera ☕️ / Valdepeñas (Ciudad Real)</name>
+      
+        
+      <description>Zona para hacer la espera. Café en gasolinera Repsol.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.398793,38.7660125,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ADBLUE Gasolinera Cepsa ⛽️</name>
+      
+        
+      <description>Gasolinera Cepsa con Adblue A-4, PK: 193,6, 13300 Valdepeñas, Ciudad Real www.cercadeti.cepsa.es +34 926 31 23 14</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.3962128,38.8249025,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ADBLUE / Gasolinera Repsol ⛽️ / Consolación (Ciudad Real)</name>
+      
+        
+      <description>ADblue Gasolinera Repsol / Km., Autovía del Sur, 185 Dirección Andalucía) Margen Derecho, 13310 Consolación, Ciudad Real www.repsol.es+34 926 31 80 43</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.3912552,38.9017781,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ADBLUE Gasolinera Atenoil ⛽️ Consolación (Ciudad Real)</name>
+      
+        
+      <description>ADBLUE Gasolinera Atenoil / Km., Autovía del Sur, 185 Dirección Madrid) Margen Izquierdo, 13310 Consolación, Ciudad Real +34 926 31 80 53</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.3904405,38.8997348,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>LAVADERO💧 / Noreña (Asturias)</name>
+      
+        
+      <description>Lavadero en gasolinera afuera de la población </description>
+      
+        
+      <styleUrl>#icon-1703-0097A7</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -5.7018605,43.3904346,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>CANGAS Aventura 🛶 / Arriondas (Asturias)</name>
+      
+        
+      <description>Cangas Aventura - Descenso del Sella Arriondas Finca La Dehesa - El Portazgo (detrás de la única gasolinera de, 33547 Arriondas, Asturias www.cangasaventura.com +34 985 84 16 994.7</description>
+      
+        
+      <styleUrl>#icon-1502-C2185B</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -5.1813248,43.3876864,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ÁREA Servicio Sobradiel 🍴/ Sobradiel (Zaragoza)</name>
+      
+        
+      <description>Área servicio invitación chófer y guía. Gasolinera Repsol. 50629, Zaragoza, España</description>
+      
+        
+      <styleUrl>#icon-1577-795548</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -1.0312991,41.7307649,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol Adblue ⛽</name>
+      
+        
+      <description>Gasolinera Repsol con Adblue/  Km. 1,80 D, 18151 Ogíjares, Granada www.repsol.es +34 958 59 72 30</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.6198933,37.1249353,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Cepsa Adblue ⛽ / Peligros (Granada)</name>
+      
+        
+      <description><![CDATA[Gasolinera Cepsa con Adblue/ Av. Reina Sofía, S/N, 18210 Peligros, Granada <br>www.cercadeti.cepsa.es <br>+34 958 40 54 05]]></description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.6370626,37.2296916,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol Adblue ⛽ Iznalloz (Granada)</name>
+      
+        
+      <description>Gasolinera Repsol con Adblue / Barrio la Nava, 69D, 18550, Granada www.repsol.es +34 958 38 48 28</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.566403,37.4059348,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol Adblue ⛽ / Iznalloz (Granada)</name>
+      
+        
+      <description>Gasolinera Repsol con Adblue / C-336, P.K. 1 D, 18550 Iznalloz, Granadawww.repsol.es+34 677 03 04 40</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.5548191,37.4008953,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA REPSOL ⛽️/ Córdoba </name>
+      
+        
+      <description>GASOLINERA REPSOL</description>
+      
+        
+      <styleUrl>#icon-1581-097138</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -4.765577,37.85173,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASILINERA ADBLUE / Brujas (BE)</name>
+      
+        
+      <description>Gasolinera de las mas baratas de la zona, tiene ADBLUE y de puede pagar con DKV, TE INVITAN A CAFE Y BOLLITO.</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            3.213656,51.195522,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA REPSOL / Los Chopos</name>
+      
+        
+      <description>Te regalan unas mantecadas por repostar. No cobran en cafeteria restaurante y descuento por dormir.</description>
+      
+        
+      <styleUrl>#icon-1581-1A237E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -4.474268,42.391738,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Liedana (Navarra)</name>
+      
+        
+      <description>Punto tipico de encuentro y espera en las javieradas. Restaurante muy amplio y con descuento a conductores de autocar. También poseen Hotel. Amplio aparcamiento y en los alrededores de la gasolinera. Gasolinera Repsol.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -1.2779441,42.6136128,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol ⛽ / Alfajarín (Zaragoza)</name>
+      
+        
+      <description>Gasolinera Repsol con Adblue / Hotel y Restaurante Rausan  </description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -0.6918914,41.6065978,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Cepsa ⛽ / Morales de Toro (Zamora)</name>
+      
+        
+      <description>N-122, PK: 417, 7, 49810 Morales de Toro, Zamoracercadeti.cepsa.es+34 980 69 67 37</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -5.296953,41.532068,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>Estación de Servicio Repsol</name>
+      
+        
+      <styleUrl>#icon-1581-006064-nodesc</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -4.105832,38.69769,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA REPSOL / Comillas (Cantabria)</name>
+      
+        
+      <description>Ca-131 Barreda, 21, IZ, 39527 La Revilla, Cantabria www.repsol.es +34 942 72 25 02</description>
+      
+        
+      <styleUrl>#icon-1581-097138</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -4.279674,43.387603,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA REPSOL / Velez Málaga (Málaga)</name>
+      
+        
+      <description>A-335, Km 1,300, 1, 29700 Vélez-Málaga, Málaga www.repsol.es +34 952 54 98 73</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -4.1125081,36.7788986,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA SHELL ⛽️ / Forst (A)</name>
+      
+        
+      <description><![CDATA[Area Shell | Bruchsaler Straße 5, Ost A, 76694 Forst, Alemania<br>www.shell.de<br>+49 7251 2200 |]]></description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            8.569001,49.160891,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA - ÁREA Route 61⛽ / Mönchengladbach (A)
+</name>
+      
+        
+      <description><![CDATA[Area Route 61 | Marie-Bernays-Ring 44, 41199 Mönchengladbach, Alemania<br>www.shell.de<br>+49 2166 606030]]></description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            6.43028,51.12015,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA TOTAL - Adblue / Bidart (FR)</name>
+      
+        
+      <description>Gasolinera que tiene Adblue en  Bidart, Francia</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -1.597308,43.422226,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA TOTAL - Adblue</name>
+      
+        
+      <description>Gasolinera que tiene Adblue en Bidart, Francia</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -1.598422,43.42283,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA  DKV  Saint-Jouan-des-Guérets (FR)
+</name>
+      
+        
+      <description><![CDATA[Saint-Jouan-des-Guérets | DKV | NO LO PONE EN LOS CARTELES PERO VALE LA TARJETA | D137, 35430 Saint-Jouan-des-Guérets, Francia <br>store.total.fr <br>+33 2 99 82 68 15]]></description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -1.981954,48.613145,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA DKV / Chartres (FR)</name>
+      
+        
+      <description><![CDATA[Chartres | DKV | 34 Avenue Jean Mermoz, 28000 Chartres, Francia<br>www.total.fr<br>+33 2 37 34 18 61]]></description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            1.506385,48.449429,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA DKV y UTA /Civray-de-Touraine (FR)
+</name>
+      
+        
+      <description><![CDATA[Gasolinera DKV y UTA | Chenonceaux | 77 Rue de Chenonceaux, 37150 Civray-de-Touraine, Francia<br>www.total.fr<br>+33 2 47 23 94 59]]></description>
+      
+        
+      <styleUrl>#icon-1581-097138</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            1.060793,47.332508,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA DKV ⛽️ / Lucignano (IT)</name>
+      
+        
+      <description><![CDATA[Lucignano | DKV | Gasolinera Agip 2 horas saliendo de Roma | km. 381, Autostrada A1 Napoli-Milano, 52046 Lucignano AR, Italia<br>enistation.com<br>+39 0575 836164]]></description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            11.774532,43.24697,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA DKV / Versalles (FR)</name>
+      
+        
+      <description><![CDATA[Versalles | DKV | Gasolinera BP | 60 Boulevard de la République, 78000 Versailles, Francia<br>www.bp.com<br>+33 1 39 50 45 02]]></description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.152813,48.804666,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA DKV  ⛽ / Köln (A)
+</name>
+      
+        
+      <description><![CDATA[Holzmarkt | DKV | Colonia 1 esta cerca de la catedral al pasar el tunel | Holzmarkt 49, 50676 Köln, Alemania<br>store.total.de<br>+49 221 218144]]></description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            6.962368,50.93136,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA DKV /Paris
+</name>
+      
+        
+      <description><![CDATA[Moulineaux | DKV | Gasolinera TOTAL cerca del hotel Puerta Versalles Mercure Expo | Quai d'Issy-les-Moulineaux, 75015 Paris, Francia<br>store.total.fr<br>+33 1 53 78 05 00]]></description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.265864,48.834634,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA DKV ⛽ / Köln (A)
+</name>
+      
+        
+      <description><![CDATA[DKV | Gasolinera Colonia 2 Esta a la salida para Boppard | Westseite, Am Verteilerkreis, 50968 Köln, Alemania<br>www.aral.de <br>+49 221 381718 / También comida rápida de Burguer King]]></description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            6.966263,50.891995,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>Venecia | Gasolinera de la Abuela | Via Malcontenta 30, 30176 Venezia VE, Italia
++39 041 698986</name>
+      
+        
+      <description><![CDATA[Venecia | Gasolinera de la Abuela | Via Malcontenta 30, 30176 Venezia VE, Italia<br>+39 041 698986]]></description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            12.196405,45.454584,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA DKV / Niza (FR)</name>
+      
+        
+      <description><![CDATA[Niza | DKV | gasolinera BP | 125-127 Boulevard René Cassin, 06200 Nice, Francia<br>www.bp.com<br>+33 4 92 29 02 02]]></description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            7.216748,43.669535,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA DKV / Melk (Austria)</name>
+      
+        
+      <description><![CDATA[Wachbergstraße 3, 3390 Melk, Austria <br>www.omv.at +43 2752 52933]]></description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            15.348276,48.219315,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA DKV / Viena (Austria)</name>
+      
+        
+      <description>Viena| Gasolinera Shell DKV y UTA cerca del shombrun no es automatica tiene cajero | Hadikgasse 128, 1140 Wien, Austriawww.shell.at+43 1 8947560</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            16.29454,48.190434,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA DKV / Salzburg (Austria)</name>
+      
+        
+      <description>Gasolinera con tarjeta DKV Münchner Bundesstraße 29, 5020 Salzburg, Austria www.enistation.at +43 662 432125</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            13.017447,47.819452,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA DKV / Innsbruck, (Austria)</name>
+      
+        
+      <description>Rennweg 20, 6020 Innsbruck, Austria www.enistation.at +43 512 585400</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            11.400513,47.277169,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>VENECIA | Gasolinera DKV | SS309, 13, 30176 Venezia VE, Italia
+www.vegacarburanti.it
++39 041 547 9602</name>
+      
+        
+      <styleUrl>#icon-1581-006064-nodesc</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            12.205903,45.445786,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA ESSO / La Chaussée-Saint-Victor ( FR)
+</name>
+      
+        
+      <description>La Chaussée-Saint-Victor | Gasolinera Esso Blois esta frente a la Carrefour | 22 Route Nationale, 41260 La Chaussée-Saint-Victor, Franciaessofuelfinder.fr+33 800 87 04 72</description>
+      
+        
+      <styleUrl>#icon-1581-097138</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            1.35096,47.6044,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA ESSO / Versalles (FR)</name>
+      
+        
+      <description>50 Rue du Pont Colbert, 78000 Versailles, Francia carburant.esso.fr +33 800 77 42 52</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.14999,48.78778,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA DKV Heidelberg (A)
+</name>
+      
+        
+      <description>TotalEnergies TankstelleRingstraße 12, 69115 Heidelberg, Alemania www.store.totalenergies.de +49 6221 23773</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            8.682616,49.404234,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA DKV / Les Houches (FR)</name>
+      
+        
+      <description><![CDATA[Mont Blanc 1ª Gasolinera DKV Paso Tunel | RN205, ROUTE BLANCHE, VOIE DESCEND, 74310 Les Houches, Francia<br>store.total.fr<br>+33 4 50 91 42 90]]></description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            6.81174,45.89828,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA DKV ⛽ / San Giovanni Valdaeno (IT)</name>
+      
+        
+      <description>52027 San Giovanni Valdarno AR, Italia</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            11.5254,43.576296,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA DKV / Lustenau (Austria)
+</name>
+      
+        
+      <description>Hohenemser Str. 1, 6890 Lustenau, Austria www.enistation.at +43 5577 83209</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            9.660984,47.418983,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA AGIP ⛽️ / Bělčice (Chequia)</name>
+      
+        
+      <description>D1 33km (směr Brno, Bělčice 24, 257 24 Bělčice, Chequia cerpacistanice.molcesko.cz  +420 721 006 286</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            14.81278,49.840648,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>Stratford-upon-Avon | Gasolinera Shell | Shipston Rd, Stratford-upon-Avon CV37 7LP, Reino Unido
+www.shell.co.uk
++44 1789 261127</name>
+      
+        
+      <description><![CDATA[Stratford-upon-Avon | Gasolinera Shell | Shipston Rd, Stratford-upon-Avon CV37 7LP, Reino Unido<br>www.shell.co.uk<br>+44 1789 261127]]></description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -1.698233,52.189973,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA SHELL ⛽ / Cambridge (Reino Unido)</name>
+      
+        
+      <description><![CDATA[Newmarket Rd., Fourwentways, Cambridge CB1 6AR, Reino Unido<br>find.shell.com <br>+44 1223 837949]]></description>
+      
+        
+      <styleUrl>#icon-1581-097138</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            0.222796,52.127018,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA DKV - UTA / Berlín (Alemania)</name>
+      
+        
+      <description><![CDATA[Berlin | Gasolinera Total | Admite DKV y UTA | de las mas baratas de Berlin | <br>Holzmarktstraße 36-42, 10243 Berlin, Alemania<br>store.total.de<br>+49 30 2493777]]></description>
+      
+        
+      <styleUrl>#icon-1581-F57C00</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            13.428749,52.511355,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA DKV / Estocolmo, (Suecia)</name>
+      
+        
+      <description><![CDATA[Estocolmo | Gasolinera Dkv | Norr Mälarstrand 31, 112 20 Stockholm, Suecia<br>preem.se<br>+46 8 652 68 60]]></description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            18.043203,59.326498,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA REPSOL / El Jardín (Albacete)</name>
+      
+        
+      <description>N-322, 302, 8 I, 02340 El Jardín, Albacete www.repsol.es +34 607 74 43 38</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -2.327713,38.8083886,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA REPSOL / Pozohondo (Albacete)</name>
+      
+        
+      <description>Ctra. Hellín, 19, 02141 Pozohondo, Albacete www.repsol.es +34 967 20 54 20</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -1.9104094,38.7174557,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA REPSOL / Ibros (Jaén)</name>
+      
+        
+      <description>Estación de Servicio Repsol/ Calle Almería, 128, 23450 Ibros, Jaén www.repsol.es +34 953 63 57 98</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.577942,38.0711066,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA DKV / Florencia ( IT)</name>
+      
+        
+      <description>Viale Europa, 200, 50126 Firenze FI, Italia www.enistation.com +39 800 101 290</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            11.2997778,43.7565719,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Figueres (Girona)</name>
+      
+        
+      <description>Zona de Espera al lado de Gasolinera / Gratuito</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.951949,42.27931,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>APARCAMIENTO LIBRE  / Córdoba </name>
+      
+        
+      <description>Aparcamiento libre mixto detrás de gasolinera  Cepsa</description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -4.785841,37.862062,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Elvas (PO)</name>
+      
+        
+      <description>Aparcamiento detrás de gasolinera BP. sin problemas mientras los pasajeros visitan Elvas</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -7.169817,38.878297,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ESTACIÓN REPSOL / A Cañiza (Pontevedra)</name>
+      
+        
+      <description>N-120, KM 613, 70 M.I, 36880 LA, Pontevedra www.repsol.es +34 986 65 10 29</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -8.2681032,42.2156748,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA REPSOL/ Librilla (Murcia)</name>
+      
+        
+      <description>Autovía del Mediterráneo, Km. 591, 5, 30892 Librilla, Murcia www.repsol.es +34 968 65 92 </description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -1.3399058,37.8926877,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA REPSOL ⛽️ / Ahigal (Cáceres)</name>
+      
+        
+      <description>C. las Viñas, 71, 10650 Ahigal, Cáceres www.repsol.es+34 927 43 92 </description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -6.1770694,40.1926847,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol ⛽️ / Talavera de la Reina (Toledo)</name>
+      
+        
+      <description>Gasolinera amplia afueras de Talavera /Solred </description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -4.8010283,39.9637905,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol Adblue ⛽️ / Chiva (Valencia) </name>
+      
+        
+      <description><![CDATA[Gasolinera Repsol xon Adblue / AT A-3 P.K. 337,00 I, 46370 Chiva, Valencia <br>www.repsol.es  <br>+34 961 98 20 14]]></description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -0.5891445,39.4753841,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol Adblue ⛽️ / Buñol (Valencia)</name>
+      
+        
+      <description>Camino Nº 19, 6, 46360 Buñol, Valencia www.grupoalz.com +34 618 27 04 55</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -0.7547792,39.4449792,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol ⛽ / Santiago de Compostela (A Coruña)</name>
+      
+        
+      <description>Gasolinera Repsol SIN ADBLUE.Tarjeta Solred. Rúa do Cruceiro da Coruña, 2, 15703 Santiago de Compostela, A Coruña www.galuresa.com +34 981 58 39 57</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -8.5329677,42.8920636,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol ⛽ / Logroño (La Rioja)</name>
+      
+        
+      <description>AU A-68 P.K. 136,00 D, 26006 Logroño, La Rioja www.repsol.es+34 941 24 11 95</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -2.3703935,42.4503987,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol ⛽️ / Vilaller (Lleida)</name>
+      
+        
+      <description>Gasolinera Repsol. NO tiene durtidor de Adblue.N-230, 129 D, 25552 Vilaller, Lérida www.repsol.es +34 973 69 80 58</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            0.7093658,42.4522883,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol ⛽️ / Castellón de Sos (Huesca)</name>
+      
+        
+      <description>Gasolinera Repsol/ NO tiene surtidor de Adblue. N-260, Km. 385, 50 D, 22466 Castejón de Sos, Huesca www.repsol.es +34 974 55 30 59</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            0.482255,42.5129132,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>GASOLINERA Repsol (Adblue) ⛽ / La Jonquera (Girona)</name>
+      
+        
+      <description>Gasolinera Repsol con surtidor de Adblue / La Jonquera, Girona. / CR N-2 P.K. 772,50 D, 17700 La Jonquera, Girona www.repsol.es +34 972 55 53 21</description>
+      
+        
+      <styleUrl>#icon-1581-006064</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.8826111,42.398556,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+  </Document>
+</kml>

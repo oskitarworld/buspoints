@@ -1,0 +1,76 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Function to check if the user is an administrator.
+    function isAdmin() {
+      // Check if the user is authenticated and if their document exists in the 'users' collection.
+      // Then, check if the 'role' field in their document is set to 'admin'.
+      return request.auth != null &&
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // Rules for the 'users' collection.
+    match /users/{userId} {
+      // Allow document creation if the user is authenticated and their UID matches the document ID.
+      allow create: if request.auth != null && request.auth.uid == userId;
+
+      // Allow a user to read and update their own document.
+      allow read, update: if request.auth != null && request.auth.uid == userId;
+
+      // Allow administrators to delete user documents.
+      allow delete: if isAdmin();
+
+      // Allow administrators to list, read, and update any document in the 'users' collection.
+      // This is separated from the user-specific rule to avoid recursive checks.
+      allow list, read, update: if isAdmin();
+    }
+
+    // Rules for the 'pois' (Points of Interest) collection.
+    match /pois/{poiId} {
+      // Allow read access if the user is authenticated and the POI is approved, or if the user is an admin.
+      allow read: if request.auth != null && (resource.data.status == 'approved' || isAdmin());
+
+      // Allow authenticated users to create POIs.
+      allow create: if request.auth != null;
+
+      // Allow administrators to update and delete POIs.
+      allow update, delete: if isAdmin();
+    }
+
+    // Rules for the 'user_pois' subcollection (if it exists).
+    match /user_pois/{poiId} {
+      // Allow authenticated users to read and list their own POIs.
+      allow read, list: if request.auth != null;
+      
+      // Allow authenticated users to create documents.
+      allow create: if request.auth != null;
+      
+      // Allow update if the user is an admin or the creator of the POI.
+      allow update: if request.auth != null && (isAdmin() || request.auth.uid == resource.data.creator_uid);
+      
+      // Allow administrators to delete documents.
+      allow delete: if isAdmin();
+    }
+    
+    // Rules for public bus stops.
+    match /bus_stops/{busStopId} {
+      // Allow any authenticated user to read bus stop data.
+      allow read: if request.auth != null;
+      
+      // Only allow administrators to write (create, update, delete) bus stop data.
+      allow write: if isAdmin();
+    }
+
+    // Rules for geographical locations or other similar data.
+    match /locations/{locationId} {
+      // Allow any authenticated user to read location data.
+      allow read: if request.auth != null;
+      
+      // Only allow administrators to write to location data.
+      allow write: if isAdmin();
+    }
+  }
+}

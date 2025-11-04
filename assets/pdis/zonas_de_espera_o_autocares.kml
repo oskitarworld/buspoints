@@ -1,0 +1,8389 @@
+<?xml version="1.0" encoding="utf-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <Placemark>
+      
+        
+      <name>APARCAMIENTO 🅿️ / Castellón de La Plana (Valencia)</name>
+      
+        
+      <description>Puedes aparcar zona comercial</description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -0.022312,39.984584,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>APARCAMIENTO 🅿️ / Marbella (Málaga)</name>
+      
+        
+      <description><![CDATA[APARCAMIENTO AUTORIZADO POR EL AYUNTAMIENTO PARA AUTOCARES. "AVISO" LOS LUNES NO APARCAR POR MERCADILLO.Marbella | Aparcamiento Asfaltado compartido con turismos | CUIDADO NO TE QUEDEN ENCERRADO]]></description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -4.872336,36.513434,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>APARCAMIENTO 🅿️ / Ojén (Málaga)</name>
+      
+        
+      <description>Ojen | Aparcamiento para 3 autocares</description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -4.853044,36.567334,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Badalona </name>
+      
+        
+      <description>Zona tranquila y con centro comercial cerca para poder comer</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.230675,41.46028,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>MUELLE DE LAS CALAVERAS / Palos de la Frontera (Huelva)</name>
+      
+        
+      <description>Zona de aparcamiento para la visita del Muelle de las Calaveras y el Monasterio de la Rabida.</description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -6.926071,37.210173,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>MOLINOS y  CASTILLO CONSUEGRA / Consuegra ( Toledo)</name>
+      
+        
+      <description>Aparcamiento habilitado para la espera mientras los pasajeros visitan los castillos. Solo autorizado a los autocares que tienen la autorización.</description>
+      
+        
+      <styleUrl>#icon-1598-424242</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.61132,39.453494,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>MUSEO Del Prado 🏛️ / Madrid</name>
+      
+        
+      <description>Aparcamiento para autocares autorizado en ambos lados y en toda la calle</description>
+      
+        
+      <styleUrl>#icon-1636-A52714</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.691056,40.414758,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>INFO ℹ️ / Templo Debod (Madrid)</name>
+      
+        
+      <description><![CDATA[INFO / TEMPLO DEBOD<br>LOS FINES DE SEMANA SE MASIFICA ESTA ZONA DE TURISMOS, NO APARCAN BIEN Y LO DEJAN EN PROHIBIDO..... CUIDADO QUE TE PUEDES QUEDAR PILLADO.]]></description>
+      
+        
+      <styleUrl>#icon-1608-1A237E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.718968,40.423301,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>INFO / O GROVE</name>
+      
+        
+      <description>ZONA DE APARCAMIENTO ALTERNATIVO.</description>
+      
+        
+      <styleUrl>#line-0288D1-5000</styleUrl>
+      
+        
+      <LineString>
+        
+          
+        <tessellate>1</tessellate>
+        
+          
+        <coordinates>
+            -8.861494,42.497812,0
+            -8.859624,42.497956,0
+            -8.858674,42.498016,0
+          </coordinates>
+        
+        
+      </LineString>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / SOLSONA</name>
+      
+        
+      <description>Aqui puedes aparcar sin problemas</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            1.526959,41.993885,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>APARCAMIENTO / SANTARÉM (PO)</name>
+      
+        
+      <description>Amplia esplanada mixta para aparcar o hacer tiempo de espera sin problemas</description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -8.689452,39.230479,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name><![CDATA[C Y D / Platja D'Aro]]></name>
+      
+        
+      <description><![CDATA[Zona reservada para dejar y recoger pasajeros en Platja D'Aro / NO APARCAR PARA NO MOLESTAR A LOS COMPAÑEROS QUE VENGAN DETRÁS]]></description>
+      
+        
+      <styleUrl>#icon-1826-0F9D58</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            3.068138,41.819504,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name><![CDATA[ZONA DE ESPERA / Platja D'Aro]]></name>
+      
+        
+      <description>Déjalo encarado a la salida para poder salir sin problemas</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            3.059649,41.81785,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Sant Feliu de Guíxols </name>
+      
+        
+      <description>Puedes dejarlo sin problema</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            3.019894,41.783446,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Valdepeñas </name>
+      
+        
+      <description>Aparcamiento para hacer la espera de la visita</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.393098,38.747965,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA ESPERA / Barcelona </name>
+      
+        
+      <description>Zona de espera cuando los dejas en Montjuic. Esta es la zona poligono industrial.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.1315088,41.3462792,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>APARCAMIENTO / Yacimientos Atapuerca</name>
+      
+        
+      <description>Aquí esperas la visita a los Yacimientos, reza para que no llueva ese polvo es muy asqueroso.</description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.5195906,42.348632,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES VALDÉS / Alicante</name>
+      
+        
+      <description>C. Vial de los Cipreses, 21, 03006 Alicante www.autocares-valdes.com +34 965 28 16 44</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -0.5267605,38.3480618,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES MI-SOL / Elche </name>
+      
+        
+      <description>C. Juan de Herrera, 15, 03203 Elche, Alicante www.autocaresmisol.com +34 965 68 03 19</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -0.6209457,38.2903869,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA AZUL💰 / Barcelona </name>
+      
+        
+      <description>Zona de Pago SPRO o máquina recaudadora</description>
+      
+        
+      <styleUrl>#icon-1513-1A237E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.1900338,41.3842158,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>APARCAMIENTO / Sort (Lérida)</name>
+      
+        
+      <description><![CDATA[Aparcamiento mixto de tierra libre en Sort, perfecto para hacer la espera a mientras visitan Sort y compran Lotería en La Bruixa D'Or]]></description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            1.1293347,42.4077646,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>APARCAMIENTO / Pont de Suert (Lérida)</name>
+      
+        
+      <description>Zona aparcamiento libre en linea cerca de zona deportiva.</description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            0.7412644,42.4047079,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA/ Medina del Campo (Valladolid)</name>
+      
+        
+      <description>Esplanada de tierra para hacer la espera de la visita a Medina del Campo.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -4.9218911,41.3073663,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Santiponce (Sevilla)</name>
+      
+        
+      <description>Aquí puedes esperar a la visita del conjunto Arqueológico de Itálica.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -6.0441584,37.4449315,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA/ Sahagún (León)</name>
+      
+        
+      <description>Zona de espera junto renfe</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -5.0232182,42.3692797,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA/ Santa Comba (A Coruña)</name>
+      
+        
+      <description>Zona de espera a las afueras de Santa Comba.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -8.8028604,43.0342225,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Madrid</name>
+      
+        
+      <description>Aparcamiento libre para hacer la espera / Calle de Garganta de los Montes </description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.6803458,40.3983536,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Madrid </name>
+      
+        
+      <description>Zona de espera en Calle Seneca</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.7260132,40.4362236,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA ☕️/ Salamanca</name>
+      
+        
+      <description>Zona tranquila para estar horas haciendo la espera. Por la noche se recomienda dejarlo en cocheras de autocares SANALON . Te llevan y te traen por 20€ el día.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -5.6494489,40.9832148,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES NIKA ☑️  / Tarragona </name>
+      
+        
+      <description><![CDATA[Parc Industrial Riu Clar 515, nau 52-57, Carrer de l'Estany, 43006 Tarragona www.autocaresnika.com +34 977 24 24 60]]></description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            1.2231298,41.142987,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES NIZATOUR / Molins de Rei (Barcelona)</name>
+      
+        
+      <description>Poligono Industrial El Plá, Carrer de Miquel Torelló i Pagès, 2, 08750 Molins de Rei, Barcelona www.nizatour.es +34 934 74 17 90</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.0211282,41.4034212,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES AMPSA ✔️ / Torroella de Montgrí (Girona)</name>
+      
+        
+      <description><![CDATA[Cocheras Autocares AMPSA /  C/ de l'Electricitat, 17257 Torroella de Montgrí, Girona www.ampsa.org +34 972 75 82 33]]></description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            3.1411286,42.0402802,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES LACT / Dos Hermanas (Sevilla)</name>
+      
+        
+      <description>C. Vía Salaria, 10 S N, Polígono Industrial, 41089 Dos Hermanas, Sevilla www.autocareslact.com +34 954 63 02 04</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -5.9405272,37.3451145,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES TORRES / Náquera (Valencia)</name>
+      
+        
+      <description>C. Vendaval, 2, 46119 Náquera, Valencia www.torresautocars.com +34 961 39 03 01</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -0.3886436,39.5967205,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES VAZQUEZ OLMEDO / Alharín de la Torre (Málaga)</name>
+      
+        
+      <description>Ctra. Churriana - Cártama (A-7052) Km. 1, Loma del Valle, 42, 3, 29130 Alhaurín de la Torre, Málaga www.avogroup.es +34 952 43 35 23</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -4.5422799,36.6840654,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES VAZQUEZ S.A / Jerez de los Caballeros (Badajoz)</name>
+      
+        
+      <description>Polígono del Pabellón, C. Industrial el Pabellón, 1, 06380 https://autocaresvazquez.es /Jerez de los Caballeros, Badajoz</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -6.7749427,38.3344708,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES BELLO / Sta Coloma de Gramanet (Barcelona)</name>
+      
+        
+      <description>Avinguda de Ramón Berenguer IV, 107, 08924 Santa Coloma de Gramenet, Barcelona www.autocaresbello.com +34 933 91 71 51</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.2074891,41.4615591,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES FONT / Alella (Barcelona)</name>
+      
+        
+      <description>17, Rambla Àngel Guimerà, 11,  https://autocarsfont.cat / 08328 Alella, Barcelona</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.2952897,41.4941207,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES DURÀ / Barcelona </name>
+      
+        
+      <description>Vía Trajana, 64, 08020 Barcelona www.autocarsdura.com +34 935 94 02 31</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.1983046,41.4285054,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES ALOMPE / Sevilla </name>
+      
+        
+      <description>C. Pino Central, 52, 41016 Sevilla. www.alompe.com +34 954 67 22 99</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -5.9268659,37.3758915,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES ALONSO / Rivas-Vaciamadrid</name>
+      
+        
+      <description>C. Mariano Fortuny, 3, 28522 Rivas-Vaciamadrid, https://autocares-alonso.com  Madrid</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.5338118,40.3443898,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES CHAOS / Madrid </name>
+      
+        
+      <description>C. Marzo, 1, 28022 Madrid www.autocareschaos.com +34 917 47 83 12</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.5702845,40.4452199,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES YOLCAR / Madrid </name>
+      
+        
+      <description>Av. de Fermina Sevillano, 10, 28022 Madrid www.yolcar.es +34 913 29 61 86</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.5666039,40.4464897,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Aranda de Duero</name>
+      
+        
+      <description>Zona de.espera al lado del Alcampo, si ea festivo puedes estar dentro del asfaltado</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.6922793,41.6767361,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>APARCAMIENTO/ Aranda de Duero (Burgos)</name>
+      
+        
+      <description>Zona de espera o aparcamiento.en Aranda.</description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.6938831,41.663665,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>APARCAMIENTO/ Linares (Jaén)</name>
+      
+        
+      <description>Aparcamiento en las afueras de Linares perfecto para hacer tiempo de espera</description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.6515532,38.0912445,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES VÁZQUEZ / A Couña</name>
+      
+        
+      <description>Avenida Finisterre, 337, 15008 A Coruña www.autocaresvazquez.net +34 981 14 84 70</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -8.433135,43.3530066,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES BENITO ABALO / Caldas de Rei (Pontevedra)</name>
+      
+        
+      <description>Av. Dona Urraca, 17, 36650 Caldas de Reyes, Pontevedra www.benitoabalo.com +34 986 54 01 01</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -8.6443029,42.6004171,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA /Alburqueque (Badajoz)</name>
+      
+        
+      <description>Zona de espera solo el fin de semana, entre semana mejor en el Polígono </description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -7.0070634,39.2231299,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Poitiers (FR)</name>
+      
+        
+      <description>Aquí puedes hacer la esperan mientras visitan Poitiers.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            0.3655365,46.5937752,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>APARCAMIENTO/ Poitiers (FR)</name>
+      
+        
+      <description>APARCAMIENTO en zona deportiva de Poitiers.</description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            0.3643522,46.5962511,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Saumur (FR)</name>
+      
+        
+      <description><![CDATA[Zona de espera en Saumur cerca de McDonald's]]></description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -0.0908502,47.265801,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>APARCAMIENTO / Castellón de la Plana (Valencia)</name>
+      
+        
+      <description>Aparcamiento opcional por esta zona de Castellón </description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -0.0240381,39.9816968,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Valencia </name>
+      
+        
+      <description>Zona para poder hacer la espera en Valencia.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -0.3248571,39.4800332,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Ayamonte (Huelva)</name>
+      
+        
+      <description>Esplanada de tierra en Ayamonte para poder hacer la espera. / También puedes dejarlo por la noche.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -7.3995323,37.2140692,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Cádiz </name>
+      
+        
+      <description>Zona de espera en Polígono sin peoblema de Aparcamiento </description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -6.2414769,36.5236487,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Gibraltar </name>
+      
+        
+      <description>Zona de espera en Av/ Sevilla Polígono de Campamento.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -5.3729162,36.1787385,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES AVANT GRUP BARDET / Polinyà (Barcelona)</name>
+      
+        
+      <description><![CDATA[Garage en Polinyà / en Carrer Tramuntana, 8, 08213 Polinyà, Barcelona<br>www.bardet.com+34 937 45 06 00]]></description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.1668962,41.5531186,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES RODRIGUEZ GÓMEZ / Villanueva de los Castillejos ( Huelva)</name>
+      
+        
+      <description>Garage Autocares Rodríguez Gómez/ C. Alonso Morgado, 104, 21540 Villanueva de los Castillejos, Huelva www.autocaresrg.com +34 959 38 52 54</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -7.2757533,37.4980108,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Viñolas ✔️ / Roses (Girona)</name>
+      
+        
+      <description>Garage de Autocares Viñoles en Roses. Te dejan aparcar en la esplanada sin coste ninguno. Gana detalle </description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            3.1624128,42.2676648,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>MUSEO Neapolis 🏛️/ Siracusa (IT)</name>
+      
+        
+      <description>Zona para sacar los tickets de Grupo para visitar Anfiteatro Romano , y Arqueológico Neopolis.</description>
+      
+        
+      <styleUrl>#icon-1636-A52714</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            15.2793739,37.075169,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Altea (Alicante)</name>
+      
+        
+      <description>Esplanada de tierra para hacer la espera en Altea</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -0.0570118,38.60071,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / San Fernando (Cádiz)</name>
+      
+        
+      <description>Zona de polígonos para hacer la espera a S.Fernando.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -6.203552,36.4752533,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Cádiz </name>
+      
+        
+      <description>Zona de espera en el Puerto</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -6.2835134,36.5429406,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>APARCAMIENTO / Calasparra (Murcia)</name>
+      
+        
+      <description>Esplanada de tierra libre, puedes dejarlo noche y hacer espera de la visita a Calasparra </description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -1.6944603,38.2280659,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Colindres (Cantabria)</name>
+      
+        
+      <description>Zona de espera en Polígono de Colindres . Avenida De Europa.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.4607623,43.3928907,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Calanda (Teruel)</name>
+      
+        
+      <description>Esplanada de tierra a las afueras Para aparcar o hacer la espera de la visita </description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -0.2368087,40.9473958,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Arazcena (Huelva)</name>
+      
+        
+      <description>A las afueras de Aracena para hacer la espera.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -6.5585569,37.8968966,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Granada </name>
+      
+        
+      <description>Zona de Espera para Albaicín o Flamenco / Carretera De Murcia</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.5924899,37.1904022,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Lasbareilles / Lourdes (FR)</name>
+      
+        
+      <description>Autocares Lasbareilles /  Av. Eugène Duviau,  Lourdes, Francia</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -0.0368607,43.1032117,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Pons / Lérida </name>
+      
+        
+      <description>Autocares Pons / C/ de la, Carrer la Fornal, 16, BAJO, 25191 Lérida www.autocarespons.com +34 973 20 12 01</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            0.6586193,41.6231984,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Gamón / Torrefarrera (Lérida)</name>
+      
+        
+      <description>Autocares Gamón - Av. Camí de les Comes, 11, Torrefarrera, Lleida www.autocarsgamon.com  +34 973 75 00 90</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            0.6035966,41.6677899,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Salvia / Vila-sana (Lérida)</name>
+      
+        
+      <description>Autocares Salvia - C/ Vilot, 39, 25245 Vila-sana, Lleida. www.autocarssalvia.com</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            0.9329149,41.6643885,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Capaz / Valencia </name>
+      
+        
+      <description>Autocares Capaz SL /Real de Madrid, 74, València, Valencia www.autocarescapaz.com +34 963 18 22 21</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -0.3919444,39.4322166,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Sagalés / Caldes de Montbui (Barcelona)</name>
+      
+        
+      <description>Autocares Sagalés / Caldes de Montbui, Barcelona www.sagales.com +34 938 65 04 47</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.1679316,41.624452,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Ñuco / Olivenza (Badajoz)</name>
+      
+        
+      <description>Garaje Autocares Ñuco / EX-315, 06100 www.autocaresnuco.net  Olivenza, Badajoz</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -7.138121,38.6514857,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES PALMA AUÑON / Peligros (Granada)</name>
+      
+        
+      <description>Autocares Palma Auñon / Polígono Industrial Asegra, Calle de Granada, 26, 18210 Peligros, Granada</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.6281216,37.2262255,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Belmonte / Cartagena (Murcia)</name>
+      
+        
+      <description>Rda. Transversal, kM 2, 8 BAJO, 30310 Cartagena, Murcia www.autocaresbelmonte.com +34 968 51 21 17</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -1.0085696,37.6238934,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Jerez de los Caballeros (Badajoz)</name>
+      
+        
+      <description>Esplanada de tierra, en poligono poco para ver, solo esperar.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -6.7660145,38.3270627,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA 🕔 / Granada</name>
+      
+        
+      <description>Aparcamiento en ambos lados de la Avenida San Rafael para hacer la espera de las visitas en Granada.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.6189213,37.1538302,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Vigo</name>
+      
+        
+      <description>Aquí puedes estar sin problema para hacer la espera.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -8.71399,42.2259629,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Ramón / Bétera (Valencia)</name>
+      
+        
+      <description>Carretera, km, 1, 46117 Bétera, Valencia www.autocaresramon.com +34 961 69 09 69</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -0.464274,39.6050743,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Rios / Espinardo (Murcia)</name>
+      
+        
+      <description>C. Francisco Alfonso Hidalgo Martinez, 58, 30100 Murcia www.autocaresrios.com +34 968 87 97 50</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -1.1750817,38.0304848,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>APARCAMIENTO / Buñol (Valencia)</name>
+      
+        
+      <description>Aparcamiento de tierra mixto a las afueras de Buñol ,para hacer la espera de la visita. </description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -0.7922579,39.426514,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA 🕔 - C Y D 🔄 / Nevada Shopping / Granada</name>
+      
+        
+      <description>Zona de espera cuando llevas Clientes al Centro comercial. Tambien C y D si no quieres dar vultas.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.6128407,37.1428555,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA O CAMBIO SENTIDO / Júzcar (Málaga)</name>
+      
+        
+      <description>Aquí puedes hacer la espera o el cambio de sentido en Júzcar.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -5.1719452,36.628155,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>CRAM Fundación para la Conservación y Recuperación de Animales Marinos 🐠 / El Prat de Llobregat (Barcelona)</name>
+      
+        
+      <description>Punto donde puedes dejar grupos para la visita a la Fundación para la Conservación y Recuperación de Animales Marinos // se da la vuelta a 500m  / NO HAY SITIO PARA ESPERAR. tienes que decir a qué hora recoges, y salir de hay.</description>
+      
+        
+      <styleUrl>#icon-1542-3949AB</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.0926725,41.283442,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Gavà (Barcelona)</name>
+      
+        
+      <description>Aquí puedes estar aparcado tienes centro comercial para comer y pasar el rato lo mejor posible.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.0110254,41.294867,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA ☕️ / Terrassa (Barcelona)</name>
+      
+        
+      <description>Zona de espera en Poligono, hay centro comercial para pasear y comer.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.0231462,41.5448379,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Jimenez ☑️ / Logroño (La Rioja)</name>
+      
+        
+      <description>Pol. Ind. La Portalada II, C. Sta. María, 8, 26006 Logroño, La Rioja www.jimenezmovilidad.es +34 941 20 27 77</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -2.4129186,42.4503835,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA ☕️ / Albacete </name>
+      
+        
+      <description>Zona df Espera cerca Universidades / Av/ de la Mancha</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -1.8544399,38.9762518,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>COLEGIO Sierra Blanca 🚸 / Málaga </name>
+      
+        
+      <description>Se entra dentro varios andenes para autocares excursión o ruta escolar</description>
+      
+        
+      <styleUrl>#icon-1682-FFD600</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -4.4733813,36.7186813,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA ☕ / Pinhal Novo (PO)</name>
+      
+        
+      <description>Aquí se puede aparcar o para hacer la espera de visitas a Pinhal Novo.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -8.9094102,38.6364214,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA ☕️ / Vallgorguina (Barcelona)</name>
+      
+        
+      <description>Zona donde poder esperar si has dejado en Cam Planas o estan haciendo visita.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.5181856,41.6431345,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>CENTRO COMERCIAL Plaza Mayor 🛒 / Málaga </name>
+      
+        
+      <description>Zona reservada en centro comercial Plaza Mayor (Málaga)</description>
+      
+        
+      <styleUrl>#icon-1685-A52714</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -4.4770804,36.6596563,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA ☕ / Jaén </name>
+      
+        
+      <description>Zona tranquila para hacer la espera de visitas a Jaén </description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.7731941,37.7689719,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA ☕ / Jaén </name>
+      
+        
+      <description>Zona para hacer la espera de las visitas a Jaén, cerca tienes un Burguer King.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.7861083,37.7917584,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA ☕ / Linares (Jaén)</name>
+      
+        
+      <description><![CDATA[Zona de espera cerca de Alcampo, McDonald's...]]></description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.6480965,38.0880464,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>APARCAMIENTO 🅿️ / Leoia (Vizcaya)</name>
+      
+        
+      <description>Aparcamiento libre en Leoia, por la zona de polígonos </description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.0017862,43.3186786,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA ☕ / Carmona (Sevilla)</name>
+      
+        
+      <description>Aquí puedes hacer la espera mientras visitan Carmona, No hay nada para pasear o bar café.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -5.627454,37.471061,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA ☕ / Carmona (Sevilla)</name>
+      
+        
+      <description>Zona de espera, aquí si tienes sitio, tienes bares,  supermercados, y Burguer king</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -5.6531529,37.4633938,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA ☕ / Jerez de la Frontera (Cádiz)</name>
+      
+        
+      <description>Zona de espera en Polígono de Jerez.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -6.1245336,36.7086531,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>C Y D 🔄 / Puente La Reina (Navarra)</name>
+      
+        
+      <description>Aquí puedes dejar al grupo y esperar. Para visitar Pueblo y  Cerca del Puente Románico </description>
+      
+        
+      <styleUrl>#icon-1826-0F9D58</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -1.8194496,42.6694539,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>CRARC 🐿/ Masquefa (Barcelona)</name>
+      
+        
+      <description>Se dejan en Av/ Maresme.  Mas adelante tienes esplanada de tierra para aparcar y esperar.</description>
+      
+        
+      <styleUrl>#icon-1542-3949AB</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            1.8142271,41.4980175,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA ☕️ / Barcelona</name>
+      
+        
+      <description>Zona de espera en Lateral Ronda, no se recomienda dejarlo por la noche.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.2093546,41.4349994,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>PARQUE Francesc Macià 🍀 / Malgrat de Mar (Barcelona)</name>
+      
+        
+      <description>Parque de Malgrat, si tienes sitio puedes parar aqui. Si no en Polígono para dejar y esperar a escalares. </description>
+      
+        
+      <styleUrl>#icon-1542-3949AB</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.7387605,41.6505393,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Alonso ✅️ / Carboneras (Almería)</name>
+      
+        
+      <description>Cocheras Autocares Alonso  Pl. Industrial de Carboneras.</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -1.9096633,36.9872768,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA ☕️ / Sintra (PO)</name>
+      
+        
+      <description>Zona de espera en Sintra si en el otro lado hay Mercadillo.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -9.357404,38.7853267,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA ESPERA ☕️ / Oporto (PO)</name>
+      
+        
+      <description>Zona de espera en Av/ Gustavo Eiffel de Oporto (Portugal)</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -8.5944839,41.1399392,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA ☕️ /Alejandropolis (GRECIA)</name>
+      
+        
+      <description>Zona de espera en el Puerto</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            25.8795798,40.8447565,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA ☕️ /Githio (GRECIA)</name>
+      
+        
+      <description>Zona de espera Githio 232 00, Grecia</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            22.560539,36.7608152,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA ☕ / Torrevieja (Alicante)</name>
+      
+        
+      <description>Zona de espera en Torrevieja, en la zona  Polígono.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -0.6751566,37.9920398,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>INSTITUTO Baix Montseny 🚸 / Sant Celoni (Barcelona)</name>
+      
+        
+      <description>Zona donde se recogen escolares para excursiones o ruta escolar del Instituto Baix Montseny.</description>
+      
+        
+      <styleUrl>#icon-1682-FFD600</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.4785571,41.6955078,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>CALA Montjoi 🚸 / Girona </name>
+      
+        
+      <description>Si vas con 12m en adelante te esperas en Puerto de Roses para que vayan delante por el tema curvas /  Carrer la Roca, s/n, 17480 Montjoi, Girona www.montjoi.com +34 972 25 62 12</description>
+      
+        
+      <styleUrl>#icon-1682-673AB7</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            3.2262295,42.2533557,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA ☕ / Málaga </name>
+      
+        
+      <description>Zona de espera justo debajo del Puente</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -4.3452554,36.724493,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>MONASTERIO De Piedra 📷 /  Nuévalos (Zaragoza)</name>
+      
+        
+      <description>Monasterio de Piedra / si no has entrado nunca  ,merece la  pena / entrada gratis con grupos.  Tienen reservado una zona para Autocares.</description>
+      
+        
+      <styleUrl>#icon-1670-E65100</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -1.7826791,41.1944614,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA ☕ / Eibar (Gipuzkoa)</name>
+      
+        
+      <description>Zona de espera en zona Polígono </description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -2.4675847,43.192132,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA ☕️/ Estella (Navarra)</name>
+      
+        
+      <description>Zona para hacer la espera en C/ Mercatondoa Kalea de Estella</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -2.0301935,42.6606945,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Plenacosta ☑️ / Santa Coloma de Farners (Girona)</name>
+      
+        
+      <description>Autocates Plenacosta / Santa Coloma de Farners (Girona)</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.6652252,41.8565436,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA ☕ / Zumaia (Guipúzcoa)</name>
+      
+        
+      <description>Zona de espera en zona Polígono de Zumaia.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -2.2500918,43.2928997,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA ☕️ / San Sebastián de los Reyes (Madrid)</name>
+      
+        
+      <description>Zona de espera afueras S.Sebastián de los Reyes. C/Del Poeta Rafael Morales.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.6074886,40.5651656,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA ☕️ / Almuñécar (Granada)</name>
+      
+        
+      <description>Zona de espera afueras de la población </description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.6755933,36.7417624,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA ☕️ / Sant Feliu de Guíxols (Girona)</name>
+      
+        
+      <description>Zona de espera cerca zona deportiva y polígono </description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            3.0213025,41.7949892,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA ☕️ / Třebíć (CH)</name>
+      
+        
+      <description>Zona donde puedes esperar </description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            15.8702538,49.2175295,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA ☕ / Setenil de las Bodegas (Cádiz)</name>
+      
+        
+      <description>Zona de espera en las afueras de Setenil de las Bodegas </description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -5.1691891,36.8674506,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Mas / Sagalés ☑️ Lloret de Mar (Girona)</name>
+      
+        
+      <description>Avinguda de les Alegries, 54, 17310 Lloret de Mar, Girona www.sagales.com +34 972 36 40 72</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.8318051,41.7132233,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Barrera ☑️ / Tordera (Barcelona)</name>
+      
+        
+      <description>Disseminat veïnat de, Pl. Sant Pere, 39, 08490 Tordera, Barcelona www.autocarsbarrera.cat +34 937 64 05 96</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.7321428,41.7168845,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA ESPERA ☕️ / Cádiz </name>
+      
+        
+      <description>Zona de espera en el Polígono.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -6.2355318,36.5227974,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA ☕️ / Celanova (Ourense)</name>
+      
+        
+      <description>Zona donde puedes esperar mientras hacen la visita a Celanova.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -7.95414,42.1574474,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Barba ☑️ / Sant Celoni (Barcelona)</name>
+      
+        
+      <description><![CDATA[Cochera de Autocares Barba / Plaça 1 d'Octubre, 1, 08470 Sant Celoni, Barcelona]]></description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.4894282,41.6896583,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Roca ☑️ / Salt (Girona)</name>
+      
+        
+      <description>Cocheras Autocares Roca.  Salt, Girona, España www.autocarsroca.com +34 972 23 60 59</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.7735028,41.968056,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ACTIVIDADES Ciencias 🚸 / Montseny (Barcelona)</name>
+      
+        
+      <description>Punto Km 14 donde te esperan los monitores para hacer actividades en el Montseny / para hacer cambio de sentido a 1,5Km se puede dar sin problemas. Llevate Bocata y una buena peli. Solo verás árboles.</description>
+      
+        
+      <styleUrl>#icon-1682-673AB7</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.4504483,41.7411837,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA☕️ / Badalona (Barcelona)</name>
+      
+        
+      <description>Puedes estar sin problema haciendo la espera.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.2403894,41.4515889,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES 6 ✔️ / Sant Feliu de Llobregat (Barcelona)</name>
+      
+        
+      <description>Cochera Autocares 6 / Carrer Treball, 29, 08980 Sant Feliu de Llobregat, Barcelona www.autocars6.com +34 938 56 26 69</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.034215,41.3939532,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Muñoz ✔️/ Mérida (Badajoz)</name>
+      
+        
+      <description>Cocheras Autocares Muñoz. Pol. Ind. El Prado, C. Alicante, 06800 Mérida, Badajoz</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -6.3902789,38.9247929,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Mir ☑️ / Ripoll (Girona)</name>
+      
+        
+      <description>Cochera Autocares Mir. C/ Esteve Bover, 1, 17500, Girona www.autocarsmir.com +34 972 70 30 12</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.2086512,42.2170031,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>INSTITUTO Cal Gravat 🚸 / Manresa (Barcelona)</name>
+      
+        
+      <description>Instituto zona C y D, Carrer de Puig i Cadafalch, 54, 08243 Manresa, Barcelona www.calgravat.cat +34 938 74 23 68</description>
+      
+        
+      <styleUrl>#icon-1682-FFD600</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            1.8460762,41.720638,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA ☕️ / Briviesca (Burgos)</name>
+      
+        
+      <description>Zona de espera en Polígono industrial de Briviesca.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.3201987,42.5566103,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>PLANCHISTERIA Quim 🛠 / Arbúcies (Girona)</name>
+      
+        
+      <description>Plancha Pintura autocares / Ctra. Hostalric, 4, 17401 Arbúcies, Girona+34 972 16 25 05</description>
+      
+        
+      <styleUrl>#icon-1590-3949AB</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.5322436,41.8098538,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>TAPIZADOS Batallé 🛠 / Arbúcies (Girona)</name>
+      
+        
+      <description>Tapiceria Batallé. Tapizan Butacas autocares. Entrada marcha estrecha. </description>
+      
+        
+      <styleUrl>#icon-1590-3949AB</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.5304584,41.8111888,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA☕  / Monchique (PO)</name>
+      
+        
+      <description>Zona pa hacer la espera afuera de la población como siempre los mas pringaos. Monchique, (Portugal)</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -8.5549582,37.279548,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA ☕/ Albufeira (PO)</name>
+      
+        
+      <description>Zona de espera afueras Albufeira(,Po)</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -8.218064,37.0992788,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA ESPERA ☕/ Albufeira (PO)</name>
+      
+        
+      <description>1 Plaza para hacer la espera perfecto si ves sitio tuyo es..</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -8.2364084,37.0969534,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA ☕ / Albufeira (PO)</name>
+      
+        
+      <description>Zona de espera mixto si puedes entrar dejalo encarado que puedas salir.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -8.2444996,37.0908317,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA ☕/ Elizondo (Navarra)</name>
+      
+        
+      <description>Aqui podrás hacer la espera, a las afueras de la población</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -1.5270981,43.13816,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA ☕/ Pasai Donibane (Gipuzkoa)</name>
+      
+        
+      <description>Zona de espera /  Pasai Donibane, Gipuzkoa</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -1.9130831,43.3239603,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA☕️ / Zafra (Badajoz)</name>
+      
+        
+      <description>Zona para hacer la espera mientras visitan Zafra.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -6.4161189,38.4303749,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Alcaide ✔️ / Aracena (Huelva)</name>
+      
+        
+      <description><![CDATA[Cocheras de autocares Alcaide en Aracena /<br>www.autocaresalcaide.net<br>+34 655 59 99 03]]></description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -6.5594266,37.8963612,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA ☕️ / Jaén </name>
+      
+        
+      <description>Zona de Espera mientras hacen visita a la Ciudad / cerca de centri comercial.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.7705861,37.7899642,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Sagalés ✔️ /La Roca del Vallés (Barcelona)</name>
+      
+        
+      <description>25, Carrer Sector Vallderiolf, 23, 08430 La Roca del Vallès, Barcelona www.sagales.com</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.3048042,41.5978796,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Prat ✔️ / Taradell (Barcelona)</name>
+      
+        
+      <description><![CDATA[Cocheras Autocares Prat de Taradell. / Carretera Mont Rodon, km. 0, 5, 08552 Taradell, Barcelona <br>www.autocarsprat.com <br>+34 938 12 64 11]]></description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.2812672,41.8739452,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Cersa ✔️ / Sant Andreu (Barcelona)</name>
+      
+        
+      <description>Cocheras Autocares Cersa C / Santander 108.</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.2073038,41.4333532,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>PROHIBICIÓN Palafrugell ⛔️</name>
+      
+        
+      <description>Prohibido Autocares y camiones ambos sentidos de la circulación  / Hay que entrar y salir por Av/Palafrugell y Av/ de España / Cámaras vigilancia</description>
+      
+        
+      <styleUrl>#icon-1898-C2185B</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            3.1475335,41.9081369,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>PROHIBICIÓN Palafrugell ⛔️</name>
+      
+        
+      <description>Prohibido Autocares y camiones ambos sentidos de la circulación / Hay que ir y salir por Av/Palafrugell /Cámaras vigilancia</description>
+      
+        
+      <styleUrl>#icon-1898-C2185B</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            3.1555588,41.9104994,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Sagalés ✔️ / Canet de Mar (Barcelona)</name>
+      
+        
+      <description>Cocheras Autocares Sagalés Polígono Industrial de Canet</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.5679822,41.5984159,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Giralt ✔️ / Caspe (Zaragoza)</name>
+      
+        
+      <description>Cocheras Autocares Giralt en Caspe. C/ Huesca</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -0.0469987,41.2397582,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA ESPERA ☕️ / Navarrete (La Rioja)</name>
+      
+        
+      <description>Zona donde puedes esperar Carretera de Burgos.Navarrete</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -2.5655266,42.4312646,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA Espera ☕️ / Oporto (PO)</name>
+      
+        
+      <description>Zona paravhacer la espera no hay gran cosa pero si te pilla por la zona aquí puedes parar.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -8.5825161,41.154831,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Benito García ✔️ / Moaña (Pontevedra)</name>
+      
+        
+      <description>Cocheras Autocares Benito García / Rúa da Fonte do Unicornio, 5, 36950 Moaña, Pontevedra www.autosbenitogarcia.com +34 986 31 27 05</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -8.7355872,42.2928364,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>Puerto Navacerrada | Zona de Aparcamiento Habilitado | Compartido</name>
+      
+        
+      <styleUrl>#poly-9FC3FF-1000-247-nodesc</styleUrl>
+      
+        
+      <Polygon>
+        
+          
+        <outerBoundaryIs>
+          
+            
+          <LinearRing>
+            
+              
+            <tessellate>1</tessellate>
+            
+              
+            <coordinates>
+                -4.002725,40.789177,0
+                -4.002489,40.788868,0
+                -3.998991,40.790062,0
+                -3.999238,40.790363,0
+                -4.002725,40.789177,0
+              </coordinates>
+            
+            
+          </LinearRing>
+          
+          
+        </outerBoundaryIs>
+        
+        
+      </Polygon>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Limoges (FR)</name>
+      
+        
+      <description>Esplanada de tierra retirada del centro pero para estar tranquilo hacendo la espera a Limoges.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            1.2214525,45.829605,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA De Espera / Chartres (FR)</name>
+      
+        
+      <description>Zona de espera afueras de Chartres.</description>
+      
+        
+      <styleUrl>#icon-1534-DB4436</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            1.5111105,48.4555635,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES San Sebastián / Cordoba</name>
+      
+        
+      <description><![CDATA[Av. de la Torrecilla, 14013 Córdoba <br>www.autocaressansebastian.es <br>+34 957 42 90 30]]></description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -4.7868804,37.8610171,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Ramirez / Córdoba </name>
+      
+        
+      <description>Avenida de la Torrecilla s/n, 14013 Córdoba www.autocaresramirez.es +34 957 42 21 77</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -4.7873889,37.8606453,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Leipzig (Alemania)</name>
+      
+        
+      <description>Esplanada de tierra para hacer tiempo gratuito </description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            12.353428,51.3444726,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA ESPERA / Tomelloso (Ciudad Real)</name>
+      
+        
+      <description>zona de espera afueras población pologono industrial de Tomelloso.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.020573,39.1751107,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Ángel Moya ✔️ / El Toboso (Toledo)</name>
+      
+        
+      <description>Autocares Ángel Moya / CTRA. QUINTANAR CM 3103, 45820 El Toboso, Toledowww.autocaresangelmoya.com+34 665 77 99 38</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -2.999547,39.5198368,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>COLEGIO Meritxell 🚸 / Mataró (Barcelona)</name>
+      
+        
+      <description>Colegio Meritxell zona reservada, en linea. Pero ya se sabe los papis hasta la puerta.</description>
+      
+        
+      <styleUrl>#icon-1682-FFD600</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.4645904,41.5552797,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA De Espera ☕️ / Santa Eugenia de Berga (Barcelona)</name>
+      
+        
+      <description>Aquí puedes aparcar mientras esperas la visita al Màgic Mon del tren. Si no te quieres complicar puedes dejarlos y recoger aquí. Pero tienen que cruzar la carretera. </description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.2808294,41.9050507,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>COLEGIO El Turó 🚸 / Mataró (Barcelona)</name>
+      
+        
+      <description>Te quedas ocupado el carril de bajada. Puedes esperar un poco más arriba y cuando los veas salir ponerte delante para no molestar tráfico.</description>
+      
+        
+      <styleUrl>#icon-1682-FFD600</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.4283027,41.5448921,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>PROHIBICIÓN 8T - +5Metros</name>
+      
+        
+      <description>Prohibido a autocares 8Toneladas y a mas de 5 Metros </description>
+      
+        
+      <styleUrl>#icon-1898-C2185B</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            1.8715562,42.3602564,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA Espera ☕️ / Vila-Rodona (Tarragona)</name>
+      
+        
+      <description>Si no te echan puedes hacer la espera a la visita de la Cooperativa  i Secció de Crèdit de Vila-rodona S.C.C.L.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            1.3547112,41.3064437,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>CHOCOLATES Torras 🍫 / Cornellà de Terri (Girona)</name>
+      
+        
+      <description><![CDATA[Se puede Entrar dentro y hacer la espera de la visita a la Fábrica Chocolates Torras / C-150a, Carretera de Girona a, Carretera de Banyoles, Km.15, 17844 Cornellà del Terri, Girona <br>www.chocolatestorras.com <br>+34 972 58 10 00]]></description>
+      
+        
+      <styleUrl>#icon-1502-C2185B</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.7908529,42.1008963,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Coll ✔️ / Porqueres (Girona)</name>
+      
+        
+      <description>Autocares Coll C/ de la Indústria, 15, 17846 Porqueres, Girona www.autocarscoll.cat +34 972 58 44 23</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.7865121,42.1060259,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Mariano ✔️ / Gijón (Asturias)</name>
+      
+        
+      <description>C. de Alejandro Goicoechea, 34, Gijon-Oeste, 33211 Gijón, Asturias www.autocaresmariano.com </description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -5.6908682,43.5302749,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA De Espera ☕ / Puebla de Sanabria (Zamora)</name>
+      
+        
+      <description>Aquí puedes hacer la espera a las afueras de la población como siempre nos mandan donde cristo perdió el mechero.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -6.6247009,42.054785,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Megías ✔️ / Armilla (Granada)</name>
+      
+        
+      <description><![CDATA[Cocheras de Autocares Megías en Armilla. Av. Fernando de los Ríos, 15, 18100 Armilla, Granada <br>www.autocaresmegias.com <br>+34 958 55 34 57]]></description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.6164527,37.1500184,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Márquez ✔️ / Manzanares (Ciudad Real)</name>
+      
+        
+      <description>Cocheras de Autocares Márquez afueras de Manzanares. A-4, KM. 171, Ciudad Real</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.3741363,39.0200507,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Prats Serrat ✔️ / Torà (Lleida)</name>
+      
+        
+      <description>Cocheras Autocares Prats Serrat  C/ Calaf, Nau 2 . Pol. Ind. l’Aguda 2., 25750 Torà, Lleida www.autocarspratsserrat.com +34 973 47 35 90</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            1.3977131,41.8138482,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Moventis ✔️ / Figueres (Girona)</name>
+      
+        
+      <description>Cocheras Moventis en Figueres.</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.9728102,42.2674961,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Novas Rías ✔️ / Barro (Pontevedra)</name>
+      
+        
+      <description><![CDATA[Cochera Autocares Novas Rías Polígono Industrial. Barro, Pontevedra <br>www.novasrias.com]]></description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -8.6776993,42.5154253,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>TMB Barcelona / Barcelona</name>
+      
+        
+      <description>Cochera TMB Barcelona, Zona Franca.</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.1101835,41.3325016,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>BATALLA Del Ebro (Memorial de les Camposines)💥 / La Fatarella (Tarragona)</name>
+      
+        
+      <description>Punto de dejar si van a visitar el Memorial. Coche grande complicado cambio sentido. A 100 Metros izquierda en el camino puedes esperar y que vayan andando.</description>
+      
+        
+      <styleUrl>#icon-1564-880E4F</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            0.5358218,41.1169864,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Del Vals ✔️ / Talavera de la Reina (Toledo)</name>
+      
+        
+      <description>Oficinas Autocares Del Vals en C. Capitán Luque, 45600 Talavera de la Reina, Toledo www.facebook.com +34 670 50 31 08</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -4.8325511,39.9650127,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Lalubie et Manterola ✔️ / Lourdes (FR)</name>
+      
+        
+      <description><![CDATA[Cocheras autocares Lalubie et Manterola en Lourdes. / Chem. de l'Arrouza, 65100 Lourdes, Francia www.lalubie-manterola.com +33 5 62 94 24 82]]></description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -0.0500251,43.0885288,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ÁREA SERVICIO Porta de Catalunya 🍽️ / La Jonquera (Girona)</name>
+      
+        
+      <description><![CDATA[Primera Área en España Si vienes de Francia. Suele estar llena de camiones que no respetan nuestra zona de aparcamiento.dejalo donde puedas. Aquí puedes hacer los 15" 30" o 45 minutos de descanso]]></description>
+      
+        
+      <styleUrl>#icon-1577-795548</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.8713105,42.4063475,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Benidorm</name>
+      
+        
+      <description>Benidorm | Aparcamiento | Apto para Esperas de los Grupos</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -0.0917429,38.5645067,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Benidorm</name>
+      
+        
+      <description>Benidorm | Aparcamiento | Polideportivo Foietes | Ideal para Descansos</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -0.137245,38.545148,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>Madrid | Zona de Aparcamiento Pago Regulado SER | Mendez Alvaro</name>
+      
+        
+      <description>Madrid | Aparcamiento Pago Regulado SER | Mendez Alvaro</description>
+      
+        
+      <styleUrl>#line-4186F0-6000</styleUrl>
+      
+        
+      <LineString>
+        
+          
+        <tessellate>1</tessellate>
+        
+          
+        <coordinates>
+            -3.685688,40.401577,0
+            -3.683928,40.400662,0
+            -3.684057,40.400539,0
+            -3.684969,40.399992,0
+          </coordinates>
+        
+        
+      </LineString>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>CASTILLO MANZANARES EL REAL</name>
+      
+        
+      <description>7 DARSENAS PARA AUTOCARES DISCRECCIONALES. A LAS 14:30 DEBEN RETIRARSE PARA POSICIONAR Y DAR SALIDA A LAS RUTAS DEL PUEBLO.</description>
+      
+        
+      <styleUrl>#icon-1598-424242</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.861681,40.728019,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>Valencia | Ciudad de las Ciencias y Artes | Aparcamiento Autorizado en Linea</name>
+      
+        
+      <description>Aparcamiento autorizado por ayuntamiento para la espera de los pasajeros mientras realizan la visita a ciudad.</description>
+      
+        
+      <styleUrl>#icon-1532-7CB342</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -0.358343,39.450328,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>APARCAMIENTO/ Lastres (Asturias)</name>
+      
+        
+      <description>Zona de aparcamiento en Lastres</description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -5.273695,43.515148,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>APARCAMIENTO / Ribadesella (Asturias)</name>
+      
+        
+      <description>Ribadesella | Aparcamiento | Explanada de Tierra | Zona Alta donde Cementerio</description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -5.054344,43.459914,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>APARCAMIENTO / Riaza (Segovia)</name>
+      
+        
+      <description>Suele haber sitio para el aparcamiento en esta zona.</description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.480488,41.277593,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>APARCAMIENTO / Palencia</name>
+      
+        
+      <description>Palencia | Aparcamiento | Zona Hospital | En toda la calle Andalucia se puede aparcar de día y de noche sin problemas</description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -4.511862,42.000341,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Alcalá de Henares </name>
+      
+        
+      <description>Zona para aparcar mientras realizan la visita los pasajeros a Alcala de Henares. Se puede aparcar en ambos sentidos y hay centro comercial para repostar víveres.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.380962,40.491646,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>APARCAMIENTO / Juan de Gazteluatxe</name>
+      
+        
+      <description>San Juan de Gazteluatxe - Mirador | Zona para poder estacionar y que los pasajeros puedan sacar fotos desde el mirador.</description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -2.770825,43.440842,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA AZUL / SPRO / Barcelona</name>
+      
+        
+      <description>Zona AZUL / usar Aplicación que están a la búsqueda de una multa/ Permitido aparcamiento por horas</description>
+      
+        
+      <styleUrl>#line-0288D1-5000</styleUrl>
+      
+        
+      <LineString>
+        
+          
+        <tessellate>1</tessellate>
+        
+          
+        <coordinates>
+            2.1838457,41.3954235,0
+            2.1855947,41.3940809,0
+          </coordinates>
+        
+        
+      </LineString>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>APARCAMIENTO/ Ourense</name>
+      
+        
+      <description>Zona libre de aparcamiento en la universidad, no oficial, zona vigilada por cámaras del campus de la universidad y vigilancia privada. APARCAMIENTO NO OFICIAL y LIBRE</description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -7.849506,42.344002,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Bermeo (Vizcaya)</name>
+      
+        
+      <description>Zona Industrial donde poder aparcar mientras realizan la visita los pasajeros a Bermeo</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -2.737806,43.419489,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>APARCAMIENTO / San Sebastián </name>
+      
+        
+      <description>Donosti | Zona Aparcamiento Habilitada y Autorizada | Centro Comercial Garbera</description>
+      
+        
+      <styleUrl>#line-4186F0-6000</styleUrl>
+      
+        
+      <LineString>
+        
+          
+        <tessellate>1</tessellate>
+        
+          
+        <coordinates>
+            -1.946168,43.307507,0
+            -1.945889,43.307423,0
+            -1.945224,43.307259,0
+            -1.944151,43.307009,0
+            -1.943912,43.307017,0
+            -1.943837,43.307085,0
+            -1.943749,43.307218,0
+            -1.943639,43.307477,0
+            -1.943381,43.308125,0
+            -1.943352,43.308196,0
+            -1.943236,43.308486,0
+          </coordinates>
+        
+        
+      </LineString>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>Madrid | Plaza de Las Ventas | Zona de Aparcamiento para Fotos </name>
+      
+        
+      <description>Madrid | Plaza de Las Ventas | Zona de Aparcamiento para Fotos</description>
+      
+        
+      <styleUrl>#line-3F5BA9-7000</styleUrl>
+      
+        
+      <LineString>
+        
+          
+        <tessellate>1</tessellate>
+        
+          
+        <coordinates>
+            -3.662996,40.431016,0
+            -3.662385,40.431277,0
+          </coordinates>
+        
+        
+      </LineString>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>Puerto Navacerrada | Zona de Aparcamiento Habilitado | Compartido</name>
+      
+        
+      <styleUrl>#poly-9FC3FF-1000-247-nodesc</styleUrl>
+      
+        
+      <Polygon>
+        
+          
+        <outerBoundaryIs>
+          
+            
+          <LinearRing>
+            
+              
+            <tessellate>1</tessellate>
+            
+              
+            <coordinates>
+                -4.002725,40.789177,0
+                -4.002489,40.788868,0
+                -3.998991,40.790062,0
+                -3.999238,40.790363,0
+                -4.002725,40.789177,0
+              </coordinates>
+            
+            
+          </LinearRing>
+          
+          
+        </outerBoundaryIs>
+        
+        
+      </Polygon>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA/ Cuéllar </name>
+      
+        
+      <description>Cuellar | Aparcamiento Zona Poligono | Ideal Esperas</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -4.32636,41.404191,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>Las Rozas | CC Las Rozas Village | Zona de Aparcamiento |</name>
+      
+        
+      <description>Zona de Espera Centro comercial Las Rozas Village </description>
+      
+        
+      <styleUrl>#line-0288D1-6000</styleUrl>
+      
+        
+      <LineString>
+        
+          
+        <tessellate>1</tessellate>
+        
+          
+        <coordinates>
+            -3.904738,40.518481,0
+            -3.90403,40.517979,0
+            -3.900581,40.516169,0
+          </coordinates>
+        
+        
+      </LineString>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Las Rozas Village</name>
+      
+        
+      <description>Las Rozas | CC Las Rozas Village | Zona de Aparcamiento de Espera</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.902786,40.517315,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Zuheros ( Córdoba)</name>
+      
+        
+      <description>Zuheros | Aparcamiento Espera Visita | Libre | Junto Cementerio</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -4.31487,37.546487,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>APARCAMIENTO/ Guadalajara </name>
+      
+        
+      <description>Guadalajara | Aparcamiento Autorizado | Visitas Zoo de Guadalajara o Espera | Junto al Cementerio</description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.176638,40.638809,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Hernani (Guipúzcoa)</name>
+      
+        
+      <description>Hernani | Aparcamiento Espera en Poligono | Todo el polígono se puede aparcar</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -1.966896,43.268671,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>CIUDAD ENCANTADA 📷 / Valdecabras (Teruel)</name>
+      
+        
+      <description>Ciudad Encantada | Aparcamiento Explanada de tierra | Hay reserva para autocares, vigilante para que no se aparquen los domingueros.</description>
+      
+        
+      <styleUrl>#icon-1502-C2185B</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -2.0055556,40.206355,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Najera (La Rioja)</name>
+      
+        
+      <description>Najera | Aparcamiento no Oficial | Adecuado para la Espera</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -2.7339,42.422443,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>APARCAMIENTO Zumaia (Guipúzcoa)</name>
+      
+        
+      <description>Zumaia | Aparcamiento Zona Industrial | Libre y sin vigilancia</description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -2.248732,43.292279,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>APARCAMIENTO / San Sebastián </name>
+      
+        
+      <description>San Sebastian | Zona Libre Aparcamiento | Junto Puerto Pesquero de Pasajes | Zona Tranquila</description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -1.934645,43.321728,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>APARCAMIENTO/ Vitoria - Gasteiz </name>
+      
+        
+      <description>Vitoria | Zona Aparcamiento EN LINEA desde El Dia De Santiago hasta las Fiestas de Virgen Blanca | Después de estas fechas NO PERMITIDO EL APARCAMIENTO</description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -2.647244,42.844101,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>APARCAMIENTO/ Bakio (Bilbao)</name>
+      
+        
+      <description>Bakio | Zona de Aparcamiento | Poligono Industrial | No oficial</description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -2.814737,43.410344,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>APARCAMIENTO/ Espiunca (PO)</name>
+      
+        
+      <description><![CDATA[Zona Aparcamiento | Visita Escalera de Paiva | Carreteras estrechas pero se llega bien con un 15m | "OJO" ENTRAR SIEMPRE POR AROUCA]]></description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -8.216556,40.992202,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>APARCAMIENTO/ Garaña (Asturias)</name>
+      
+        
+      <description>Garaña| Zona de Aparcamiento | Explanada Tierra</description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -4.969325,43.453655,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Madrid </name>
+      
+        
+      <description>Madrid | Aparcamiento Libre | Ideal para esperas</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.707648,40.372098,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>Salobreña | Zona para Aparcamiento </name>
+      
+        
+      <description>Salobreña | Zona para Aparcamiento</description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.581794,36.746468,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>Benidorm | estación de autocares.</name>
+      
+        
+      <description>estación de autocares.</description>
+      
+        
+      <styleUrl>#icon-1532-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -0.124068,38.548736,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Benidorm</name>
+      
+        
+      <description>Benidorm | Aparcamiento | Zona de Espera junto Centro Comercial Marina | No Recomendado por la Noche</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -0.17915,38.535988,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>Sevilla | Zona Aparcamiento de Flamenco Patio Andaluz | Controlado por personal del Patio Andaluz  </name>
+      
+        
+      <description>Sevilla | Zona Aparcamiento de Flamenco Patio Andaluz | Controlado por personal del Patio Andaluz</description>
+      
+        
+      <styleUrl>#poly-0BA9CC-5000-107</styleUrl>
+      
+        
+      <Polygon>
+        
+          
+        <outerBoundaryIs>
+          
+            
+          <LinearRing>
+            
+              
+            <tessellate>1</tessellate>
+            
+              
+            <coordinates>
+                -5.962114,37.396854,0
+                -5.962935,37.396154,0
+                -5.962502,37.395786,0
+                -5.961616,37.396482,0
+                -5.962114,37.396854,0
+              </coordinates>
+            
+            
+          </LinearRing>
+          
+          
+        </outerBoundaryIs>
+        
+        
+      </Polygon>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>LAGO PROSERPINA / Mérida </name>
+      
+        
+      <description>Aparcamiento asfaltado para tres autocares.</description>
+      
+        
+      <styleUrl>#icon-1532-7CB342</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -6.365982,38.966783,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>APARCAMIENTO/ Córdoba </name>
+      
+        
+      <description>APARCAMIENTO gratuito cerca de centro comercial para hacer tiempo de espera</description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -4.787954,37.858833,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>MUSEO SALZILLO / Murcia</name>
+      
+        
+      <description>Zona habilitada de estacionamiento para la visita al Museo Salcillo en Murcia en calle San Andrés justo enfrente del Museo</description>
+      
+        
+      <styleUrl>#icon-1636-A52714</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -1.137954,37.986236,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>APARCAMIENTO / Riaza (Segovia)</name>
+      
+        
+      <description>Sin problema de aparcamiento en esta zona </description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.4955282,41.2702806,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DEPORTIVA / Cuéllar </name>
+      
+        
+      <description>Polideportivo, campo de fútbol pistas pádel , tenis y piscina de Cuéllar </description>
+      
+        
+      <styleUrl>#icon-1698-AFB42B</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -4.3087249,41.3938102,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Barbastro (Huesca)</name>
+      
+        
+      <description>Zona tranquila para aparcar sin problemas </description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            0.1175194,42.0332759,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / León </name>
+      
+        
+      <description>Aparcamiento gratuito para hacer la espera de las visitas en León </description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -5.5807703,42.6022794,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Santiago de Compostela </name>
+      
+        
+      <description>ZONA DE ESPERA Y SIN PROBLEMAS PARA EL APARCAMIENTO. Zona de poligono frecuentada por discrecionales en espera. Buen sitio rodeado de centros comerciales y sin problema para aparcar. Sitio de reunion para el cafe en la cercana cepsa.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -8.5026319,42.9033034,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>APARCAMIENTO / Ribadeo (Lugo)</name>
+      
+        
+      <description>Aparcamiento de tierra mixto amplio, para dejarlo noche o hacer tiempo de espera.</description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -7.0495184,43.536804,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ESTACIÓN ESQUÍ/ San Isidro</name>
+      
+        
+      <description>Aparcamiento gratuito en la estación de San Isidro / zona reservada para autocares </description>
+      
+        
+      <styleUrl>#icon-1688-BDBDBD</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -5.3762222,43.0624451,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Llanes (Asturias)</name>
+      
+        
+      <description>Si desde aquí te va bien para luego recogerlos aquí puedes hacer la espera</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -4.757026,43.408905,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name><![CDATA[ZONA DE ESPERA / L'Hospitalet ]]></name>
+      
+        
+      <description>Si dejas al grupo en Montjuic esta es buena zona de espera.( Ya que MONJUIC es caro aparcar)</description>
+      
+        
+      <styleUrl>#line-0288D1-4897</styleUrl>
+      
+        
+      <LineString>
+        
+          
+        <tessellate>1</tessellate>
+        
+          
+        <coordinates>
+            2.1349948,41.3473211,0
+            2.1360951,41.3476889,0
+          </coordinates>
+        
+        
+      </LineString>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>TERMINAL CRUCEROS / Getxo (Vizcaya)</name>
+      
+        
+      <description>Getxo | Zona Aparcamiento de Espera | Terminal de Cruceros</description>
+      
+        
+      <styleUrl>#icon-1622-757575</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.0259798,43.3414971,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>APARCAMIENTO / Vitoria</name>
+      
+        
+      <description>Recinto asfaltado para poder dejarlo por la noche o hacer las esperas de las visitas. gratuito sin vigilancia.</description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -2.6850922,42.8350291,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Vitoria </name>
+      
+        
+      <description>Vitoria | Zona Aparcamientop EN LINEA JUNTO AL LECLERC desde El Dia De Santiago hasta las Fiestas de Virgen Blanca | Después de estas fechas NO PERMITIDO EL APARCAMIENTO</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -2.7015619,42.8385379,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Vitoria</name>
+      
+        
+      <description>Vitoria | Zona Aparcamiento EN LINEA desde El Dia De Santiago hasta las Fiestas de Virgen Blanca | Después de estas fechas NO PERMITIDO EL APARCAMIENTO</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -2.7106316,42.8436959,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Hondarribia (Guipúzcoa)</name>
+      
+        
+      <description>Lugar para hacer la espera de la visita / no hay reserva</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -1.8010836,43.3648815,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name><![CDATA[AREA "Los Corzos" ⬇️ / Alcalá de los Gazules (Cádiz)]]></name>
+      
+        
+      <description>AMPLIO APARCAMIENTO. TRATO ESPECIAL CON EL CHOFER ( PRODUCTOS TIPICOS DE LA ZONA, ACEITE....) INVITACION A COMIDA Y DETALLE DE FIDELIDAD. Crta A-381 p.k. 45 calle de la Palmosa H, 11180 Alcalá de los Gazules, Cádiz, España956 41 32 12</description>
+      
+        
+      <styleUrl>#icon-1769-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -5.716174,36.43727,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Don Benito (Badajoz)</name>
+      
+        
+      <description>Zona de espera en esplanada de tierra.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -5.8530623,38.9540797,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Gibert / Vilanova del Vallès (Barcelona)</name>
+      
+        
+      <description>Garage Autocares Gibert / C/ del Pla, 5, 08410 Vilanova del Vallès, Barcelona+34 938 70 13 59</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.2877379,41.5472662,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>APARCAMIENTO / Salvatierra de Miño (Pontevedra)</name>
+      
+        
+      <description>Aparcamiento libre en linea, hacer tiempo de espera o aparcar por la noche.</description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -8.5019902,42.0843393,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Salvatierra de Miño (Pontevedra)</name>
+      
+        
+      <description>Esplanada de tierra para poder hacer la espera.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -8.5086872,42.079815,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>TOT circ🚸 / Copons (Barcelona)</name>
+      
+        
+      <description>Visita con escolares, Por no tener no tienes ni cobertura. Descárgate alguna película llévate comida y a esperar.</description>
+      
+        
+      <styleUrl>#icon-1682-673AB7</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            1.5095786,41.6418095,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>MIRADOR Felix Rodríguez de La Fuente 📷 / Pelegrina (Guadalajara)</name>
+      
+        
+      <description>Zona reservada para visitar el mirador. / Pelegrina, Guadalajara</description>
+      
+        
+      <styleUrl>#icon-1535-757575</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -2.6204745,41.0124049,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>EMBARQUE Civitavecchia 🚢 / (Roma) (IT)</name>
+      
+        
+      <description>Zona de espera para embarque en Puerto Civitavecchia (IT)</description>
+      
+        
+      <styleUrl>#icon-1622-757575</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            11.7807559,42.1026231,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Transportes Pujol Serra S.L. ✔️ / Andratx (Illes Balears)</name>
+      
+        
+      <description>Cocheras Autocares Transportes Pujol. C/ Antoni Mulet, 45, 07150 Andratx, Illes Balears www.transportespujolserra.com +34 971 13 62 19</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.424043,39.5776006,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ESPERA EN JAVIERADA</name>
+      
+        
+      <description>EN JAVIERADAS PUNTO DE ENCUENTRO Y ESPERA ENTRE LOS PASAJEROS Y CONDUCTORES DE LOS AUTOCARES.</description>
+      
+        
+      <styleUrl>#icon-1608-3949AB</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -1.218839,42.599938,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Meroño</name>
+      
+        
+      <description>Garage autocares Meroño</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -0.951369,37.616611,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ALBERGUE LAS DEHESAS</name>
+      
+        
+      <description><![CDATA[Albergue de campamentos de colegios. A la salida  en el cruce con la carretera los autocares grandes no pueden girar en sentido obligatorio de la ,marcha "TENDRAS QUE SALIR DIRECCION PROHIBIDA LOS 100M"]]></description>
+      
+        
+      <styleUrl>#icon-1682-9C27B0</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -4.069168,40.761195,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>Zona de Aparcamiento</name>
+      
+        
+      <description>Zona que comprende el aparcamiento en linea</description>
+      
+        
+      <styleUrl>#line-0288D1-5000</styleUrl>
+      
+        
+      <LineString>
+        
+          
+        <tessellate>1</tessellate>
+        
+          
+        <coordinates>
+            -4.076625,40.715899,0
+            -4.076453,40.715184,0
+            -4.075745,40.714062,0
+            -4.075112,40.713736,0
+          </coordinates>
+        
+        
+      </LineString>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / León</name>
+      
+        
+      <description>Zona de espera en León </description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -5.591762,42.612628,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>APARCAMIENTO / Braga (PO)</name>
+      
+        
+      <description>Aparcamiento gratuito y zona de recojida o dejada para hacer via crucis</description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -8.381453,41.552992,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>Hostal Las Abadias-Merida</name>
+      
+        
+      <description><![CDATA[Calle villarta de los montes, 1, 06800 Mérida, Badajoz, España<br>www.hostalabadias.com<br>+34 924 31 33 26. Wifi en la habitacion. Baño individual, habitación sencilla, aparcamiento a 100m por la zona.  incluido el desayuno para conductores.]]></description>
+      
+        
+      <styleUrl>#icon-1602-9C27B0</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -6.352683,38.927149,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>Tren Turistico Cazorla</name>
+      
+        
+      <description><![CDATA[TREN TURÍSTICO CIUDAD DE CAZORLA. Jose Angel Marin 606127025. ( se deja a los pasajeros en la plaza constitución, pudiendo estacionar a la salida del Trenecito y apartándote a su regreso o bajando a 300 metros tienes dársenas de la estación de autocares )<br>Recorrido casco histórico y panorámica de Cazorla.<br>(Incluye locución explicativa)<br>Duración 40 min. Aprox.<br>Precio venta al público 4€<br>1€ comisionable para guías o transportistas.<br>Recorrido Panorámica y Mirador de Cazorla.<br>(Incluye locución explicativa)<br>Duración 45 min. Aprox.<br>Precio venta al público 4€<br>1€ comisionable para guias o transportistas.<br>Posibilidad de extensión desde el mirador a la virgen de la cabeza por 2 € más. Total 6€. AVISAR CON ANTELACION PARA CONCRETAR GRUPOS Y HORARIOS. Jose Angel Marin 606127025]]></description>
+      
+        
+      <styleUrl>#icon-1502-C2185B</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.002572,37.912816,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>RUINAS SEGOBRIGA 🏛/ Saelices ( Cuenca)</name>
+      
+        
+      <description>Visita a las ruinas de Segobriga con los grupos. Aparcamiento en el mismo centro de visitantes. Si nos juntamos muchos autocares la guardia civil te obliga a entrar por el siguiente camino y aparcamos en el camino al lado izquierdo. Cuidado con los pasajeros que se bajan al lado rodado del camino.</description>
+      
+        
+      <styleUrl>#icon-1636-A52714</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -2.808809,39.892481,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>SALIDA OÑATI</name>
+      
+        
+      <description>LINEA AZUL: SALIDA RECOMENDADA PARA AUTOCARES.</description>
+      
+        
+      <styleUrl>#line-9C27B0-4574</styleUrl>
+      
+        
+      <LineString>
+        
+          
+        <tessellate>1</tessellate>
+        
+          
+        <coordinates>
+            -2.4161909,43.03416,0
+            -2.4172529,43.03547,0
+            -2.4184009,43.036356,0
+            -2.4189589,43.036693,0
+            -2.4191309,43.036952,0
+            -2.4194739,43.036827,0
+            -2.4186259,43.034325,0
+            -2.4181539,43.033705,0
+            -2.4171139,43.03227,0
+          </coordinates>
+        
+        
+      </LineString>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>PROHIBICIÓN/ ArqueoPinto</name>
+      
+        
+      <description>Prohibida la entrada a todos los autocares EXCEPTO aquellos que lleven 1º y 2º de infantil que a estos son los únicos que se les permite el acceso ademas de grupos de movilidad reducida. ¨¨¨NO EXISTE AUTORIZACION NINGUNA¨¨¨que no os engañen. CUIDADO QUE MULTAN LOS GUARDIAS SI TE PILLAN DENTRO Y COMPRUEBAN EL CURSO QUE LLEVAS.</description>
+      
+        
+      <styleUrl>#icon-1898-C2185B</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.697768,40.236352,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Sánchez Ortuño</name>
+      
+        
+      <description><![CDATA[Av. de la Estación, 0, 30594 Pozo Estrecho, Murcia<br>www.sanchezortuno.com<br>+34 968 16 60 93]]></description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -0.987653,37.708393,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES J.VAZQUEZ /Palos de la Frontera</name>
+      
+        
+      <description><![CDATA[Pol. Ind. San Jorge, C. A, Nº 169-179, 21810 Palos de la Frontera, Huelva<br>www.autocaresjvazquez.es<br>+34 959 25 46 37]]></description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -6.880334,37.220875,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA/ Córdoba </name>
+      
+        
+      <description>ZONA de espera /  Se puede esperar por dentro de la media Luna</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -4.786568,37.880763,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ESTACIÓN ESQUÍ/ La Colanilla</name>
+      
+        
+      <description>Zona de aparcamiento para la estación de sky de la colanilla</description>
+      
+        
+      <styleUrl>#icon-1688-BDBDBD</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -5.690572,40.35638,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ESTACIÓN ESQUÍ / Boi Taull</name>
+      
+        
+      <description>Zona amplia de aparcamiento mixto, en pistas Boi Taull.</description>
+      
+        
+      <styleUrl>#icon-1688-BDBDBD</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            0.8698005,42.478577,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>BODEGAS VIVANCO / Briones (Navarra)</name>
+      
+        
+      <description>Zona reservada para la visita a las Bodegas. N-232, 26330 Briones, La Rioja</description>
+      
+        
+      <styleUrl>#icon-1798-FBC02D</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -2.778995,42.5400821,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>SANTUARIO NUESTRA SEÑORA DO CORPIÑO</name>
+      
+        
+      <description>Santuario famoso. El cura esta autorizado y especializado en exorcismos. Se practican exorcismos y se espantan malos augurios. Aparcamiento en la zona trasera. Santa Eulalia de Losón, s/n, 36512 Lalín, Pontevedra, España www.ocorpino.es 600 72 73 73</description>
+      
+        
+      <styleUrl>#icon-1670-E65100</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -8.2156707,42.7448524,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / San Sebastián </name>
+      
+        
+      <description>Zona de espera libre al lado de plaza de toros</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -1.9695361,43.2968895,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES ROMERO / Huelva</name>
+      
+        
+      <description>Ctra. Gibraleón, 29, 21002 Huelva www.autocaresromero.com +34 959 15 15 52</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -6.9439546,37.2886244,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES IM GOMEZ / Navalcarnero (Madrid)</name>
+      
+        
+      <description>Pol. Ind. Alparrache II, C. Cam. de Bastos, 2, 28600 Navalcarnero, Madrid www.gomezautocares.com +34 918 11 08 85</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -4.0036306,40.2907828,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>C Y D / Besalú</name>
+      
+        
+      <description>Zona reservada para dejar pasajeros / aquí también se coge trenecito. Aparcar en esplanada</description>
+      
+        
+      <styleUrl>#icon-1826-0F9D58</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.70264,42.198333,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Tarazona</name>
+      
+        
+      <description>Puedes hacer la espera aquí o ir directamente a la esplanada del recinto ferial </description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -1.7199977,41.901924,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>APARCAMIENTO / Almansa (Albacete)</name>
+      
+        
+      <description>Esplanada de tierra para aparcar o hacer la espera de la visita a Almansa.</description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -1.0883915,38.8702601,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>R.MADRID / SOLO PARTIDOS</name>
+      
+        
+      <description>Avenida Concha Espina habilitada para aparcar autocares los dias de Partido / OJO!! NO SE PUEDE APARCAR HASTA 2/3 HORAS ANTES DEL PARTIDO</description>
+      
+        
+      <styleUrl>#icon-1899-DB4436</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.6847664,40.4518068,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Sintra (PO)</name>
+      
+        
+      <description>APARCAMIENTO MIXTO DE CAMIONES Y AUTOCARES A LAS AFUERAS DE SINTRA. PARA LA ESPERA DE RECOGIDA DE VIAJEROS. EXPLANADA DE TIERRA</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -9.37471,38.784124,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZOO AQUARIO / Madrid</name>
+      
+        
+      <description>APARCAMIENTO EXCLUSIVO PARA AUTOCARES DISCRECCIONALES, AMPLIO ESPACIO.</description>
+      
+        
+      <styleUrl>#icon-1743-817717</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.759835,40.409477,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>Zona de Espera-Valencia</name>
+      
+        
+      <description>zona autorizada para el aparcamiento mientras los pasajeros realizan la visita.</description>
+      
+        
+      <styleUrl>#line-9C27B0-6000</styleUrl>
+      
+        
+      <LineString>
+        
+          
+        <tessellate>1</tessellate>
+        
+          
+        <coordinates>
+            -0.360768,39.44935,0
+            -0.352528,39.45283,0
+          </coordinates>
+        
+        
+      </LineString>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA ESPERA / Sete (FR)</name>
+      
+        
+      <description>Aparcamiento para la espera de los viajeros mientras hacen la visita a SETE-FRANCIA</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            3.671461,43.39422,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>APARCAMIENTO OÑATI</name>
+      
+        
+      <description>APARCAMIENTO PARA AUTOCARES DE LUNES A DOMINGO</description>
+      
+        
+      <styleUrl>#line-0288D1-6000</styleUrl>
+      
+        
+      <LineString>
+        
+          
+        <tessellate>1</tessellate>
+        
+          
+        <coordinates>
+            -2.4185578,43.0336605,0
+            -2.419177,43.0335279,0
+          </coordinates>
+        
+        
+      </LineString>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA ☕ / Getaria (Guipúzcoa)</name>
+      
+        
+      <description>Aparcamiento, en Puerto  infórmate si te dejan. Si no la otra opción es ir al Polígono de Zumaia </description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -2.197545,43.30574,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>APARCAMIENTO /Aranjuez</name>
+      
+        
+      <description>Esplanda asfaltada donde está permitido el aparcamiento a autocares. Tiene acceso por los dos lados.</description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.606272,40.040676,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>C Y D / Puerto Crucero Palma</name>
+      
+        
+      <description>Zona reservada cruceros de Palma BALEARIA</description>
+      
+        
+      <styleUrl>#icon-1826-0F9D58</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.624676,39.551778,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Grupo Benidorm</name>
+      
+        
+      <description><![CDATA[Camí del Salt de l'Aigua, 15, 03503 Benidorm, Alicante<br>www.autocaresgrupobenidorm.com<br>+34 966 80 18 50]]></description>
+      
+        
+      <styleUrl>#icon-1513-1A237E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -0.11851,38.548626,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>APARCAMIENTO /  Benidorm (Alicante)</name>
+      
+        
+      <description>Esplanada de tierra público mixto, para hacer la espera está bien pero dejarlo por la noche no.</description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -0.1260198,38.55064,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Totana ( Murcia)</name>
+      
+        
+      <description>Aparcamiento en linea para hacer espera sin problemas.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -1.4978669,37.7648416,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Sevilla </name>
+      
+        
+      <description>Zona de Espera en el Lateral de la Avenida Kansas City</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -5.9649529,37.3982784,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA ☕ / Cambridge (Reino Unido)</name>
+      
+        
+      <description>Cambridge | Zona Aparcamiento Espera</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            0.09346,52.19833,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>Puerto Navacerrada | Zona de Aparcamiento Habilitado | Compartido</name>
+      
+        
+      <styleUrl>#poly-9FC3FF-1000-247-nodesc</styleUrl>
+      
+        
+      <Polygon>
+        
+          
+        <outerBoundaryIs>
+          
+            
+          <LinearRing>
+            
+              
+            <tessellate>1</tessellate>
+            
+              
+            <coordinates>
+                -4.002725,40.789177,0
+                -4.002489,40.788868,0
+                -3.998991,40.790062,0
+                -3.999238,40.790363,0
+                -4.002725,40.789177,0
+              </coordinates>
+            
+            
+          </LinearRing>
+          
+          
+        </outerBoundaryIs>
+        
+        
+      </Polygon>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>Dehesas de Cercedilla</name>
+      
+        
+      <description>Curva habilitada para dar la vuelta los días festivos y fines de semana por la prohibición a los autocares.</description>
+      
+        
+      <styleUrl>#line-DB4436-5241</styleUrl>
+      
+        
+      <LineString>
+        
+          
+        <tessellate>1</tessellate>
+        
+          
+        <coordinates>
+            -4.0712282,40.7616615,0
+            -4.0712156,40.7618057,0
+            -4.0712841,40.761948,0
+            -4.0714005,40.7620189,0
+            -4.0715371,40.7620167,0
+            -4.0716839,40.7619075,0
+            -4.071689,40.7617704,0
+          </coordinates>
+        
+        
+      </LineString>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>APARCAMIENTO / Cordes-sur-Ciel (FR)</name>
+      
+        
+      <description>Aparcamiento mixto, aquí puedes hacer el tiempo D espera </description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            1.9586275,44.0640921,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Langeais (FR)</name>
+      
+        
+      <description>Esplanada de tierra para hacer la espera en Langeais France.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            0.4007594,47.3213975,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Pinilla / Navahermosa (Toledo)</name>
+      
+        
+      <description>C. García Lorca, 1, 45150 Navahermosa, Toledo</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -4.4790835,39.6357955,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Francisco Ramos / Guadalajara </name>
+      
+        
+      <description>C. Méjico, 47 Nave, 19004 Guadalajara www.autocaresframos.com +34 949 20 01 58</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.1930638,40.6274676,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Venecia (IT)</name>
+      
+        
+      <description>Zona de Espera en el lateral de Via Torino de Venecia.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            12.2515196,45.4796456,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name><![CDATA[APARCAMIENTO 🅿️ / L'Escala (Girona)]]></name>
+      
+        
+      <description>Se puede aparcar por esta zona es comercial.</description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            3.1285213,42.1151794,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>MUSEO Cap Sciences 🏛 / Burdeaux (FR)</name>
+      
+        
+      <description>Zona para dejar delante Museo Ciencias /  Hangar 20, Quai de Bacalan, 33300 Bordeaux, Francia www.cap-sciences.net +33 5 56 01 07 07</description>
+      
+        
+      <styleUrl>#icon-1636-A52714</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -0.5544455,44.859755,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>APARCAMIENTO LIBRE NERJA</name>
+      
+        
+      <description>Para hacer la espera y aparcar sin problema</description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.872454,36.757685,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>APARCAMIENTO ZONA COMERCIAL // NO OFICIAL</name>
+      
+        
+      <description>Puedes aparcar para hacer tiempo de espera. ZONA comercial</description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -0.019299,39.98151,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>APARCAMIENTO GRATUITO</name>
+      
+        
+      <description><![CDATA[APARCAMIENTO AUTORIZADO POR EL AYUNTAMIENTO PARA AUTOCARES. "AVISO" LOS LUNES NO APARCAR POR MERCADILLO.Marbella | Aparcamiento Asfaltado compartido con turismos | CUIDADO NO TE QUEDEN ENCERRADO]]></description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -4.872336,36.513434,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Plaza Karl Marx</name>
+      
+        
+      <description>Puedes hacer aquí la espera no suelen decir nada, pero depende el que te pille te puede echar.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.161538,41.439911,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA ESPERA - Faro (P)</name>
+      
+        
+      <description>Lugar para esperar a recoger grupo en Faro ( P)</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -7.946139,37.022998,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA ESPERA / Berga</name>
+      
+        
+      <description>Zona tranquila para esperar a recoger grupo. Aparcamiento en linea libre</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            1.85146,42.097025,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Olvera (Cádiz)</name>
+      
+        
+      <description>Aquí puedes esperar mientras hacen las visitas</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -5.265901,36.938079,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>Autocares ROYMAR </name>
+      
+        
+      <description>Camí de la Mar, 16, 46540 El Puig de Santa Maria, Valencia www.autocaresroymar.com +34 961 47 02 14</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -0.28295,39.58356,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>Autocares RODRIGO / Valencia </name>
+      
+        
+      <description><![CDATA[Ctra. de Rochs, 47, 46013 València, Valencia<br>autocaresrodrigo.com<br>+34 963 34 90 01]]></description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -0.350283,39.443722,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>DESGUACES Julián Manzaneque 🛠 / Manzanares (Ciudad Real)</name>
+      
+        
+      <description>Desguaces de autocares por si necesitas algún portón o piezas varias.</description>
+      
+        
+      <styleUrl>#icon-1590-1A237E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.380481,38.96523,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Tarifa (Cádiz)</name>
+      
+        
+      <description>ZONA de Espera en el puerto</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -5.604811,36.010642,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA ESPERA ESPECTÁCULO CABALLOS ECUESTRES / Jerez</name>
+      
+        
+      <description>Aparcamiento en jerez mientras se ven los caballos.VIGILADO POR GORRILLAS .</description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -6.137459,36.695751,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Córdoba </name>
+      
+        
+      <description>Aparcamiento al lado del centro Comercial.Aparcamiento en linea.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -4.787003,37.857718,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Sevilla</name>
+      
+        
+      <description>ZONA de espera por calles del recinto Ferial</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -5.99609,37.368111,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / LA CARTUJA (Sevilla)</name>
+      
+        
+      <description>Aparcamiento libre en campa de tierra. La entrada es mala, no hay sombras ni tampoco ningún servicio, ideal para la espera de la visita a la torre del oro. Estas a 7 minutos de la Torre del Oro</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -6.013242,37.397608,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>MUELLE DE LAS CALAVERAS / Palos de la Frontera (Huelva)</name>
+      
+        
+      <description>Zona de aparcamiento para la visita del Muelle de las Calaveras y el Monasterio de la Rabida.</description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -6.926071,37.210173,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>MOLINOS y  CASTILLO CONSUEGRA 🏰 / Consuegra ( Toledo)</name>
+      
+        
+      <description>Aparcamiento habilitado para la espera mientras los pasajeros visitan los castillos. Solo autorizado a los autocares que tienen la autorización.</description>
+      
+        
+      <styleUrl>#icon-1598-424242</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.61132,39.453494,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ENTRADA Alcazar de Toledo</name>
+      
+        
+      <description>Solo esta permitida la entrada a partir de la puerta de bisagra los autocares con autorización expresa del ayuntamiento o del Acazar de toledo</description>
+      
+        
+      <styleUrl>#line-F9A825-5000</styleUrl>
+      
+        
+      <LineString>
+        
+          
+        <tessellate>1</tessellate>
+        
+          
+        <coordinates>
+            -4.025474,39.862478,0
+            -4.02551,39.862326,0
+            -4.025414,39.8622,0
+            -4.025241,39.862104,0
+            -4.025255,39.86174,0
+            -4.025191,39.861514,0
+            -4.02504,39.861325,0
+            -4.024715,39.861187,0
+            -4.024423,39.861093,0
+            -4.023607,39.861182,0
+            -4.02341,39.861197,0
+            -4.023191,39.86117,0
+            -4.021958,39.861298,0
+            -4.021756,39.861252,0
+            -4.0212385,39.8609347,0
+            -4.0210701,39.8607049,0
+            -4.021037,39.860557,0
+            -4.021035,39.860329,0
+            -4.021107,39.860036,0
+            -4.0211,39.859543,0
+            -4.021074,39.858833,0
+            -4.021087,39.857475,0
+            -4.021085,39.857435,0
+            -4.019375,39.857404,0
+            -4.019368,39.857522,0
+            -4.019882,39.857542,0
+            -4.019848,39.858164,0
+          </coordinates>
+        
+        
+      </LineString>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / CARAVACA DE LA CRUZ (Murcia)</name>
+      
+        
+      <description>Aparcamiento en linea sin problemas</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -1.867027,38.096799,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>NO PASAR / AYLLÓN ( Segovia)</name>
+      
+        
+      <description>ATENCION !!! No entrar con autocares. Se estrecha la calle y no giras.</description>
+      
+        
+      <styleUrl>#icon-1898-C2185B</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.372811,41.417576,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Luarca (Asturias)</name>
+      
+        
+      <description>Puedes venir a este punto para hacer la espera mientras visitan Luarca</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -6.537138,43.537496,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>INFO / O GROVE</name>
+      
+        
+      <description>ZONA DE APARCAMIENTO ALTERNATIVO.</description>
+      
+        
+      <styleUrl>#line-0288D1-5000</styleUrl>
+      
+        
+      <LineString>
+        
+          
+        <tessellate>1</tessellate>
+        
+          
+        <coordinates>
+            -8.861494,42.497812,0
+            -8.859624,42.497956,0
+            -8.858674,42.498016,0
+          </coordinates>
+        
+        
+      </LineString>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>C Y D 🔄 (EXPRESS) / Sanxenxo (Pontevedra)</name>
+      
+        
+      <description>Zona RESERVADA para dejar pasajeros y recogerlos a la hora que te digan . NO TE QUEDES APARCADO.</description>
+      
+        
+      <styleUrl>#icon-1826-E65100</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -8.8128186,42.4027599,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA ☕ / Sanxenxo (Pontevedra)</name>
+      
+        
+      <description>En el lateral de la carretera es bastante ancho para hacer la espera de la visita de Sanxenxo</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -8.8167891,42.4046769,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / SOLSONA</name>
+      
+        
+      <description>Aqui puedes aparcar sin problemas</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            1.526959,41.993885,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>APARCAMIENTO / SANTARÉM (PO)</name>
+      
+        
+      <description>Amplia esplanada mixta para aparcar o hacer tiempo de espera sin problemas</description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -8.689452,39.230479,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name><![CDATA[ZONA DE ESPERA / L' Escala]]></name>
+      
+        
+      <description>Puedes aparcar por el polígono para hacer la</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            3.126208,42.112242,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name><![CDATA[C Y D / Platja D'Aro]]></name>
+      
+        
+      <description><![CDATA[Zona reservada para dejar y recoger pasajeros en Platja D'Aro / NO APARCAR PARA NO MOLESTAR A LOS COMPAÑEROS QUE VENGAN DETRÁS]]></description>
+      
+        
+      <styleUrl>#icon-1826-0F9D58</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            3.068138,41.819504,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA ☕ / Pals (Girona)</name>
+      
+        
+      <description>Aqui se hace la espera a la visita de Pals. Si es finde y hay fútbol hay coches, dejalo encarado a la salida. En el campo tienes para comer bocatas.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            3.1534551,41.9785453,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Montblanc (Tarragona)</name>
+      
+        
+      <description>De momento no hay viviendas por esta zona y se puede hacer la espera sin problemas.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            1.1546779,41.3723733,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Sariñena (Huesca)</name>
+      
+        
+      <description>Aparcamiento a las afueras población en linea, descanso o dejar aparcado noche.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -0.1514184,41.7919635,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES ESTEBAN RIVAS / Getafe (Madrid)</name>
+      
+        
+      <description>Pol. Ind. San Marcos, C. Eratóstenes, 15, 28906 Getafe, Madrid www.estebanrivas.es +34 916 93 77 11</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.6952577,40.2950501,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA/ Almería </name>
+      
+        
+      <description>Zona para hacer la Espera en Estadio UD Almería.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -2.4330149,36.8383368,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>APARCAMIENTO / Almería </name>
+      
+        
+      <description>Aparcamiento en linea afueras de Almería para hacer zona de espera o dejarlo aparcado.</description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -2.4435536,36.8642008,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>APARCAMIENTO/ Leganés (Madrid)</name>
+      
+        
+      <description>Aparcamientos de tierra mixto en Leganés para hacer la espera del grupo </description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.7643327,40.3398487,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Leganés (Madrid)</name>
+      
+        
+      <description>En finde no hay problema para hacer la espera por el polígono.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.7387937,40.3310057,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA / Leganés (Madrid)</name>
+      
+        
+      <description>Aparcamientos para hacer zona de espera dejarlo cerca salida para salir bien.</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -3.7509493,40.3411753,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>APARCAMIENTO / Mérida</name>
+      
+        
+      <description>Aparcamiento recinto Ferial para hacer tiempo de espera . Gratuito </description>
+      
+        
+      <styleUrl>#icon-1644-0288D1</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -6.3558978,38.9253672,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>LA SELVA AVENTURA 🚸/ Arbucies (Barcelona)</name>
+      
+        
+      <description>Se dejan aqui en este punto porque no se puede llegar / prohibido autocares.</description>
+      
+        
+      <styleUrl>#icon-1682-673AB7</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.4376274,41.8542713,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>PROHIBIDO AUTOCARES</name>
+      
+        
+      <description>No se puede subir hasta Seva Aventura.</description>
+      
+        
+      <styleUrl>#icon-1899-DB4436</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.4373514,41.854216,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Calella Moventis ☑️ / Malgrat de Mar (Barcelona)</name>
+      
+        
+      <description>Camí de la Pomereda, 11, 08380 Malgrat de Mar, Barcelona www.autocarscalella.com +34 937 66 43 59</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.7516495,41.6467854,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA ☕️ / Tarragona </name>
+      
+        
+      <description>Zona de espera por aqui tienes centro Comercial para pasear y comer. C/ De joan Amades i Gelats</description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            1.2026947,41.1295923,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>ZONA DE ESPERA ☕️ /Alcañiz (Teruel)</name>
+      
+        
+      <description>Zona de espera a las afueras de Alcañiz, con sitios para comer. </description>
+      
+        
+      <styleUrl>#icon-1534-4E342E</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -0.1413264,41.0516952,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Sagalés ☑️ / Mollet de Vallés (Barcelona)</name>
+      
+        
+      <description>P.I. Can Magarola, Carrer de Friedrich Wilhelm Sertüner, s/n, 08100 Barcelona www.sagales.com +34 902 13 00 14</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            2.225293,41.5500589,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Rodriguez ☑️ / Los Gallardos (Almería)</name>
+      
+        
+      <description>Autocares Rodriguez / Carretera Nacional 340, Km. 520, 04280 Los Gallardos, Almería</description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -1.9315408,37.168732,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>Souvenirs Sobrellano / Comillas (Cantabria)</name>
+      
+        
+      <description>Venta de Bebidas y Souvenirs de la zona. Si llevas Grupos tienen detalle con Chofer y Guía/ C. del Marqués de Comillas, 26, 39520 Comillas, Cantabria</description>
+      
+        
+      <styleUrl>#icon-1769-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -4.2944341,43.3850167,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+    <Placemark>
+      
+        
+      <name>AUTOCARES Jesús Álvarez ✔️ / Torrijos / Toledo</name>
+      
+        
+      <description><![CDATA[Cocheras de Autocares Jesús Álvarez  / Pl. Industrial Valdoli, 13, 45500 Torrijos, Toledo <br>www.autocaresjesusalvarez.com <br>+34 639 11 85 68]]></description>
+      
+        
+      <styleUrl>#icon-1532-000000</styleUrl>
+      
+        
+      <Point>
+        
+          
+        <coordinates>
+            -4.2718621,39.9949595,0
+          </coordinates>
+        
+        
+      </Point>
+      
+      
+    </Placemark>
+  </Document>
+</kml>

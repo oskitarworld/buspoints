@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "599296548737",
+    "project_id": "buspoint-49ea0",
+    "storage_bucket": "buspoint-49ea0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:599296548737:android:ca68c23ed70087d1b65280",
+        "android_client_info": {
+          "package_name": "com.example.trucker_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "599296548737-jj01qjanje7f3g67icn5vhu538s743k1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.trucker_app",
+            "certificate_hash": "57a02963450782e16f9917a0527ff6204ca0c587"
+          }
+        },
+        {
+          "client_id": "599296548737-hlfum3s1emkb63dmpslnoada40gl5r5v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDdOY8rXDYeRn0Zp5gx2LWWOTpsahfC3RM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "599296548737-hlfum3s1emkb63dmpslnoada40gl5r5v.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "599296548737-6fdust2lfmcla5usf5e4jqlggasm6pf4.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.myapp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
