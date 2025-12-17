@@ -28,7 +28,8 @@ class _AddPoiScreenState extends State<AddPoiScreen> {
   @override
   void initState() {
     super.initState();
-    widget.categories.sort();
+    // Preserve the category order passed by the caller (HomeScreen).
+    // Do not sort here so the dropdown matches the main menu order.
 
     if (widget.initialPosition != null) {
       _selectedLocation = widget.initialPosition;
@@ -86,35 +87,28 @@ class _AddPoiScreenState extends State<AddPoiScreen> {
       }
 
       try {
-        final userDoc = await FirebaseFirestore.instance
-            .collection('users')
-            .doc(user.uid)
-            .get();
-        final bool isAdmin =
-            userDoc.exists && userDoc.data()?['role'] == 'admin';
-
-        final String status = isAdmin ? 'approved' : 'pending';
-        const String adminMessage = 'Punto de interés añadido y aprobado correctamente.';
-        const String userMessage = '¡Gracias! Tu punto ha sido enviado para su revisión.';
-        final String successMessage = isAdmin ? adminMessage : userMessage;
-
+        // All user submissions go to user_pois with status 'pending'.
         final geoFirePoint = GeoFirePoint(GeoPoint(
             _selectedLocation!.latitude, _selectedLocation!.longitude));
 
         await FirebaseFirestore.instance.collection('user_pois').add({
-          'name': _nameController.text,
-          'description': _descriptionController.text,
+          'name': _nameController.text.trim(),
+          'description': _descriptionController.text.trim(),
           'category': _selectedCategory,
-          'geo': geoFirePoint.data,
+          // Helpful coordinate shapes for later processing/approval
+          'latitude': _selectedLocation!.latitude,
+          'longitude': _selectedLocation!.longitude,
+          'geopoint': GeoPoint(_selectedLocation!.latitude, _selectedLocation!.longitude),
+          'geo': geoFirePoint.data, // keeps geohash for potential proximity queries
           'submittedBy': user.uid,
           'submittedAt': FieldValue.serverTimestamp(),
-          'status': status,
+          'status': 'pending',
         });
 
         if (mounted) {
           Navigator.of(context).pop();
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(successMessage)),
+            const SnackBar(content: Text('¡Gracias! Tu punto ha sido enviado para su revisión.')),
           );
         }
       } on FirebaseException catch (e) {
@@ -209,8 +203,8 @@ class _AddPoiScreenState extends State<AddPoiScreen> {
                   ),
                   maxLines: 3,
                   validator: (value) {
-                    if ((_selectedCategory == 'Lista blanca' ||
-                            _selectedCategory == 'Lista negra') &&
+                    final cat = (_selectedCategory ?? '').toLowerCase();
+                    if ((cat == 'lista gold' || cat == 'lista negra') &&
                         (value == null || value.isEmpty)) {
                       return 'Los comentarios son obligatorios para esta categoría.';
                     }

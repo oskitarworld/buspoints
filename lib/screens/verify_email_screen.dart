@@ -113,17 +113,31 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
               ),
             ),
             const SizedBox(height: 32),
-            ElevatedButton.icon(
-              icon: const Icon(Icons.send),
-              label: const Text('Reenviar Correo'),
-              onPressed: _canResendEmail ? sendVerificationEmail : null,
+            Center(
+              child: SizedBox(
+                width: 180,
+                child: ElevatedButton.icon(
+                  icon: const Icon(Icons.send, size: 18),
+                  label: const Text('Reenviar Correo', style: TextStyle(fontSize: 14)),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  onPressed: _canResendEmail ? sendVerificationEmail : null,
+                ),
+              ),
             ),
             const SizedBox(height: 12),
-            TextButton(
-              onPressed: () => authService.signOut(),
-              child: const Text(
-                'Cerrar Sesión',
-                style: TextStyle(color: Colors.grey),
+            Center(
+              child: TextButton(
+                onPressed: () {
+                  authService.signOut();
+                  Navigator.of(context).pushReplacementNamed('/auth');
+                },
+                child: const Text(
+                  'Iniciar Sesión',
+                  style: TextStyle(color: Colors.blueGrey, fontWeight: FontWeight.bold),
+                ),
               ),
             ),
           ],

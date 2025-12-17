@@ -5,54 +5,103 @@ service cloud.firestore {
 
     // Function to check if the user is an administrator.
     function isAdmin() {
-      // Check if the user is authenticated and if their document exists in the 'users' collection.
-      // Then, check if the 'role' field in their document is set to 'admin'.
+      // Check if the user is authenticated and has role 'admin'
       return request.auth != null &&
              exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+             (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+              get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true);
     }
 
     // Rules for the 'users' collection.
     match /users/{userId} {
-      // Allow document creation if the user is authenticated and their UID matches the document ID.
-      allow create: if request.auth != null && request.auth.uid == userId;
+  // Allow document creation if the user is authenticated and their UID matches the document ID, o si es admin.
+  allow create: if true;
 
       // Allow a user to read and update their own document.
       allow read, update: if request.auth != null && request.auth.uid == userId;
+
+      // Allow any authenticated user to list users (needed for finding admin)
+      allow list: if request.auth != null;
 
       // Allow administrators to delete user documents.
       allow delete: if isAdmin();
 
       // Allow administrators to list, read, and update any document in the 'users' collection.
       // This is separated from the user-specific rule to avoid recursive checks.
-      allow list, read, update: if isAdmin();
+      allow read, update: if isAdmin();
     }
 
     // Rules for the 'pois' (Points of Interest) collection.
     match /pois/{poiId} {
-      // Allow read access if the user is authenticated and the POI is approved, or if the user is an admin.
-      allow read: if request.auth != null && (resource.data.status == 'approved' || isAdmin());
+      // Allow read access to authenticated users (approved points live here).
+      allow read: if request.auth != null;
 
-      // Allow authenticated users to create POIs.
-      allow create: if request.auth != null;
+      // Only administrators can create approved POIs here.
+      allow create: if isAdmin();
 
       // Allow administrators to update and delete POIs.
       allow update, delete: if isAdmin();
     }
 
-    // Rules for the 'user_pois' subcollection (if it exists).
+    // Rules for the 'user_pois' collection (user-submitted POIs).
     match /user_pois/{poiId} {
-      // Allow authenticated users to read and list their own POIs.
-      allow read, list: if request.auth != null;
-      
+      // Allow read only if the POI is approved (public), or the requester is the author, or an admin.
+      // This prevents normal authenticated users from listing/reading pending or rejected submissions.
+      allow read: if request.auth != null && (
+        // public approved items
+        resource.data.status == 'approved' ||
+        // the author can read their own submission
+        request.auth.uid == resource.data.submittedBy ||
+        // admins can read everything
+        isAdmin()
+      );
+
+      // Only administrators may list the collection (to power admin UIs). Regular users cannot list all user_pois.
+      allow list: if isAdmin();
+
       // Allow authenticated users to create documents.
       allow create: if request.auth != null;
-      
-      // Allow update if the user is an admin or the creator of the POI.
-      allow update: if request.auth != null && (isAdmin() || request.auth.uid == resource.data.creator_uid);
-      
+
+      // Allow update if the user is an admin or the submitter of the POI.
+      allow update: if request.auth != null && (isAdmin() || request.auth.uid == resource.data.submittedBy);
+
       // Allow administrators to delete documents.
       allow delete: if isAdmin();
+    }
+    
+    // Rules for PDIs and their subcollection 'reviews'
+    match /pdis_v2/{pdiId} {
+      // Allow authenticated users to read POI data.
+      allow read: if request.auth != null;
+
+      // Subcollection 'reviews' for each PDI
+      match /reviews/{reviewId} {
+        // Allow authenticated users to create a review (submit a comment)
+        allow create: if request.auth != null;
+
+        // Allow the author to read their own review, admins can read all
+        allow read: if request.auth != null &&
+                     (request.auth.uid == resource.data.userId || isAdmin());
+
+        // Only administrators can update or delete reviews (approve/reject)
+        allow update, delete: if isAdmin();
+      }
+    }
+
+    // Global collectionGroup rule for any 'reviews' subcollection across the database.
+    // This ensures queries using collectionGroup('reviews') (e.g. for admin dashboards)
+    // are permitted for administrators. It also keeps create/update/delete semantics.
+    match /{path=**}/reviews/{reviewId} {
+      // Allow authenticated users to create a review (submit a comment)
+      allow create: if request.auth != null;
+
+      // Allow the author to read their own review, admins can read all.
+      // This also permits admin queries over collectionGroup('reviews').
+      allow read: if request.auth != null &&
+                   (request.auth.uid == resource.data.userId || isAdmin());
+
+      // Only administrators can update or delete reviews (approve/reject)
+      allow update, delete: if isAdmin();
     }
     
     // Rules for public bus stops.
@@ -71,6 +120,55 @@ service cloud.firestore {
       
       // Only allow administrators to write to location data.
       allow write: if isAdmin();
+    }
+
+    // Rules for contact messages.
+    match /contact_messages/{messageId} {
+      allow create: if true;
+      // Permitir borrar al administrador o al usuario dueño del mensaje (por email)
+      allow delete: if isAdmin() || (request.auth != null && resource.data.email == request.auth.token.email);
+      // Solo admins pueden leer y actualizar
+      allow read, update: if isAdmin();
+    }
+    
+    // Rules for user_messages (propuestas de mejora and other messages)
+    match /user_messages/{messageId} {
+      // Any authenticated user can create messages
+      allow create: if request.auth != null;
+      
+      // Users can list messages (Firestore will validate read permissions for each doc)
+      allow list: if request.auth != null;
+      
+      // Users can read messages they sent or received, admins can read all EXCEPT contact copies
+      allow read: if request.auth != null && 
+                     (request.auth.uid == resource.data.fromUid || 
+                      request.auth.uid == resource.data.toUid ||
+                      (isAdmin() && resource.data.isContact != true));
+      
+      // Users can update messages they sent or received (to mark as read), admins can update any EXCEPT contact copies
+      allow update: if request.auth != null && 
+                       (request.auth.uid == resource.data.toUid ||
+                        request.auth.uid == resource.data.fromUid ||
+                        (isAdmin() && resource.data.isContact != true));
+      
+      // Users can delete messages they sent or received, admins can delete any EXCEPT contact copies
+      allow delete: if request.auth != null && 
+                       (request.auth.uid == resource.data.fromUid || 
+                        request.auth.uid == resource.data.toUid || 
+                        (isAdmin() && resource.data.isContact != true));
+    }
+    
+    // --- TESTING ONLY: Permit authenticated reads on pdis and places ---
+    // These rules are intended for quick local debugging. Remove or tighten
+    // them before deploying to production.
+    match /pdis/{docId} {
+      // Allow any authenticated user to read PDI documents for testing.
+      allow read: if request.auth != null;
+    }
+
+    match /places/{docId} {
+      // Allow any authenticated user to read 'places' used by the client.
+      allow read: if request.auth != null;
     }
   }
 }

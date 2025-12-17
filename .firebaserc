@@ -1,5 +1,8 @@
 {
-  "projects": {},
+  "projects": {
+    "default": "buspoint-49ea0",
+    "buspoints": "buspoint-49ea0"
+  },
   "targets": {},
   "etags": {}
 }

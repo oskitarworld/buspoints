@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:myapp/services/auth_service.dart';
+import '../screens/auth/auth_screen.dart';
 
 class PendingApprovalScreen extends StatelessWidget {
   const PendingApprovalScreen({super.key});
@@ -45,7 +46,7 @@ class PendingApprovalScreen extends StatelessWidget {
               ),
               const SizedBox(height: 15),
               const Text(
-                'Tu cuenta ha sido creada, pero necesita ser aprobada por un administrador. Por favor, realiza un pago de 20€ vía Bizum al siguiente número para activar tu cuenta:',
+                'Tu cuenta ha sido creada, pero necesita ser aprobada por un administrador. Por favor, realiza un pago de 15€ vía Bizum al siguiente número para activar tu cuenta:',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 18,
@@ -66,7 +67,7 @@ class PendingApprovalScreen extends StatelessWidget {
                     Icon(Icons.phone_iphone_rounded, color: Colors.blueAccent),
                     SizedBox(width: 15),
                     Text(
-                      '+34 123 456 789',
+                      '602 428 045',
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
@@ -80,7 +81,22 @@ class PendingApprovalScreen extends StatelessWidget {
               ElevatedButton.icon(
                 icon: const Icon(Icons.logout),
                 label: const Text('Cerrar Sesión'),
-                onPressed: () => authService.signOut(),
+                onPressed: () async {
+                  try {
+                    print('Intentando cerrar sesión...');
+                    await authService.signOut();
+                    print('Sesión cerrada, navegando a login...');
+                    if (context.mounted) {
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(builder: (_) => const AuthScreen()),
+                        (route) => false,
+                      );
+                    }
+                  } catch (e, st) {
+                    print('Error al cerrar sesión: $e');
+                    print('Stacktrace: $st');
+                  }
+                },
                 style: ElevatedButton.styleFrom(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 24, vertical: 12),

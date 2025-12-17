@@ -1,7 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:myapp/models/user_model.dart';
-import 'package:slide_to_act/slide_to_act.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'create_user_screen.dart';
 
 class ManageUsersScreen extends StatelessWidget {
@@ -12,7 +11,145 @@ class ManageUsersScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Gestionar Usuarios'),
+        backgroundColor: Colors.red[800],
         actions: [
+          IconButton(
+            icon: const Icon(Icons.campaign),
+            tooltip: 'Enviar push a todos',
+            onPressed: () {
+              final messageController = TextEditingController();
+              final formKey = GlobalKey<FormState>();
+              bool isSending = false;
+              showDialog(
+                context: context,
+                builder: (ctx) {
+                  return StatefulBuilder(
+                    builder: (context, setState) {
+                      return AlertDialog(
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        title: Row(
+                          children: [
+                            const Icon(Icons.campaign, color: Colors.blue),
+                            const SizedBox(width: 12),
+                            const Expanded(child: Text('Enviar notificación a todos')),
+                          ],
+                        ),
+                        content: Form(
+                          key: formKey,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              TextFormField(
+                                controller: messageController,
+                                decoration: InputDecoration(
+                                  labelText: 'Mensaje',
+                                  hintText: 'Escribe tu mensaje aquí...',
+                                  border: const OutlineInputBorder(),
+                                  prefixIcon: const Icon(Icons.edit),
+                                  filled: true,
+                                  fillColor: Colors.grey[50],
+                                ),
+                                maxLines: 5,
+                                validator: (value) {
+                                  if (value == null || value.trim().isEmpty) {
+                                    return 'El mensaje no puede estar vacío';
+                                  }
+                                  if (value.trim().length < 5) {
+                                    return 'El mensaje debe tener al menos 5 caracteres';
+                                  }
+                                  return null;
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: isSending ? null : () => Navigator.of(ctx).pop(),
+                            child: const Text('Cancelar'),
+                          ),
+                          ElevatedButton.icon(
+                            icon: isSending
+                                ? const SizedBox(
+                                    width: 16,
+                                    height: 16,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                    ),
+                                  )
+                                : const Icon(Icons.send),
+                            label: Text(isSending ? 'Enviando...' : 'Enviar a todos'),
+                            style: ElevatedButton.styleFrom(backgroundColor: Colors.blue[700]),
+                            onPressed: isSending
+                                ? null
+                                : () async {
+                                    if (formKey.currentState?.validate() ?? false) {
+                                      setState(() => isSending = true);
+                                      try {
+                                        final currentUser = FirebaseAuth.instance.currentUser;
+                                        if (currentUser == null) throw Exception('No hay usuario autenticado');
+                                        final adminDoc = await FirebaseFirestore.instance.collection('users').doc(currentUser.uid).get();
+                                        final adminData = adminDoc.data();
+                                        final adminName = adminData?['name'] ?? currentUser.displayName ?? 'Administrador';
+
+                                        // Create a system notification (non-respondable) for broadcast
+                                        final firestore = FirebaseFirestore.instance;
+                                        final notifRef = await firestore.collection('system_notifications').add({
+                                          'fromUid': currentUser.uid,
+                                          'fromName': adminName,
+                                          'message': messageController.text.trim(),
+                                          'timestamp': FieldValue.serverTimestamp(),
+                                          'fromAdmin': true,
+                                          'to': 'all',
+                                          'respondable': false,
+                                        });
+
+                                        // Create per-user copies for efficient reads and per-user unread counts
+                                        // Use batched writes in chunks of 500
+                                        final usersSnap = await firestore.collection('users').get();
+                                        const int batchSize = 500;
+                                        final docs = usersSnap.docs;
+                                        for (var i = 0; i < docs.length; i += batchSize) {
+                                          final chunk = docs.sublist(i, (i + batchSize) > docs.length ? docs.length : i + batchSize);
+                                          final batch = firestore.batch();
+                                          for (var u in chunk) {
+                                            final uid = u.id;
+                                            final userNotifRef = firestore.collection('users').doc(uid).collection('notifications').doc(notifRef.id);
+                                            batch.set(userNotifRef, {
+                                              'fromUid': currentUser.uid,
+                                              'fromName': adminName,
+                                              'message': messageController.text.trim(),
+                                              'timestamp': FieldValue.serverTimestamp(),
+                                              'read': false,
+                                              'systemNotifId': notifRef.id,
+                                            });
+                                          }
+                                          await batch.commit();
+                                        }
+
+                                        if (ctx.mounted) Navigator.of(ctx).pop();
+                                        if (context.mounted) {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(content: Text('Mensaje broadcast enviado a todos'), backgroundColor: Colors.green[700]),
+                                          );
+                                        }
+                                      } catch (e) {
+                                        setState(() => isSending = false);
+                                        if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(content: Text('Error al enviar broadcast: $e'), backgroundColor: Colors.red));
+                                      }
+                                    }
+                                  },
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () => Navigator.push(
@@ -36,88 +173,101 @@ class UserList extends StatefulWidget {
 }
 
 class _UserListState extends State<UserList> {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   String _searchQuery = '';
-
-  void _showSearchDialog() async {
-    final searchController = TextEditingController(text: _searchQuery);
-    await showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Buscar Usuario'),
-        content: TextField(
-          controller: searchController,
-          decoration: const InputDecoration(
-            hintText: 'Nombre o email...',
-            icon: Icon(Icons.search),
-          ),
-          autofocus: true,
-        ),
-        actions: [
-          TextButton(
-            child: const Text('Cancelar'),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          ElevatedButton(
-            child: const Text('Buscar'),
-            onPressed: () {
-              if (mounted) {
-                setState(() => _searchQuery = searchController.text);
-              }
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
-      ),
-    );
-  }
+  String _filterRole = 'todos';
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Padding(
+        // Barra de búsqueda y filtros
+        Container(
           padding: const EdgeInsets.all(16.0),
-          child: Row(
+          color: Colors.grey[100],
+          child: Column(
             children: [
-              Expanded(
-                child: Text(
-                  _searchQuery.isEmpty
-                      ? 'Mostrando todos los usuarios'
-                      : 'Resultados para: "$_searchQuery"'
+              TextField(
+                decoration: InputDecoration(
+                  hintText: 'Buscar por nombre o email...',
+                  prefixIcon: const Icon(Icons.search),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  filled: true,
+                  fillColor: Colors.white,
                 ),
+                onChanged: (value) {
+                  setState(() {
+                    _searchQuery = value.toLowerCase();
+                  });
+                },
               ),
-              IconButton(
-                icon: const Icon(Icons.search),
-                onPressed: _showSearchDialog,
-                tooltip: 'Buscar'
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  const Text('Filtrar por rol: ',
+                      style: TextStyle(fontWeight: FontWeight.w500)),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: SegmentedButton<String>(
+                      segments: const [
+                        ButtonSegment(value: 'todos', label: Text('Todos')),
+                        ButtonSegment(value: 'user', label: Text('Usuario')),
+                        ButtonSegment(value: 'admin', label: Text('Admin')),
+                      ],
+                      selected: {_filterRole},
+                      onSelectionChanged: (Set<String> newSelection) {
+                        setState(() {
+                          _filterRole = newSelection.first;
+                        });
+                      },
+                    ),
+                  ),
+                ],
               ),
-              if (_searchQuery.isNotEmpty)
-                IconButton(
-                  icon: const Icon(Icons.clear),
-                  onPressed: () => setState(() => _searchQuery = ''),
-                  tooltip: 'Limpiar Búsqueda'
-                ),
             ],
           ),
         ),
+        // Lista de usuarios
         Expanded(
-          child: StreamBuilder<QuerySnapshot>(
-            stream: _firestore.collection('users').snapshots(),
+          child: StreamBuilder(
+            stream: FirebaseFirestore.instance.collection('users').snapshots(),
             builder: (context, snapshot) {
-              if (snapshot.hasError) return Center(child: Text('Error: ${snapshot.error}'));
-              if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
+              if (snapshot.hasError) {
+                return const Center(child: Text('Error al cargar usuarios.'));
+              }
+              if (!snapshot.hasData) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
-              final users = snapshot.data!.docs.where((doc) {
-                final data = doc.data() as Map<String, dynamic>;
-                final name = (data['name'] ?? '').toLowerCase();
-                final email = (data['email'] ?? '').toLowerCase();
-                return name.contains(_searchQuery.toLowerCase()) || email.contains(_searchQuery.toLowerCase());
-              }).toList();
+              var users = snapshot.data!.docs;
 
-              if (users.isEmpty) return const Center(child: Text('No se encontraron usuarios.'));
+              // Aplicar filtros
+              if (_searchQuery.isNotEmpty) {
+                users = users.where((doc) {
+                  final data = doc.data();
+                  final name = (data['name'] ?? '').toString().toLowerCase();
+                  final email = (data['email'] ?? '').toString().toLowerCase();
+                  return name.contains(_searchQuery) ||
+                      email.contains(_searchQuery);
+                }).toList();
+              }
+
+              if (_filterRole != 'todos') {
+                users = users.where((doc) {
+                  final data = doc.data();
+                  return (data['role'] ?? 'user') == _filterRole;
+                }).toList();
+              }
+
+              if (users.isEmpty) {
+                return const Center(
+                    child:
+                        Text('No hay usuarios que coincidan con los filtros.'));
+              }
 
               return ListView.builder(
+                padding: const EdgeInsets.all(16.0),
                 itemCount: users.length,
                 itemBuilder: (context, index) {
                   final userDoc = users[index];
@@ -133,153 +283,1118 @@ class _UserListState extends State<UserList> {
 }
 
 class UserListItem extends StatelessWidget {
-  final QueryDocumentSnapshot userDoc;
+  final dynamic userDoc;
   const UserListItem({super.key, required this.userDoc});
-
-  String _formatDate(DateTime date) => '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
-
-  void _showSnackBar(BuildContext context, String message, {bool isError = false}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: isError ? Colors.red : Colors.green),
-    );
-  }
-
-  Future<void> _updateSubscription(BuildContext context, String uid, List<Subscription> history, Subscription oldSub, DateTime newEndDate) async {
-    final updatedSub = Subscription(startDate: oldSub.startDate, endDate: newEndDate);
-    final index = history.indexWhere((s) => s.startDate == oldSub.startDate && s.endDate == oldSub.endDate);
-    if (index != -1) {
-      final updatedHistory = List<Subscription>.from(history)..[index] = updatedSub;
-      try {
-        await FirebaseFirestore.instance.collection('users').doc(uid).update({
-          'subscriptionHistory': updatedHistory.map((s) => s.toMap()).toList(),
-        });
-        if (!context.mounted) return;
-        _showSnackBar(context, 'Suscripción actualizada.');
-      } catch (e) {
-        if (!context.mounted) return;
-        _showSnackBar(context, 'Error al actualizar: $e', isError: true);
-      }
-    }
-  }
-
-  Future<void> _renewSubscription(BuildContext context, String uid, List<Subscription> history) async {
-    final newSub = Subscription(startDate: DateTime.now(), endDate: DateTime.now().add(const Duration(days: 365)));
-    try {
-      await FirebaseFirestore.instance.collection('users').doc(uid).update({
-        'subscriptionHistory': [...history.map((s) => s.toMap()), newSub.toMap()],
-      });
-      if (!context.mounted) return;
-      _showSnackBar(context, 'Suscripción renovada.');
-    } catch (e) {
-      if (!context.mounted) return;
-      _showSnackBar(context, 'Error al renovar: $e', isError: true);
-    }
-  }
-
-  Future<void> _deleteUser(BuildContext context, String uid) async {
-    try {
-      await FirebaseFirestore.instance.collection('users').doc(uid).delete();
-      if (!context.mounted) return;
-      _showSnackBar(context, 'Usuario eliminado.');
-    } catch (e) {
-      if (!context.mounted) return;
-      _showSnackBar(context, 'Error al eliminar: $e', isError: true);
-    }
-  }
-
-  Future<void> _updateUserRole(BuildContext context, String uid, String newRole, UserModel user) async {
-      Map<String, dynamic> dataToUpdate = {'role': newRole};
-      if (newRole == 'user' && user.role == 'admin') {
-        final newSub = Subscription(startDate: DateTime.now(), endDate: DateTime.now().add(const Duration(days: 365)));
-        dataToUpdate['subscriptionHistory'] = [newSub.toMap()];
-      } else if (newRole == 'admin') {
-        dataToUpdate['subscriptionHistory'] = [];
-      }
-    try {
-      await FirebaseFirestore.instance.collection('users').doc(uid).update(dataToUpdate);
-      if (!context.mounted) return;
-      _showSnackBar(context, 'Rol actualizado.');
-    } catch (e) {
-      if (!context.mounted) return;
-      _showSnackBar(context, 'Error al actualizar rol: $e', isError: true);
-    }
-  }
-
-  void _confirmDelete(BuildContext context, String uid, String name) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Confirmar Eliminación'),
-        content: Text('¿Seguro que quieres eliminar a $name?'),
-        actions: [
-          TextButton(child: const Text('Cancelar'), onPressed: () => Navigator.of(ctx).pop()),
-          SlideAction(text: 'Deslizar para Eliminar', onSubmit: () { Navigator.of(ctx).pop(); _deleteUser(context, uid); return null; })
-        ],
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
-    final user = UserModel.fromFirestore(userDoc);
+    final data = userDoc.data() as Map<String, dynamic>;
+    final String name = data['name'] ?? 'Usuario';
+    final String email = data['email'] ?? '';
+    final String role = data['role'] ?? 'user';
+    final bool subscriptionActive = data['subscriptionActive'] ?? false;
+    final bool frozen = data['frozen'] ?? false;
+    final String? photoUrl = data['photoURL'];
+
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: ExpansionTile(
-        title: Text(user.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text('${user.email} - Rol: ${user.role.toUpperCase()}'),
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('Historial de Suscripciones', style: TextStyle(fontWeight: FontWeight.bold)),
-                ...user.subscriptionHistory.map((sub) => Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('  • ${_formatDate(sub.startDate)} - ${_formatDate(sub.endDate)}'),
-                        IconButton(
-                          icon: const Icon(Icons.edit, size: 18),
-                          onPressed: () async {
-                            final newDate = await showDatePicker(context: context, initialDate: sub.endDate, firstDate: sub.startDate, lastDate: DateTime(2100));
-                            if (newDate != null) {
-                              if (!context.mounted) return;
-                              _updateSubscription(context, user.uid, user.subscriptionHistory, sub, newDate);
-                            }
-                          },
+      margin: const EdgeInsets.only(bottom: 12.0),
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: InkWell(
+        onTap: () => _showManageUserDialog(context, data, userDoc.id),
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            children: [
+              // Avatar del usuario
+              CircleAvatar(
+                radius: 30,
+                backgroundColor: Colors.red[100],
+                backgroundImage: photoUrl != null && photoUrl.isNotEmpty
+                    ? NetworkImage(photoUrl)
+                    : null,
+                child: photoUrl == null || photoUrl.isEmpty
+                    ? Text(
+                        name.isNotEmpty ? name[0].toUpperCase() : 'U',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.red[800],
                         ),
-                      ],
-                    )),
-                if (user.subscriptionHistory.isEmpty) const Text('  Sin suscripciones.'),
-                const SizedBox(height: 16),
-                Wrap(
-                  spacing: 8.0,
-                  runSpacing: 4.0,
+                      )
+                    : null,
+              ),
+              const SizedBox(width: 16),
+              // Información del usuario
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (user.role != 'admin' && !user.isSubscriptionActive)
-                      ElevatedButton.icon(
-                        onPressed: () => _renewSubscription(context, user.uid, user.subscriptionHistory),
-                        icon: const Icon(Icons.autorenew, size: 18),
-                        label: const Text('Renovar'),
-                      ),
-                    ElevatedButton.icon(
-                      onPressed: () => _confirmDelete(context, user.uid, user.name),
-                      icon: const Icon(Icons.delete, size: 18),
-                      label: const Text('Eliminar'),
-                      style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            name,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        if (role == 'admin')
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.purple[100],
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Text(
+                              'ADMIN',
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.purple,
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
-                    ElevatedButton.icon(
-                      onPressed: () => _updateUserRole(context, user.uid, user.role == 'admin' ? 'user' : 'admin', user),
-                      icon: const Icon(Icons.admin_panel_settings, size: 18),
-                      label: Text(user.role == 'admin' ? 'Quitar Admin' : 'Hacer Admin'),
+                    const SizedBox(height: 4),
+                    Text(
+                      email,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    // Badges de estado
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 4,
+                      children: [
+                        if (subscriptionActive)
+                          _buildBadge('Suscripción activa', Colors.green),
+                        if (!subscriptionActive)
+                          _buildBadge('Sin suscripción', Colors.orange),
+                        if (frozen) _buildBadge('Cuenta congelada', Colors.red),
+                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
+              ),
+              // Acciones rápidas: enviar push y ver detalles
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.campaign, color: Colors.blue),
+                    tooltip: 'Enviar notificación a este usuario',
+                    onPressed: () {
+                      // Abrir diálogo de envío de mensaje al usuario concreto
+                      _showSendMessageDialog(context, userDoc.id, name, email);
+                    },
+                  ),
+                  Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey[400]),
+                ],
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
+
+  Widget _buildBadge(String label, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withOpacity(0.3)),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 11,
+          color: Colors.red[800],
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    );
+  }
+
+  void _showManageUserDialog(
+      BuildContext context, Map<String, dynamic> data, String userId) {
+    final String name = data['name'] ?? 'Usuario';
+    final String email = data['email'] ?? '';
+    final String phone = data['phone'] ?? 'No disponible';
+    final String role = data['role'] ?? 'user';
+    final bool subscriptionActive = data['subscriptionActive'] ?? false;
+    final bool frozen = data['frozen'] ?? false;
+    final String? photoUrl = data['photoURL'];
+
+    // Formatear la fecha de inicio de suscripción
+    String subscriptionStart = 'No disponible';
+    if (data['subscriptionStart'] != null) {
+      try {
+        DateTime? startDate;
+
+        // Intentar diferentes formatos de fecha
+        if (data['subscriptionStart'] is Timestamp) {
+          startDate = (data['subscriptionStart'] as Timestamp).toDate();
+        } else if (data['subscriptionStart'] is String) {
+          startDate = DateTime.tryParse(data['subscriptionStart']);
+        }
+
+        if (startDate != null) {
+          subscriptionStart =
+              '${startDate.day}/${startDate.month}/${startDate.year}';
+        }
+      } catch (e) {
+        subscriptionStart = 'Formato no válido';
+      }
+    }
+
+    // Formatear la fecha de fin de suscripción
+    String subscriptionEnd = 'No disponible';
+    if (data['subscriptionEnd'] != null) {
+      try {
+        DateTime? endDate;
+
+        // Intentar diferentes formatos de fecha
+        if (data['subscriptionEnd'] is Timestamp) {
+          endDate = (data['subscriptionEnd'] as Timestamp).toDate();
+        } else if (data['subscriptionEnd'] is String) {
+          endDate = DateTime.tryParse(data['subscriptionEnd']);
+        }
+
+        if (endDate != null) {
+          subscriptionEnd = '${endDate.day}/${endDate.month}/${endDate.year}';
+        }
+      } catch (e) {
+        subscriptionEnd = 'Formato no válido';
+      }
+    }
+
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return Dialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          child: Container(
+            width: 500,
+            padding: const EdgeInsets.all(24.0),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Header con avatar y nombre
+                  Column(
+                    children: [
+                      CircleAvatar(
+                        radius: 50,
+                        backgroundColor: Colors.red[100],
+                        backgroundImage: photoUrl != null && photoUrl.isNotEmpty
+                            ? NetworkImage(photoUrl)
+                            : null,
+                        child: photoUrl == null || photoUrl.isEmpty
+                            ? Text(
+                                name.isNotEmpty ? name[0].toUpperCase() : 'U',
+                                style: TextStyle(
+                                  fontSize: 40,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.red[800],
+                                ),
+                              )
+                            : null,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        name,
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        email,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Información del usuario
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[50],
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Column(
+                      children: [
+                        _buildInfoRow(Icons.phone, 'Teléfono', phone),
+                        const Divider(height: 24),
+                        _buildInfoRow(
+                          Icons.admin_panel_settings,
+                          'Rol',
+                          role == 'admin' ? 'Administrador' : 'Usuario',
+                        ),
+                        const Divider(height: 24),
+                        _buildInfoRow(
+                          Icons.card_membership,
+                          'Suscripción',
+                          subscriptionActive ? 'Activa' : 'Inactiva',
+                          valueColor:
+                              subscriptionActive ? Colors.green : Colors.orange,
+                        ),
+                        if (subscriptionActive &&
+                            subscriptionStart != 'No disponible') ...[
+                          const Divider(height: 24),
+                          _buildInfoRow(
+                            Icons.play_circle_outline,
+                            'Fecha inicio',
+                            subscriptionStart,
+                            valueColor: Colors.blue,
+                          ),
+                        ],
+                        const Divider(height: 24),
+                        _buildInfoRow(
+                          Icons.event,
+                          subscriptionActive ? 'Vencimiento' : 'Última fecha',
+                          subscriptionEnd,
+                          valueColor: subscriptionActive ? null : Colors.grey,
+                        ),
+                        if (frozen) ...[
+                          const Divider(height: 24),
+                          _buildInfoRow(
+                            Icons.lock,
+                            'Estado',
+                            'Cuenta congelada',
+                            valueColor: Colors.red,
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Botones de acción
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      ElevatedButton.icon(
+                        icon: const Icon(Icons.edit),
+                        label: const Text('Editar Datos Personales'),
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.of(ctx).pop();
+                          _showEditUserDialog(context, data, userId);
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      ElevatedButton.icon(
+                        icon: const Icon(Icons.message),
+                        label: const Text('Enviar Mensaje'),
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          backgroundColor: Colors.blue[700],
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.of(ctx).pop();
+                          _showSendMessageDialog(context, userId, name, email);
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      ElevatedButton.icon(
+                        icon: const Icon(Icons.card_membership),
+                        label: const Text('Administrar Suscripción'),
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          backgroundColor: Colors.green[700],
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.of(ctx).pop();
+                          _showManageSubscriptionDialog(context, data, userId);
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      ElevatedButton.icon(
+                        icon: Icon(frozen ? Icons.lock_open : Icons.lock),
+                        label: Text(
+                            frozen ? 'Descongelar Cuenta' : 'Congelar Cuenta'),
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          backgroundColor:
+                              frozen ? Colors.orange[700] : Colors.red[700],
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.of(ctx).pop();
+                          _toggleFreezeAccount(context, userId, frozen);
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      OutlinedButton.icon(
+                        icon: const Icon(Icons.delete_outline),
+                        label: const Text('Eliminar Usuario'),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          foregroundColor: Colors.red,
+                          side: const BorderSide(color: Colors.red),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.of(ctx).pop();
+                          _showDeleteUserDialog(context, userId, name);
+                        },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  TextButton(
+                    onPressed: () => Navigator.of(ctx).pop(),
+                    child: const Text('Cerrar'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildInfoRow(IconData icon, String label, String value,
+      {Color? valueColor}) {
+    return Row(
+      children: [
+        Icon(icon, size: 20, color: Colors.grey[600]),
+        const SizedBox(width: 12),
+        Text(
+          '$label:',
+          style: TextStyle(
+            fontSize: 14,
+            color: Colors.grey[700],
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            value,
+            style: TextStyle(
+              fontSize: 14,
+              color: valueColor ?? Colors.black87,
+              fontWeight: FontWeight.w600,
+            ),
+            textAlign: TextAlign.end,
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showEditUserDialog(
+      BuildContext context, Map<String, dynamic> data, String userId) {
+    final nameController = TextEditingController(text: data['name'] ?? '');
+    final emailController = TextEditingController(text: data['email'] ?? '');
+    final phoneController = TextEditingController(text: data['phone'] ?? '');
+    final formKey = GlobalKey<FormState>();
+
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Text('Editar Datos Personales'),
+          content: Form(
+            key: formKey,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextFormField(
+                    controller: nameController,
+                    decoration: const InputDecoration(
+                      labelText: 'Nombre',
+                      prefixIcon: Icon(Icons.person),
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'El nombre no puede estar vacío';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: emailController,
+                    decoration: const InputDecoration(
+                      labelText: 'Email',
+                      prefixIcon: Icon(Icons.email),
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'El email no puede estar vacío';
+                      }
+                      if (!RegExp(r'^.+@.+\..+$').hasMatch(value)) {
+                        return 'Email no válido';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: phoneController,
+                    decoration: const InputDecoration(
+                      labelText: 'Teléfono',
+                      prefixIcon: Icon(Icons.phone),
+                      border: OutlineInputBorder(),
+                    ),
+                    keyboardType: TextInputType.phone,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'El teléfono no puede estar vacío';
+                      }
+                      return null;
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              child: const Text('Cancelar'),
+              onPressed: () => Navigator.of(ctx).pop(),
+            ),
+            ElevatedButton(
+              child: const Text('Guardar'),
+              onPressed: () async {
+                if (formKey.currentState?.validate() ?? false) {
+                  try {
+                    await FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(userId)
+                        .update({
+                      'name': nameController.text.trim(),
+                      'email': emailController.text.trim(),
+                      'phone': phoneController.text.trim(),
+                    });
+                    if (ctx.mounted) {
+                      Navigator.of(ctx).pop();
+                    }
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text('Datos actualizados correctamente.')),
+                      );
+                    }
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Error al actualizar: $e')),
+                      );
+                    }
+                  }
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showManageSubscriptionDialog(
+      BuildContext context, Map<String, dynamic> data, String userId) {
+    final bool currentStatus = data['subscriptionActive'] ?? false;
+    DateTime? selectedDate;
+
+    // Obtener fecha de inicio si existe
+    String? startDateText;
+    if (data['subscriptionStart'] != null) {
+      try {
+        DateTime? startDate;
+        if (data['subscriptionStart'] is Timestamp) {
+          startDate = (data['subscriptionStart'] as Timestamp).toDate();
+        } else if (data['subscriptionStart'] is String) {
+          startDate = DateTime.tryParse(data['subscriptionStart']);
+        }
+        if (startDate != null) {
+          startDateText =
+              '${startDate.day}/${startDate.month}/${startDate.year}';
+        }
+      } catch (e) {
+        startDateText = null;
+      }
+    }
+
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
+              title: const Text('Administrar Suscripción'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Estado actual: ${currentStatus ? "Activa" : "Inactiva"}',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: currentStatus ? Colors.green : Colors.orange,
+                    ),
+                  ),
+                  if (startDateText != null) ...[
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Icon(Icons.play_circle_outline,
+                            size: 18, color: Colors.blue[700]),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Inicio: $startDateText',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.blue[700],
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                  const SizedBox(height: 20),
+                  const Text('Selecciona una nueva fecha de vencimiento:'),
+                  const SizedBox(height: 12),
+                  OutlinedButton.icon(
+                    icon: const Icon(Icons.calendar_today),
+                    label: Text(
+                      selectedDate != null
+                          ? '${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}'
+                          : 'Seleccionar fecha',
+                    ),
+                    onPressed: () async {
+                      final DateTime? picked = await showDatePicker(
+                        context: context,
+                        initialDate: DateTime.now(),
+                        firstDate: DateTime.now(),
+                        lastDate:
+                            DateTime.now().add(const Duration(days: 365 * 5)),
+                      );
+                      if (picked != null) {
+                        setState(() {
+                          selectedDate = picked;
+                        });
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  const Divider(),
+                  const SizedBox(height: 8),
+                  const Text('Acciones rápidas:',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    children: [
+                      _buildQuickActionChip('1 mes', 30, (date) {
+                        setState(() => selectedDate = date);
+                      }),
+                      _buildQuickActionChip('3 meses', 90, (date) {
+                        setState(() => selectedDate = date);
+                      }),
+                      _buildQuickActionChip('6 meses', 180, (date) {
+                        setState(() => selectedDate = date);
+                      }),
+                      _buildQuickActionChip('1 año', 365, (date) {
+                        setState(() => selectedDate = date);
+                      }),
+                    ],
+                  ),
+                ],
+              ),
+              actions: [
+                if (currentStatus)
+                  TextButton.icon(
+                    icon: const Icon(Icons.cancel, color: Colors.red),
+                    label: const Text('Desactivar',
+                        style: TextStyle(color: Colors.red)),
+                    onPressed: () async {
+                      try {
+                        await FirebaseFirestore.instance
+                            .collection('users')
+                            .doc(userId)
+                            .update({
+                          'subscriptionActive': false,
+                        });
+                        if (ctx.mounted) {
+                          Navigator.of(ctx).pop();
+                        }
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text('Suscripción desactivada')),
+                          );
+                        }
+                      } catch (e) {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Error: $e')),
+                          );
+                        }
+                      }
+                    },
+                  ),
+                TextButton(
+                  child: const Text('Cancelar'),
+                  onPressed: () => Navigator.of(ctx).pop(),
+                ),
+                ElevatedButton(
+                  onPressed: selectedDate == null
+                      ? null
+                      : () async {
+                          try {
+                            // Si no hay fecha de inicio previa, establecer la actual
+                            Map<String, dynamic> updateData = {
+                              'subscriptionActive': true,
+                              'subscriptionEnd':
+                                  selectedDate!.toIso8601String(),
+                            };
+
+                            // Solo establecer fecha de inicio si no existe
+                            if (data['subscriptionStart'] == null) {
+                              updateData['subscriptionStart'] =
+                                  DateTime.now().toIso8601String();
+                            }
+
+                            await FirebaseFirestore.instance
+                                .collection('users')
+                                .doc(userId)
+                                .update(updateData);
+                            if (ctx.mounted) {
+                              Navigator.of(ctx).pop();
+                            }
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text(
+                                        'Suscripción actualizada correctamente')),
+                              );
+                            }
+                          } catch (e) {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                    content: Text('Error al actualizar: $e')),
+                              );
+                            }
+                          }
+                        },
+                  child: const Text('Activar/Actualizar'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildQuickActionChip(
+      String label, int days, Function(DateTime) onSelected) {
+    return ActionChip(
+      label: Text(label),
+      onPressed: () {
+        final newDate = DateTime.now().add(Duration(days: days));
+        onSelected(newDate);
+      },
+    );
+  }
+
+  void _toggleFreezeAccount(
+      BuildContext context, String userId, bool currentlyFrozen) {
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title:
+              Text(currentlyFrozen ? 'Descongelar Cuenta' : 'Congelar Cuenta'),
+          content: Text(
+            currentlyFrozen
+                ? '¿Estás seguro de que quieres descongelar esta cuenta? El usuario podrá volver a acceder.'
+                : '¿Estás seguro de que quieres congelar esta cuenta? El usuario no podrá acceder hasta que sea descongelada.',
+          ),
+          actions: [
+            TextButton(
+              child: const Text('Cancelar'),
+              onPressed: () => Navigator.of(ctx).pop(),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: currentlyFrozen ? Colors.orange : Colors.red,
+              ),
+              onPressed: () async {
+                try {
+                  await FirebaseFirestore.instance
+                      .collection('users')
+                      .doc(userId)
+                      .update({
+                    'frozen': !currentlyFrozen,
+                  });
+                  if (ctx.mounted) {
+                    Navigator.of(ctx).pop();
+                  }
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          currentlyFrozen
+                              ? 'Cuenta descongelada correctamente'
+                              : 'Cuenta congelada correctamente',
+                        ),
+                      ),
+                    );
+                  }
+                } catch (e) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Error: $e')),
+                    );
+                  }
+                }
+              },
+              child: Text(currentlyFrozen ? 'Descongelar' : 'Congelar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showDeleteUserDialog(
+      BuildContext context, String userId, String userName) {
+    final confirmController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Row(
+            children: [
+              Icon(Icons.warning, color: Colors.red),
+              SizedBox(width: 8),
+              Text('Eliminar Usuario'),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                '¡ADVERTENCIA! Esta acción no se puede deshacer.',
+                style: TextStyle(
+                  color: Colors.red,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text('Estás a punto de eliminar al usuario: $userName'),
+              const SizedBox(height: 16),
+              const Text('Escribe "ELIMINAR" para confirmar:'),
+              const SizedBox(height: 8),
+              TextField(
+                controller: confirmController,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  hintText: 'ELIMINAR',
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              child: const Text('Cancelar'),
+              onPressed: () => Navigator.of(ctx).pop(),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+              ),
+              onPressed: () async {
+                if (confirmController.text.trim() == 'ELIMINAR') {
+                  try {
+                    await FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(userId)
+                        .delete();
+                    if (ctx.mounted) {
+                      Navigator.of(ctx).pop();
+                    }
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text('Usuario eliminado correctamente')),
+                      );
+                    }
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Error al eliminar: $e')),
+                      );
+                    }
+                  }
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content:
+                            Text('Debes escribir "ELIMINAR" para confirmar')),
+                  );
+                }
+              },
+              child: const Text('Eliminar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showSendMessageDialog(BuildContext context, String toUserId,
+      String toUserName, String toUserEmail) {
+    final messageController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+    bool isSending = false;
+
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
+              title: Row(
+                children: [
+                  const Icon(Icons.message, color: Colors.blue),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('Enviar Mensaje'),
+                        Text(
+                          'Para: $toUserName',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                            fontWeight: FontWeight.normal,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              content: Form(
+                key: formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.blue[50],
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.info_outline,
+                              color: Colors.blue[700], size: 20),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'Este mensaje se enviará directamente al usuario',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.blue[900],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: messageController,
+                      decoration: InputDecoration(
+                        labelText: 'Mensaje',
+                        hintText: 'Escribe tu mensaje aquí...',
+                        border: const OutlineInputBorder(),
+                        prefixIcon: const Icon(Icons.edit),
+                        filled: true,
+                        fillColor: Colors.grey[50],
+                      ),
+                      maxLines: 5,
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'El mensaje no puede estar vacío';
+                        }
+                        if (value.trim().length < 10) {
+                          return 'El mensaje debe tener al menos 10 caracteres';
+                        }
+                        return null;
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: isSending ? null : () => Navigator.of(ctx).pop(),
+                  child: const Text('Cancelar'),
+                ),
+                ElevatedButton.icon(
+                  icon: isSending
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        )
+                      : const Icon(Icons.send),
+                  label: Text(isSending ? 'Enviando...' : 'Enviar'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue[700],
+                  ),
+                  onPressed: isSending
+                      ? null
+                      : () async {
+                          if (formKey.currentState?.validate() ?? false) {
+                            setState(() => isSending = true);
+
+                            try {
+                              // Obtener información del admin que envía
+                              final currentUser =
+                                  FirebaseAuth.instance.currentUser;
+                              if (currentUser == null) {
+                                throw Exception('No hay usuario autenticado');
+                              }
+
+                              // Obtener datos del admin
+                              final adminDoc = await FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(currentUser.uid)
+                                  .get();
+                              final adminData = adminDoc.data();
+                              final adminName = adminData?['name'] ??
+                                  currentUser.displayName ??
+                                  'Administrador';
+                              final adminEmail = adminData?['email'] ??
+                                  currentUser.email ??
+                                  '';
+
+                              // Enviar el mensaje
+                              await FirebaseFirestore.instance
+                                  .collection('user_messages')
+                                  .add({
+                                'fromUid': currentUser.uid,
+                                'fromName': adminName,
+                                'fromEmail': adminEmail,
+                                // legacy fields
+                                'toUid': toUserId,
+                                'toName': toUserName,
+                                'toEmail': toUserEmail,
+                                // new canonical field read by Cloud Functions
+                                'to': toUserId,
+                                'message': messageController.text.trim(),
+                                'timestamp': FieldValue.serverTimestamp(),
+                                'read': false,
+                                'fromAdmin': true,
+                              });
+
+                              if (ctx.mounted) {
+                                Navigator.of(ctx).pop();
+                              }
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Row(
+                                      children: [
+                                        const Icon(Icons.check_circle,
+                                            color: Colors.white),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: Text(
+                                              'Mensaje enviado a $toUserName'),
+                                        ),
+                                      ],
+                                    ),
+                                    backgroundColor: Colors.green[700],
+                                    duration: const Duration(seconds: 3),
+                                  ),
+                                );
+                              }
+                            } catch (e) {
+                              setState(() => isSending = false);
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Error al enviar: $e'),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                              }
+                            }
+                          }
+                        },
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  
 }

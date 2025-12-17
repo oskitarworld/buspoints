@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:myapp/services/auth_service.dart';
 import 'package:myapp/widgets/dialogs.dart';
+import 'package:myapp/screens/terms_of_use_screen.dart';
+import 'package:myapp/screens/verify_email_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
   final VoidCallback onToggleAuthMode;
@@ -17,24 +19,60 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   bool _isLoading = false;
   bool _isPasswordVisible = false;
+  bool _isConfirmPasswordVisible = false;
+  bool _acceptedTerms = false;
 
   void _signUp() async {
     if (!_formKey.currentState!.validate()) {
+      return;
+    }
+    if (!_acceptedTerms) {
+      setState(() {});
       return;
     }
     if (_isLoading) return;
     setState(() => _isLoading = true);
 
     try {
-      await Provider.of<AuthService>(context, listen: false).register(
+      final user = await Provider.of<AuthService>(context, listen: false).register(
         _nameController.text,
         _emailController.text,
+        _phoneController.text,
         _passwordController.text,
       );
+      if (mounted && user != null) {
+        // Ensure navigation happens after the current frame to avoid
+        // interfering with any rebuilds triggered by auth state listeners.
+        debugPrint('[SignUpScreen] Registro completado para ${user.email}; programando navegación a VerifyEmailScreen');
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          try {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (_) => const VerifyEmailScreen()),
+            );
+          } catch (e, st) {
+            debugPrint('[SignUpScreen] Error al navegar a VerifyEmailScreen: $e\n$st');
+            // Fallback: show a dialog instructing the user to ir a la pantalla de verificación manualmente
+            if (mounted) {
+              showDialog(
+                context: context,
+                builder: (_) => AlertDialog(
+                  title: const Text('Registro completado'),
+                  content: const Text('Tu cuenta se ha creado. Por favor, revisa tu correo para verificarla. Si no recibes el correo, ve a la pantalla de verificación desde el menú de inicio de sesión.'),
+                  actions: [
+                    TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('OK')),
+                  ],
+                ),
+              );
+            }
+          }
+        });
+      }
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
       String errorMessage = 'Ocurrió un error inesperado. Por favor, inténtalo de nuevo o contacta con el soporte.';
@@ -44,6 +82,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
         errorMessage = 'Ya existe una cuenta para ese correo electrónico.';
       } else if (e.code == 'invalid-email') {
         errorMessage = 'La dirección de correo electrónico no es válida.';
+      } else if (e.code == 'username-already-in-use') {
+        errorMessage = 'El nombre de usuario ya está en uso. Elige otro.';
+      } else if (e.code == 'phone-already-in-use') {
+        errorMessage = 'Ya existe una cuenta para ese teléfono.';
+      } else if (e.code == 'firestore-error') {
+        // Surface Firestore errors (permission issues, connectivity) to the user
+        errorMessage = e.message ?? 'No se pudo completar la verificación de datos. Por favor, inténtalo de nuevo más tarde.';
       }
       showErrorDialog(context, 'Error de Registro', errorMessage);
     } catch (e) {
@@ -67,94 +112,222 @@ class _SignUpScreenState extends State<SignUpScreen> {
             padding: const EdgeInsets.all(24.0),
             child: Form(
               key: _formKey,
-              autovalidateMode: AutovalidateMode.onUserInteraction,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [
+                children: <Widget>[
                   Image.asset(
                     'assets/images/logo.png',
                     height: 150,
                   ),
                   const SizedBox(height: 40),
-                  TextFormField(
-                    controller: _nameController,
-                    decoration:
-                        const InputDecoration(labelText: 'Nombre de Usuario'),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Por favor, introduce tu nombre de usuario.';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 8),
-                  TextFormField(
-                    controller: _emailController,
-                    decoration: const InputDecoration(labelText: 'Correo Electrónico'),
-                    keyboardType: TextInputType.emailAddress,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Por favor, introduce tu dirección de correo electrónico.';
-                      }
-                      if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                        return 'Por favor, introduce una dirección de correo electrónico válida.';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 8),
-                  TextFormField(
-                    controller: _passwordController,
-                    obscureText: !_isPasswordVisible,
-                    decoration: InputDecoration(
-                      labelText: 'Contraseña (mín. 6 caracteres)',
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _isPasswordVisible
-                              ? Icons.visibility
-                              : Icons.visibility_off,
+                  Container(
+                    constraints: const BoxConstraints(maxWidth: 350),
+                    child: TextFormField(
+                      controller: _nameController,
+                      decoration: InputDecoration(
+                        labelText: 'Nombre',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(18),
                         ),
-                        onPressed: () {
-                          setState(() {
-                            _isPasswordVisible = !_isPasswordVisible;
-                          });
-                        },
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'El nombre es obligatorio';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    constraints: const BoxConstraints(maxWidth: 350),
+                    child: TextFormField(
+                      controller: _phoneController,
+                      decoration: InputDecoration(
+                        labelText: 'Teléfono',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
+                      keyboardType: TextInputType.phone,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'El teléfono es obligatorio';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    constraints: const BoxConstraints(maxWidth: 350),
+                    child: TextFormField(
+                      controller: _emailController,
+                      decoration: InputDecoration(
+                        labelText: 'Correo Electrónico',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
+                      keyboardType: TextInputType.emailAddress,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'El correo electrónico es obligatorio';
+                        }
+                        if (!value.contains('@')) {
+                          return 'Ingresa un correo electrónico válido';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    constraints: const BoxConstraints(maxWidth: 350),
+                    child: TextFormField(
+                      controller: _passwordController,
+                      decoration: InputDecoration(
+                        labelText: 'Contraseña',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                        filled: true,
+                        fillColor: Colors.white,
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _isPasswordVisible
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _isPasswordVisible = !_isPasswordVisible;
+                            });
+                          },
+                        ),
+                      ),
+                      obscureText: !_isPasswordVisible,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'La contraseña es obligatoria';
+                        }
+                        if (value.length < 6) {
+                          return 'La contraseña debe tener al menos 6 caracteres';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    constraints: const BoxConstraints(maxWidth: 350),
+                    child: TextFormField(
+                      controller: _confirmPasswordController,
+                      decoration: InputDecoration(
+                        labelText: 'Confirmar Contraseña',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                        filled: true,
+                        fillColor: Colors.white,
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _isConfirmPasswordVisible
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
+                            });
+                          },
+                        ),
+                      ),
+                      obscureText: !_isConfirmPasswordVisible,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Confirma tu contraseña';
+                        }
+                        if (value != _passwordController.text) {
+                          return 'Las contraseñas no coinciden';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Align(
+                        alignment: Alignment.center,
+                        child: Checkbox(
+                          value: _acceptedTerms,
+                          onChanged: (val) {
+                            setState(() {
+                              _acceptedTerms = val ?? false;
+                            });
+                          },
+                        ),
+                      ),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => const TermsOfUseScreen(),
+                              ),
+                            );
+                          },
+                          child: RichText(
+                            text: const TextSpan(
+                              style: TextStyle(color: Colors.black, fontSize: 14),
+                              children: [
+                                TextSpan(text: 'Acepto los '),
+                                TextSpan(
+                                  text: 'Términos de Uso',
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                    decoration: TextDecoration.underline,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                TextSpan(text: ' de BusPoints.'),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (!_acceptedTerms)
+                    const Padding(
+                      padding: EdgeInsets.only(left: 8.0, bottom: 8.0),
+                      child: Text(
+                        'Debes aceptar los Términos de Uso para registrarte.',
+                        style: TextStyle(color: Colors.red, fontSize: 13),
                       ),
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Por favor, introduce una contraseña.';
-                      }
-                      if (value.length < 6) {
-                        return 'La contraseña debe tener al menos 6 caracteres.';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 8),
-                  TextFormField(
-                    controller: _confirmPasswordController,
-                    obscureText: !_isPasswordVisible,
-                    decoration: const InputDecoration(
-                      labelText: 'Confirmar Contraseña',
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Por favor, confirma tu contraseña.';
-                      }
-                      if (value != _passwordController.text) {
-                        return 'Las contraseñas no coinciden.';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  _isLoading
-                      ? const CircularProgressIndicator()
-                      : ElevatedButton(
-                          onPressed: _signUp,
-                          child: const Text('Registrarse'),
+                  const SizedBox(height: 24),
+                  SizedBox(
+                    width: 200,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18),
                         ),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                      ),
+                      onPressed: _signUp,
+                      child: const Text('Registrarse', style: TextStyle(fontSize: 16)),
+                    ),
+                  ),
                   TextButton(
                     onPressed: widget.onToggleAuthMode,
                     child: const Text('¿Ya tienes una cuenta? Inicia sesión'),

@@ -20,7 +20,14 @@ class ApproveUsersScreen extends StatelessWidget {
           endDate: DateTime(now.year + 1, now.month, now.day),
         );
         dataToUpdate['subscriptionHistory'] = [newSubscription.toMap()];
+        // Also write explicit start/end fields for UIs that read them directly
+  dataToUpdate['subscriptionStart'] = Timestamp.fromDate(newSubscription.startDate);
+  dataToUpdate['subscriptionEnd'] = Timestamp.fromDate(newSubscription.endDate);
+  // Also set alternate keys used elsewhere in the app for compatibility
+  dataToUpdate['subscriptionStartDate'] = Timestamp.fromDate(newSubscription.startDate);
+  dataToUpdate['subscriptionEndDate'] = Timestamp.fromDate(newSubscription.endDate);
         dataToUpdate['approvedPoisCount'] = 0;
+        dataToUpdate['subscriptionActive'] = true;
       }
 
       await firestore.collection('users').doc(uid).update(dataToUpdate);

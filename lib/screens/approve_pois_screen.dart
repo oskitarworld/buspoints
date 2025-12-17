@@ -58,6 +58,7 @@ class _ApprovePoisScreenState extends State<ApprovePoisScreen> {
           transaction.update(userRef, {
             'approvedPoisCount': newPoisCount,
             'subscriptionEndDate': Timestamp.fromDate(newSubscriptionEndDate),
+            'subscriptionActive': true,
           });
         }
       });

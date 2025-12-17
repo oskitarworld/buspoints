@@ -1,32 +1,108 @@
-
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
+import 'dart:developer' as developer;
+
 import 'package:myapp/firebase_options.dart';
-import 'package:myapp/models/user_model.dart';
 import 'package:myapp/screens/home_screen.dart';
 import 'package:myapp/services/auth_service.dart';
-import 'package:myapp/screens/pending_approval_screen.dart';
-import 'package:myapp/screens/verify_email_screen.dart';
-import 'package:myapp/screens/subscription_screen.dart';
+// NOTE: moved user role gating into `lib/widgets/auth_gate.dart`.
 import 'package:myapp/screens/auth/auth_screen.dart';
-import 'package:myapp/screens/splash_screen.dart'; // Importa la nueva pantalla
+import 'package:myapp/screens/splash_screen.dart';
+import 'package:myapp/screens/frozen_account_screen.dart';
+// auth_gate is used by SplashScreen; not directly referenced here.
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Object? initializationError;
+  // Inicializar FCM
+  if (kIsWeb) {
+    // Registrar el service worker para notificaciones web
+    try {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+      developer.log('[APP START] Firebase initialized at ${DateTime.now().toIso8601String()}', name: 'main');
+      // Disable local persistence temporarily to diagnose long local DB operations.
+      // This prevents Firestore from using its local SQLite cache while we debug.
+      FirebaseFirestore.instance.settings = const Settings(persistenceEnabled: false);
+      await FirebaseMessaging.instance.requestPermission();
+      await FirebaseMessaging.instance.setAutoInitEnabled(true);
+      // Registrar el service worker (solo web)
+      // El archivo ya existe en la raíz del proyecto
+      await FirebaseMessaging.instance.setDeliveryMetricsExportToBigQuery(true);
+    } catch (e) {
+      print('Error inicializando FCM en web: $e');
+    }
+  }
   try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+    // Inicializar FCM en móvil/escritorio
+    if (!kIsWeb) {
+      await FirebaseMessaging.instance.requestPermission();
+      await FirebaseMessaging.instance.setAutoInitEnabled(true);
+    }
+    // TEST DE CONEXIÓN FIRESTORE
+    final firestore = FirebaseFirestore.instance;
+    try {
+      // Disable local persistence temporarily on mobile as well while debugging
+      // long local DB operations (SQLite). Re-enable once validated.
+      try {
+        FirebaseFirestore.instance.settings = const Settings(persistenceEnabled: false);
+        developer.log('[APP START] Firestore persistence disabled for debug', name: 'main');
+      } catch (e) {
+        // ignore: avoid_print
+        print('Could not change Firestore settings: $e');
+      }
+
+      final snapshot = await firestore.collection('places').limit(1).get();
+      print('[TEST FIRESTORE] Conexión OK. Docs encontrados: \\${snapshot.docs.length}');
+      if (snapshot.docs.isNotEmpty) {
+        print('[TEST FIRESTORE] Primer doc: \\${snapshot.docs.first.data()}');
+      }
+    } catch (e) {
+      print('[TEST FIRESTORE] ERROR: \\${e.toString()}');
+    }
   } catch (e) {
     initializationError = e;
   }
   runApp(MyApp(initializationError: initializationError));
 }
+
+// Mostrar notificaciones push en primer plano
+void setupFCMForegroundNotifications() {
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    if (message.notification != null) {
+      final notification = message.notification!;
+      // Mostrar un SnackBar global con el mensaje
+      final context = navigatorKey.currentContext;
+      if (context != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(notification.title != null
+                ? '${notification.title}: ${notification.body ?? ''}'
+                : notification.body ?? ''),
+            backgroundColor: Colors.blue,
+            duration: const Duration(seconds: 4),
+          ),
+        );
+      }
+      // Note: badge update on Android launchers varies by device/launcher.
+      // We rely on APNs badge (iOS) via server `apns.aps.badge` and send
+      // `data.badge` so the app may update a launcher badge when in foreground.
+    }
+  });
+}
+
+
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 class MyApp extends StatelessWidget {
   final Object? initializationError;
@@ -38,6 +114,8 @@ class MyApp extends StatelessWidget {
       return ErrorDisplayApp(error: initializationError!);
     }
 
+    // Inicializar escucha de notificaciones en primer plano
+    setupFCMForegroundNotifications();
     return MultiProvider(
       providers: [
         Provider<AuthService>(create: (_) => AuthService()),
@@ -47,6 +125,7 @@ class MyApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
+        navigatorKey: navigatorKey,
         title: 'Bus Points',
         theme: ThemeData(
           useMaterial3: true,
@@ -55,85 +134,20 @@ class MyApp extends StatelessWidget {
             brightness: Brightness.light,
           ),
         ),
-        darkTheme: ThemeData(
-          useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.blueGrey,
-            brightness: Brightness.dark,
-          ),
-        ),
-        themeMode: ThemeMode.system,
-        home: const SplashScreen(), // <<--- AQUÍ ESTÁ EL CAMBIO
+        themeMode: ThemeMode.light,
+        home: const SplashScreen(),
         routes: {
           '/home': (context) => const HomeScreen(),
           '/auth': (context) => const AuthScreen(),
+          '/frozen': (context) => const FrozenAccountScreen(username: 'usuario'),
         },
       ),
     );
   }
 }
 
-class AuthGate extends StatelessWidget {
-  const AuthGate({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final user = Provider.of<User?>(context);
-
-    if (user == null) {
-      return const AuthScreen();
-    }
-
-    if (!user.emailVerified) {
-      return const VerifyEmailScreen();
-    }
-
-    return UserRoleGate(user: user);
-  }
-}
-
-class UserRoleGate extends StatelessWidget {
-  final User user;
-
-  const UserRoleGate({super.key, required this.user});
-
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<DocumentSnapshot>(
-      stream: FirebaseFirestore.instance.collection('users').doc(user.uid).snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(body: Center(child: CircularProgressIndicator()));
-        }
-
-        if (!snapshot.hasData || !snapshot.data!.exists) {
-          // This can happen briefly if a user is deleted from the backend.
-          // Signing out is a good safe action.
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            context.read<AuthService>().signOut();
-          });
-          return const Scaffold(body: Center(child: Text('Usuario no encontrado. Cerrando sesión...')));
-        }
-
-        final userModel = UserModel.fromFirestore(snapshot.data!);
-
-        if (userModel.role == 'admin') {
-          return const HomeScreen();
-        }
-
-        switch (userModel.status) {
-          case 'approved':
-            return userModel.isSubscriptionActive
-                ? const HomeScreen()
-                : const SubscriptionScreen();
-          case 'pending':
-          default:
-            return const PendingApprovalScreen();
-        }
-      },
-    );
-  }
-}
+// AuthGate and UserRoleGate moved to `lib/widgets/auth_gate.dart` to avoid
+// circular imports between `main.dart` and `splash_screen.dart`.
 
 class ErrorDisplayApp extends StatelessWidget {
   final Object error;

@@ -1,0 +1,59 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Function to check if the user is an administrator.
+    function isAdmin() {
+      return request.auth != null &&
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // Rules for the 'users' collection.
+    match /users/{userId} {
+      allow create: if request.auth != null && request.auth.uid == userId;
+      allow read, update: if request.auth != null && request.auth.uid == userId;
+      allow delete: if isAdmin();
+      allow list, read, update: if isAdmin();
+    }
+
+    // Rules for the 'pois' (Points of Interest) collection.
+    match /pois/{poiId} {
+      allow read: if request.auth != null && (resource.data.status == 'approved' || isAdmin());
+      allow create: if request.auth != null;
+      allow update, delete: if isAdmin();
+    }
+
+    // Rules for the 'user_pois' subcollection (if it exists).
+    match /user_pois/{poiId} {
+      allow read, list: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null && (isAdmin() || request.auth.uid == resource.data.creator_uid);
+      allow delete: if isAdmin();
+    }
+
+    // Rules for public bus stops.
+    match /bus_stops/{busStopId} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+
+    // Rules for geographical locations or other similar data.
+    match /locations/{locationId} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+
+    // REGLA PARA LA COLECCIÓN 'places'
+    match /places/{placeId} {
+      allow read: if request.auth != null;
+    }
+
+    // Rules for contact messages.
+    match /contact_messages/{messageId} {
+      allow create: if request.auth != null;
+      allow read, update, delete: if isAdmin();
+    }
+  }
+}

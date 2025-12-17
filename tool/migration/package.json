@@ -1,0 +1,16 @@
+{
+  "name": "buspoints-migration",
+  "version": "1.0.0",
+  "description": "Scripts to migrate pdis from local KML files to Firestore with normalized slugs and categories.",
+  "main": "migrate_pdis_from_kml.js",
+  "scripts": {
+    "migrate": "node migrate_pdis_from_kml.js",
+    "copy": "node copy_pdis_to_pdis_v2.js",
+    "delete": "node delete_collection.js"
+  },
+  "dependencies": {
+    "firebase-admin": "^11.10.0",
+    "xml2js": "^0.4.23",
+    "minimist": "^1.2.8"
+  }
+}

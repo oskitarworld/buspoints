@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:myapp/services/firestore_service.dart';
 
 class PoiApprovalScreen extends StatelessWidget {
   const PoiApprovalScreen({super.key});
@@ -18,13 +19,12 @@ class PoiApprovalScreen extends StatelessWidget {
 class PoiList extends StatelessWidget {
   const PoiList({super.key});
 
+  FirestoreService get _fs => FirestoreService();
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance
-          .collection('user_pois')
-          .where('status', isEqualTo: 'pending')
-          .snapshots(),
+      stream: _fs.pendingUserPoisStream(),
       builder: (context, snapshot) {
         if (snapshot.hasError) return Center(child: Text('Error: ${snapshot.error}'));
         if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
@@ -63,7 +63,7 @@ class PoiListItem extends StatelessWidget {
 
   Future<void> _approvePoi(BuildContext context, String poiId) async {
     try {
-      await FirebaseFirestore.instance.collection('user_pois').doc(poiId).update({'status': 'approved'});
+      await FirestoreService().approveUserPoiAndMove(poiId);
       if (!context.mounted) return;
       _showSnackBar(context, 'PDI aprobado con éxito.');
     } catch (e) {
@@ -74,7 +74,7 @@ class PoiListItem extends StatelessWidget {
 
   Future<void> _rejectPoi(BuildContext context, String poiId) async {
     try {
-      await FirebaseFirestore.instance.collection('user_pois').doc(poiId).delete();
+      await FirestoreService().rejectUserPoi(poiId);
       if (!context.mounted) return;
       _showSnackBar(context, 'PDI rechazado con éxito.');
     } catch (e) {
@@ -86,7 +86,7 @@ class PoiListItem extends StatelessWidget {
   Future<String> _getUserEmail(String uid) async {
     if (uid.isEmpty) return 'Usuario Desconocido';
     try {
-      final userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+  final userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
       return userDoc.exists ? userDoc.data()!['email'] ?? 'Email no encontrado' : 'Usuario no encontrado';
     } catch (e) {
       return 'Error cargando email';

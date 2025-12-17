@@ -28,19 +28,23 @@ class UserModel {
   final String uid;
   final String email;
   final String name;
+  final String phone;
   final String role;
   final String status;
   final int approvedPoisCount;
   final List<Subscription> subscriptionHistory;
+  final bool subscriptionFrozen;
 
   UserModel({
     required this.uid,
     required this.email,
     required this.name,
+    required this.phone,
     required this.role,
     required this.status,
     this.approvedPoisCount = 0,
     this.subscriptionHistory = const [], // Default to an empty list
+    this.subscriptionFrozen = false,
   });
 
   // A getter to find the latest subscription end date.
@@ -75,14 +79,40 @@ class UserModel {
           .toList();
     }
 
+    // Backwards-compatibility: if no subscriptionHistory exists but explicit
+    // `subscriptionStart`/`subscriptionEnd` (or `subscriptionEndDate`) fields
+    // are present, create a single-entry history so UI and checks work.
+    if (history.isEmpty) {
+      Timestamp? startTs;
+      Timestamp? endTs;
+      if (data['subscriptionStart'] is Timestamp) {
+        startTs = data['subscriptionStart'] as Timestamp;
+      }
+      if (data['subscriptionEnd'] is Timestamp) {
+        endTs = data['subscriptionEnd'] as Timestamp;
+      }
+      // older code/path might have used subscriptionEndDate
+      if (endTs == null && data['subscriptionEndDate'] is Timestamp) {
+        endTs = data['subscriptionEndDate'] as Timestamp;
+      }
+
+      if (startTs != null || endTs != null) {
+        final start = (startTs ?? endTs)!.toDate();
+        final end = (endTs ?? startTs)!.toDate();
+        history = [Subscription(startDate: start, endDate: end)];
+      }
+    }
+
     return UserModel(
       uid: doc.id,
       email: data['email'] ?? '',
       name: data['name'] ?? data['displayName'] ?? 'Nombre no disponible',
+      phone: data['phone'] ?? '',
       role: data['role'] ?? 'user',
       status: data['status'] ?? 'pending',
       approvedPoisCount: data['approvedPoisCount'] ?? 0,
       subscriptionHistory: history,
+      subscriptionFrozen: data['subscriptionFrozen'] ?? false,
     );
   }
 
@@ -92,12 +122,14 @@ class UserModel {
       'uid': uid,
       'email': email,
       'name': name,
+      'phone': phone,
       'role': role,
       'status': status,
       'approvedPoisCount': approvedPoisCount,
       // Convert the list of Subscription objects to a list of maps.
       'subscriptionHistory':
           subscriptionHistory.map((sub) => sub.toMap()).toList(),
+      'subscriptionFrozen': subscriptionFrozen,
     };
   }
 }
