@@ -19,6 +19,15 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   final _phoneController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    // Prefill the phone field with the Spanish country code but keep it editable.
+    if (_phoneController.text.isEmpty) {
+      _phoneController.text = '+34';
+    }
+  }
   String? _selectedRole = 'user';
   bool _isLoading = false;
   bool _isPasswordVisible = false;
@@ -41,7 +50,21 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
     try {
       final name = _nameController.text.trim();
       final email = _emailController.text.trim();
-      final phone = _phoneController.text.trim();
+      String phone = _phoneController.text.trim();
+      // Basic normalization to E.164-ish: remove non-digit except leading +,
+      // and if the number doesn't start with +, assume Spanish country code +34.
+      String normalized = phone.replaceAll(RegExp(r'[^0-9+]'), '');
+      if (normalized.isEmpty) {
+        _showErrorSnackBar('Por favor, introduce un teléfono.');
+        setState(() => _isLoading = false);
+        return;
+      }
+      if (!normalized.startsWith('+')) {
+  // Strip leading zeros to avoid +34061234567 mistakes
+  normalized = normalized.replaceFirst(RegExp(r'^0+'), '');
+  normalized = '+34$normalized';
+      }
+      phone = normalized;
       final usersRef = FirebaseFirestore.instance.collection('users');
       // Validar duplicados de nombre (timeout corto para evitar bloqueos largos)
       final nameDup = await usersRef.where('name', isEqualTo: name).get().timeout(const Duration(seconds: 5));

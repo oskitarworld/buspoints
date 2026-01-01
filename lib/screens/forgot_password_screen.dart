@@ -53,56 +53,64 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       appBar: AppBar(
         title: const Text('Recuperar Contraseña'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Image.asset(
-              'assets/images/logo.png',
-              height: 150,
-            ),
-            const SizedBox(height: 40),
-            const Text(
-              'Introduce tu correo electrónico para recibir un enlace y restablecer tu contraseña.',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 20),
-            Container(
-              constraints: const BoxConstraints(maxWidth: 350),
-              child: TextField(
-                controller: _emailController,
-                decoration: InputDecoration(
-                  labelText: 'Correo Electrónico',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(18),
+      body: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24.0),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 600),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    'assets/images/logo.png',
+                    height: 150,
                   ),
-                  filled: true,
-                  fillColor: Colors.white,
-                ),
-                keyboardType: TextInputType.emailAddress,
-                autocorrect: false,
-              ),
-            ),
-            const SizedBox(height: 20),
-            _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : SizedBox(
-                    width: 250,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
+                  const SizedBox(height: 40),
+                  const Text(
+                    'Introduce tu correo electrónico para recibir un enlace y restablecer tu contraseña.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  const SizedBox(height: 20),
+                  Container(
+                    constraints: const BoxConstraints(maxWidth: 350),
+                    child: TextField(
+                      controller: _emailController,
+                      decoration: InputDecoration(
+                        labelText: 'Correo Electrónico',
+                        border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(18),
                         ),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        filled: true,
+                        fillColor: Colors.white,
                       ),
-                      onPressed: _sendPasswordResetEmail,
-                      child: const Text('Enviar Correo de Restablecimiento'),
+                      keyboardType: TextInputType.emailAddress,
+                      autocorrect: false,
                     ),
                   ),
-          ],
+                  const SizedBox(height: 20),
+                  _isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : SizedBox(
+                          width: 250,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(18),
+                              ),
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                            ),
+                            onPressed: _sendPasswordResetEmail,
+                            child: const Text('Enviar Correo de Restablecimiento'),
+                          ),
+                        ),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );

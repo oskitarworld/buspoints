@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
+import 'package:myapp/services/auth_service.dart';
+import 'package:myapp/screens/auth/auth_screen.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -17,7 +20,20 @@ class SubscriptionScreen extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
-            onPressed: () => FirebaseAuth.instance.signOut(),
+            onPressed: () async {
+              try {
+                await Provider.of<AuthService>(context, listen: false).signOut();
+                if (context.mounted) {
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (_) => const AuthScreen()),
+                    (route) => false,
+                  );
+                }
+              } catch (e) {
+                // fallback to direct signOut if provider fails
+                await FirebaseAuth.instance.signOut();
+              }
+            },
             tooltip: 'Cerrar Sesión',
           ),
         ],
@@ -59,7 +75,19 @@ class SubscriptionScreen extends StatelessWidget {
             ),
             const SizedBox(height: 30),
             ElevatedButton.icon(
-              onPressed: () => FirebaseAuth.instance.signOut(),
+              onPressed: () async {
+                try {
+                  await Provider.of<AuthService>(context, listen: false).signOut();
+                  if (context.mounted) {
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (_) => const AuthScreen()),
+                      (route) => false,
+                    );
+                  }
+                } catch (e) {
+                  await FirebaseAuth.instance.signOut();
+                }
+              },
               icon: const Icon(Icons.logout, color: Colors.white),
               label: const Text('Cerrar Sesión',
                   style: TextStyle(color: Colors.white)),
@@ -79,6 +107,9 @@ class SubscriptionScreen extends StatelessWidget {
   }
 
   Widget _buildInstructionCard(BuildContext context, String userEmail) {
+    // canonical number without spaces (used for copying)
+    const bizumNumberRaw = '602418045';
+    // display with spaces for readability
     const bizumNumber = '602 41 80 45';
     const subscriptionPrice = '15 €'; // Updated Price
 
@@ -101,8 +132,8 @@ class SubscriptionScreen extends StatelessWidget {
             _buildInstructionRow(context, 'Servicio:', 'Bizum',
                 icon: FontAwesomeIcons.mobileScreenButton),
             const SizedBox(height: 16),
-            _buildInstructionRow(context, 'Teléfono:', bizumNumber,
-                icon: FontAwesomeIcons.phone, canCopy: true),
+      _buildInstructionRow(context, 'Teléfono:', bizumNumber,
+        icon: FontAwesomeIcons.phone, canCopy: true, copyValue: bizumNumberRaw),
             const SizedBox(height: 16),
             _buildInstructionRow(context, 'Importe:', subscriptionPrice,
                 icon: FontAwesomeIcons.euroSign),
@@ -116,7 +147,7 @@ class SubscriptionScreen extends StatelessWidget {
   }
 
   Widget _buildInstructionRow(BuildContext context, String label, String value,
-      {required IconData icon, bool canCopy = false}) {
+    {required IconData icon, bool canCopy = false, String? copyValue}) {
     return Row(
       crossAxisAlignment:
           CrossAxisAlignment.start, // Align to the top for multi-line text
@@ -140,16 +171,37 @@ class SubscriptionScreen extends StatelessWidget {
         ),
         if (canCopy)
           Padding(
-            padding: const EdgeInsets.only(
-                left: 8.0, top: 2.0), // Adjust icon alignment
+            padding: const EdgeInsets.only(left: 8.0, top: 2.0),
             child: GestureDetector(
               onTap: () {
-                Clipboard.setData(ClipboardData(text: value));
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('"$value" copiado al portapapeles')),
+                final textToCopy = (copyValue ?? value).replaceAll(RegExp(r"\\D"), '');
+                Clipboard.setData(ClipboardData(text: textToCopy));
+                // Custom styled floating SnackBar with icon
+                final snack = SnackBar(
+                  behavior: SnackBarBehavior.floating,
+                  margin: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  duration: const Duration(milliseconds: 1400),
+                  content: Row(
+                    children: [
+                      const Icon(Icons.check_circle, color: Colors.white),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          'Teléfono copiado al portapapeles',
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    ],
+                  ),
                 );
+                ScaffoldMessenger.of(context)
+                  ..hideCurrentSnackBar()
+                  ..showSnackBar(snack);
               },
-              child: const Icon(Icons.copy, size: 18, color: Colors.grey),
+              child: Icon(Icons.copy, size: 18, color: Theme.of(context).colorScheme.primary),
             ),
           ),
       ],

@@ -73,7 +73,9 @@ class _UserInboxScreenState extends State<UserInboxScreen> {
                     children: [
                       Expanded(
                         child: Text(
-                          data['fromName'] ?? data['fromEmail'] ?? 'Remitente',
+              (data['fromAdmin'] == true)
+                ? 'Equipo BusPoints'
+                : (data['fromName'] ?? data['fromEmail'] ?? 'Remitente'),
                           style: TextStyle(
                             fontWeight: isRead ? FontWeight.normal : FontWeight.bold,
                           ),
@@ -105,7 +107,7 @@ class _UserInboxScreenState extends State<UserInboxScreen> {
                     showDialog(
                       context: context,
                       builder: (ctx) => AlertDialog(
-                        title: Text(data['fromName'] ?? data['fromEmail'] ?? 'Remitente'),
+                        title: Text((data['fromAdmin'] == true) ? 'Equipo BusPoints' : (data['fromName'] ?? data['fromEmail'] ?? 'Remitente')),
                         content: Column(
                           mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.start,

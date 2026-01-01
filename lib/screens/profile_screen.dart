@@ -1,20 +1,41 @@
+// ignore_for_file: use_build_context_synchronously
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:myapp/services/firestore_web_compat.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:myapp/utils/marker_utils.dart';
+// package:rxdart was used for merging streams in the old 'Añadidos' tab.
+// That tab was removed; keep this file free of unused imports.
 import 'package:myapp/models/user_model.dart'; // Import the updated model
+import 'package:myapp/models/user_route.dart';
+import 'package:myapp/screens/approved_pois_screen.dart';
+import 'package:myapp/screens/edit_route_points_screen.dart';
 
-class ProfileScreen extends StatelessWidget {
+
+class ProfileScreen extends StatefulWidget {
+  /// initialInnerTabIndex: when opening Profile from other screens we may
+  /// want to focus the inner tab (e.g. 'Mis rutas' at index 3). Defaults to 0.
+  const ProfileScreen({super.key, this.initialInnerTabIndex = 0});
+
+  final int initialInnerTabIndex;
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
   // --- MÉTODOS DE VALORACIONES (antes de build) ---
-  Widget _buildUserReviewsTab(BuildContext context, String uid) {
+  Widget _buildUserReviewsTab(BuildContext context, String uid, bool isAdmin) {
+    // Read reviews from the user's personal reviews subcollection. We mirror
+    // reviews under users/{uid}/reviews when the user submits them so the
+    // profile listing is reliable and doesn't depend on collectionGroup queries.
     return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
       stream: resilientStream(
         querySnapshotsCompat(
-          FirebaseFirestore.instance
-              .collectionGroup('reviews')
-              .where('userId', isEqualTo: uid)
-              .where('status', isEqualTo: 'approved'),
+          FirebaseFirestore.instance.collection('users').doc(uid).collection('reviews').orderBy('createdAt', descending: true),
         ),
         name: 'profile_user_reviews',
       ),
@@ -23,7 +44,7 @@ class ProfileScreen extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         }
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          return const Center(child: Text('No tienes valoraciones aprobadas.'));
+          return const Center(child: Text('No tienes valoraciones.'));
         }
         final reviews = snapshot.data!.docs;
         return ListView.builder(
@@ -36,6 +57,20 @@ class ProfileScreen extends StatelessWidget {
               child: ListTile(
                 leading: Icon(Icons.star, color: Colors.amber[700]),
                 title: Text(data['comment'] ?? ''),
+                // Tocar la valoración debe llevar al PDI correspondiente en el mapa
+                onTap: () {
+                  final pdiId = (data['pdiId'] ?? data['pdiId'])?.toString();
+                  final name = (data['pdiName'] ?? data['name'] ?? '')?.toString();
+                  final category = (data['pdiCategory'] ?? data['category'] ?? '')?.toString();
+                  // Navegar a Home y pedir foco en el PDI (si tenemos docId lo pasamos)
+                  Navigator.of(context).pushNamed('/home', arguments: {
+                    'focus': {
+                      if (pdiId != null && pdiId.isNotEmpty) 'docId': pdiId,
+                      if (name != null && name.isNotEmpty) 'name': name,
+                      if (category != null && category.isNotEmpty) 'category': category,
+                    }
+                  });
+                },
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -50,9 +85,15 @@ class ProfileScreen extends StatelessWidget {
                       Text('Fecha: ${data['createdAt'] is Timestamp
                           ? (data['createdAt'] as Timestamp).toDate().toString().substring(0, 16)
                           : data['createdAt'].toString()}'),
+                    // Show status so users know if their review is pending or rejected
+                    if (data['status'] != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 6.0),
+                        child: Text('Estado: ${data['status']}', style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                      ),
                   ],
                 ),
-                trailing: Row(
+                    trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     IconButton(
@@ -60,11 +101,13 @@ class ProfileScreen extends StatelessWidget {
                       tooltip: 'Editar',
                       onPressed: () => _showEditReviewDialog(context, review),
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.delete, color: Colors.red),
-                      tooltip: 'Borrar',
-                      onPressed: () => _deleteReview(context, review),
-                    ),
+                    // Only show delete button to admins
+                    if (isAdmin)
+                      IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.red),
+                        tooltip: 'Borrar',
+                        onPressed: () => _deleteReview(context, review),
+                      ),
                   ],
                 ),
               ),
@@ -79,6 +122,7 @@ class ProfileScreen extends StatelessWidget {
     final data = review.data() as Map<String, dynamic>;
     final controller = TextEditingController(text: data['comment'] ?? '');
     final ratingController = TextEditingController(text: data['rating']?.toString() ?? '');
+    
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -90,6 +134,7 @@ class ProfileScreen extends StatelessWidget {
               controller: controller,
               decoration: const InputDecoration(labelText: 'Comentario'),
             ),
+            const SizedBox(height: 8),
             TextFormField(
               controller: ratingController,
               decoration: const InputDecoration(labelText: 'Puntuación (1-5)'),
@@ -105,13 +150,34 @@ class ProfileScreen extends StatelessWidget {
           ElevatedButton(
             onPressed: () async {
               final dialogNavigator = Navigator.of(ctx);
-              final messenger = ScaffoldMessenger.of(context);
               final newComment = controller.text.trim();
               final newRating = int.tryParse(ratingController.text.trim()) ?? data['rating'];
-              await review.reference.update({'comment': newComment, 'rating': newRating});
+              // Close the edit dialog first, then perform updates in background.
               dialogNavigator.pop();
-              messenger.showSnackBar(
-                const SnackBar(content: Text('Valoración actualizada')),
+              // Update mirrored review document
+              await review.reference.update({'comment': newComment, 'rating': newRating});
+              // Also try to update canonical review under pdis_v2/<pdiId>/reviews/<id>
+              try {
+                final pdiId = data['pdiId'] ?? data['pdiId'];
+                if (pdiId != null) {
+                  final canonRef = FirebaseFirestore.instance.collection('pdis_v2').doc(pdiId.toString()).collection('reviews').doc(review.id);
+                  final canonSnap = await canonRef.get();
+                  if (canonSnap.exists) {
+                    await canonRef.update({'comment': newComment, 'rating': newRating});
+                  }
+                }
+              } catch (_) {}
+              if (!mounted) return;
+              
+              showDialog(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  title: const Text('Valoración actualizada'),
+                  content: const Text('Tu valoración ha sido actualizada.'),
+                  actions: [
+                    TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Cerrar')),
+                  ],
+                ),
               );
             },
             child: const Text('Guardar'),
@@ -122,8 +188,8 @@ class ProfileScreen extends StatelessWidget {
   }
 
   void _deleteReview(BuildContext context, QueryDocumentSnapshot review) async {
-    final messenger = ScaffoldMessenger.of(context);
     final confirm = await showDialog<bool>(
+    
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Eliminar valoración'),
@@ -141,13 +207,35 @@ class ProfileScreen extends StatelessWidget {
       ),
     );
     if (confirm == true) {
-      await review.reference.delete();
-      messenger.showSnackBar(
-        const SnackBar(content: Text('Valoración eliminada')),
+      try {
+        // Delete mirrored review
+        await review.reference.delete();
+      } catch (_) {}
+      // Also try to delete canonical review under pdis_v2/<pdiId>/reviews/<id>
+      try {
+        final data = review.data() as Map<String, dynamic>;
+        final pdiId = data['pdiId'];
+        if (pdiId != null) {
+          final canonRef = FirebaseFirestore.instance.collection('pdis_v2').doc(pdiId.toString()).collection('reviews').doc(review.id);
+          final snap = await canonRef.get();
+          if (snap.exists) await canonRef.delete();
+        }
+      } catch (_) {}
+      if (!mounted) return;
+      
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Valoración eliminada'),
+          content: const Text('La valoración ha sido eliminada.'),
+          actions: [
+            TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Cerrar')),
+          ],
+        ),
       );
     }
   }
-  const ProfileScreen({super.key});
+
 
   String _formatDate(DateTime date) {
     return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
@@ -155,6 +243,7 @@ class ProfileScreen extends StatelessWidget {
 
   void _showEditDialog(BuildContext context, String field, String value, String uid) {
     final controller = TextEditingController(text: value);
+    
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -174,30 +263,50 @@ class ProfileScreen extends StatelessWidget {
           ElevatedButton(
             onPressed: () async {
               final dialogNavigator = Navigator.of(ctx);
-              final messenger = ScaffoldMessenger.of(context);
               final newValue = controller.text.trim();
               final usersRef = FirebaseFirestore.instance.collection('users');
               if (field == 'email') {
                 final emailDup = await usersRef.where('email', isEqualTo: newValue).get();
                 if (emailDup.docs.any((doc) => doc.id != uid)) {
-                  messenger.showSnackBar(
-                    const SnackBar(content: Text('Ya existe una cuenta con ese correo electrónico'), backgroundColor: Colors.red),
+                  if (!mounted) return;
+                  showDialog(
+                    context: context,
+                    builder: (ctx) => AlertDialog(
+                      title: const Text('Correo duplicado'),
+                      content: const Text('Ya existe una cuenta con ese correo electrónico'),
+                      actions: [TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Cerrar'))],
+                    ),
                   );
                   return;
                 }
               } else {
                 final phoneDup = await usersRef.where('phone', isEqualTo: newValue).get();
                 if (phoneDup.docs.any((doc) => doc.id != uid)) {
-                  messenger.showSnackBar(
-                    const SnackBar(content: Text('Ya existe una cuenta con ese teléfono'), backgroundColor: Colors.red),
+                  if (!mounted) return;
+                  showDialog(
+                    context: context,
+                    builder: (ctx) => AlertDialog(
+                      title: const Text('Teléfono duplicado'),
+                      content: const Text('Ya existe una cuenta con ese teléfono'),
+                      actions: [TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Cerrar'))],
+                    ),
                   );
                   return;
                 }
               }
               await usersRef.doc(uid).update({field: newValue});
               dialogNavigator.pop();
-              messenger.showSnackBar(
-                const SnackBar(content: Text('Datos actualizados')),
+              if (!mounted) return;
+              
+              showDialog(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  title: const Text('Datos actualizados'),
+                  content: const Text('Tus datos han sido actualizados correctamente.'),
+                  actions: [
+                    TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Cerrar')),
+                  ],
+                ),
               );
             },
             child: const Text('Guardar'),
@@ -220,6 +329,7 @@ class ProfileScreen extends StatelessWidget {
 
     return DefaultTabController(
       length: 4,
+      initialIndex: widget.initialInnerTabIndex,
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Mi Perfil'),
@@ -322,7 +432,7 @@ class ProfileScreen extends StatelessWidget {
                 // VALORACIONES
                 Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: _buildUserReviewsTab(context, user.uid),
+                  child: _buildUserReviewsTab(context, user.uid, user.role == 'admin'),
                 ),
                 // RECOMPENSAS
                 Padding(
@@ -420,14 +530,12 @@ class ProfileScreen extends StatelessWidget {
       future: Future.wait([
         FirebaseFirestore.instance.collection('users').doc(uid).collection('saved_places').get(),
         FirebaseFirestore.instance.collection('users').doc(uid).collection('favorite_places').get(),
-        // Solo reviews aprobadas:
-        FirebaseFirestore.instance.collectionGroup('reviews')
-          .where('userId', isEqualTo: uid)
-          .where('status', isEqualTo: 'approved')
-          .get(),
+        // Solo reviews aprobadas (use the user's mirrored reviews subcollection):
+        FirebaseFirestore.instance.collection('users').doc(uid).collection('reviews').where('status', isEqualTo: 'approved').get(),
         FirebaseFirestore.instance.collection('users').doc(uid).collection('history_places').get(),
-        FirebaseFirestore.instance.collection('users').doc(uid).collection('added_pois').get(),
         FirebaseFirestore.instance.collection('users').doc(uid).collection('reports').get(),
+        // Count user-created routes for the statistics panel
+        FirebaseFirestore.instance.collection('user_routes').where('createdBy', isEqualTo: uid).get(),
       ]),
       builder: (context, snapshot) {
         if (!snapshot.hasData) return const SizedBox.shrink();
@@ -452,9 +560,25 @@ class ProfileScreen extends StatelessWidget {
                     _buildStatItem(context, Icons.favorite, data[1].size.toString(), 'Favoritos'),
                     _buildStatItem(context, Icons.star, data[2].size.toString(), 'Valoraciones'),
                     _buildStatItem(context, Icons.history, data[3].size.toString(), 'Visitados'),
-                    _buildStatItem(context, Icons.add_location, data[4].size.toString(), 'Añadidos'),
-                    _buildStatItem(context, Icons.report, data[5].size.toString(), 'Reportes'),
+                    _buildStatItem(context, Icons.report, data[4].size.toString(), 'Reportes'),
+                    _buildStatItem(context, Icons.alt_route, data[5].size.toString(), 'Rutas'),
                   ],
+                ),
+                const SizedBox(height: 12),
+                // Show user's current points (useful to verify awards were applied)
+                StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                  stream: FirebaseFirestore.instance.collection('users').doc(uid).snapshots(),
+                  builder: (ctx, snapPoints) {
+                    if (!snapPoints.hasData) return const SizedBox.shrink();
+                    final u = snapPoints.data!.data();
+                    final pts = (u != null && u['points'] != null) ? (u['points'].toString()) : '0';
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Chip(label: Text('Puntos: $pts', style: const TextStyle(fontWeight: FontWeight.bold))),
+                      ],
+                    );
+                  },
                 ),
               ],
             ),
@@ -484,7 +608,7 @@ class ProfileScreen extends StatelessWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: Column(
           children: [
-            const TabBar(
+              const TabBar(
               labelColor: Colors.blue,
               unselectedLabelColor: Colors.grey,
               indicatorColor: Colors.blue,
@@ -492,18 +616,22 @@ class ProfileScreen extends StatelessWidget {
                 Tab(icon: Icon(Icons.bookmark), text: 'Guardados'),
                 Tab(icon: Icon(Icons.favorite), text: 'Favoritos'),
                 Tab(icon: Icon(Icons.history), text: 'Historial'),
-                Tab(icon: Icon(Icons.add_location), text: 'Añadidos'),
+                Tab(icon: Icon(Icons.alt_route), text: 'Mis rutas'),
               ],
             ),
             SizedBox(
-              height: 200,
+              // Give the tab content more vertical space so lists and maps
+              // (e.g. 'Mis rutas' previews) don't appear clipped at half the
+              // screen and cause awkward nested scrolling. Use a fraction of
+              // the viewport height which works across devices.
+              height: MediaQuery.of(context).size.height * 0.55,
               child: TabBarView(
-                children: [
-                  _buildPlaceList(context, uid, 'saved_places'),
-                  _buildPlaceList(context, uid, 'favorite_places'),
-                  _buildPlaceList(context, uid, 'history_places'),
-                  _buildAddedPoisList(context, uid),
-                ],
+                  children: [
+                    _buildPlaceList(context, uid, 'saved_places'),
+                    _buildPlaceList(context, uid, 'favorite_places'),
+                    _buildPlaceList(context, uid, 'history_places'),
+                    _buildUserRoutesList(context, uid),
+                  ],
               ),
             ),
           ],
@@ -512,39 +640,303 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  /// List PDIs the user submitted (user_pois where submittedBy == uid)
-  Widget _buildAddedPoisList(BuildContext context, String uid) {
-    return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection('user_pois').where('submittedBy', isEqualTo: uid).orderBy('createdAt', descending: true).snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          return const Center(child: Text('No has añadido PDIs.'));
-        }
-        return ListView.builder(
-          itemCount: snapshot.data!.docs.length,
-          itemBuilder: (context, index) {
-            final doc = snapshot.data!.docs[index];
-            final data = doc.data() as Map<String, dynamic>;
-            final status = (data['status'] ?? '').toString();
-            return ListTile(
-              leading: const Icon(Icons.place, color: Colors.deepPurple),
-              title: Text(data['title'] ?? data['name'] ?? 'PDI sin título'),
-              subtitle: Text('Estado: ${status.isNotEmpty ? status : 'pendiente'}'),
-              trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
-              onTap: () {
-                // Optional: navigate to PDI detail screen if exists
-              },
-            );
-          },
+  Widget _buildUserRoutesList(BuildContext context, String uid) {
+    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+      stream: FirebaseFirestore.instance.collection('user_routes').where('createdBy', isEqualTo: uid).orderBy('createdAt', descending: true).snapshots(),
+      builder: (context, snap) {
+        if (snap.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
+        final docs = snap.data?.docs ?? [];
+        if (docs.isEmpty) return const Center(child: Text('No has creado rutas aún.'));
+
+        // Separate private and public routes
+        final privateDocs = docs.where((d) => (d.data()['isPrivate'] ?? false) == true).toList();
+        final publicDocs = docs.where((d) => (d.data()['isPrivate'] ?? false) != true).toList();
+
+        return SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                child: const Text('Rutas privadas', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              ),
+              if (privateDocs.isEmpty)
+                const Padding(padding: EdgeInsets.symmetric(horizontal: 16.0), child: Text('No tienes rutas privadas.'))
+              else
+                ListView.separated(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: privateDocs.length,
+                  separatorBuilder: (_, __) => const Divider(height: 1),
+                  itemBuilder: (ctx, i) => _buildRouteTile(privateDocs[i]),
+                ),
+              const Divider(height: 24),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                child: const Text('Rutas públicas', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              ),
+              if (publicDocs.isEmpty)
+                const Padding(padding: EdgeInsets.symmetric(horizontal: 16.0), child: Text('No tienes rutas públicas.'))
+              else
+                ListView.separated(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: publicDocs.length,
+                  separatorBuilder: (_, __) => const Divider(height: 1),
+                  itemBuilder: (ctx, i) => _buildRouteTile(publicDocs[i]),
+                ),
+              const SizedBox(height: 12),
+            ],
+          ),
         );
       },
     );
   }
 
+  Widget _buildRouteTile(QueryDocumentSnapshot<Map<String, dynamic>> d) {
+    final data = d.data();
+    final name = data['name'] ?? '(sin nombre)';
+    final desc = data['description'] ?? '';
+    final approved = data['approved'] == true;
+    final isPrivate = data['isPrivate'] == true;
+    final pdis = (data['pdis'] as List? ?? []).length;
+    return ListTile(
+      title: Text(name),
+      subtitle: Text('$pdis puntos • ${approved ? 'Aprobada' : 'Pendiente'}\n$desc'),
+      isThreeLine: true,
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(icon: const Icon(Icons.edit, color: Colors.orange), tooltip: 'Editar ruta', onPressed: () => _editOwnRoute(d.id, data)),
+          IconButton(icon: const Icon(Icons.format_list_numbered, color: Colors.blue), tooltip: 'Editar puntos', onPressed: () {
+            try {
+              final userRoute = UserRoute.fromDoc(d);
+              _editRoutePoints(userRoute);
+            } catch (_) {
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No se puede editar los puntos de la ruta')));
+            }
+          }),
+          IconButton(icon: const Icon(Icons.delete_forever, color: Colors.red), tooltip: 'Eliminar ruta', onPressed: () async {
+            final owner = data['createdBy'] ?? '';
+            final currentUid = FirebaseAuth.instance.currentUser?.uid;
+            if (currentUid == null || currentUid != owner) {
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No tienes permiso para eliminar esta ruta')));
+              return;
+            }
+            final confirm = await showDialog<bool>(context: context, builder: (ctx) => AlertDialog(
+              title: const Text('Eliminar ruta'),
+              content: const Text('¿Seguro que deseas eliminar esta ruta? Esta acción es irreversible.'),
+              actions: [TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Cancelar')), ElevatedButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('Eliminar'))],
+            ));
+            if (confirm == true) {
+              try {
+                await FirebaseFirestore.instance.collection('user_routes').doc(d.id).delete();
+                if (!mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Ruta eliminada')));
+              } catch (e) {
+                if (!mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error eliminando ruta: $e')));
+              }
+            }
+          }),
+          // For private routes always show a green tick. Public routes show
+          // a green tick if approved or an hourglass if pending approval.
+          isPrivate
+              ? const Icon(Icons.check_circle, color: Colors.green)
+              : (approved ? const Icon(Icons.check_circle, color: Colors.green) : const Icon(Icons.hourglass_top, color: Colors.orange)),
+        ],
+      ),
+      onTap: () {
+        try {
+          final userRoute = UserRoute.fromDoc(d);
+          _showRoutePreview(userRoute);
+        } catch (_) {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No se puede mostrar la vista previa de la ruta')));
+        }
+      },
+    );
+  }
+
+  Future<void> _showRoutePreview(UserRoute r) async {
+    final Set<Marker> markers = {};
+    for (var i = 0; i < r.pdis.length; i++) {
+      try {
+        final bmp = await createNumberedMarker(i + 1, size: 100, color: Colors.teal);
+        markers.add(Marker(markerId: MarkerId(i.toString()), position: LatLng(r.pdis[i].lat, r.pdis[i].lng), icon: bmp, infoWindow: InfoWindow(title: 'Punto ${i + 1}')));
+      } catch (_) {
+        markers.add(Marker(markerId: MarkerId(i.toString()), position: LatLng(r.pdis[i].lat, r.pdis[i].lng), infoWindow: InfoWindow(title: 'Punto ${i + 1}')));
+      }
+    }
+
+    showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+              title: Text(r.name),
+              content: SizedBox(
+                width: double.maxFinite,
+                height: 300,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: GoogleMap(
+                    initialCameraPosition: CameraPosition(target: LatLng(r.pdis.first.lat, r.pdis.first.lng), zoom: 13),
+                    markers: markers,
+                    polylines: {
+                      Polyline(polylineId: const PolylineId('route'), points: r.pdis.map((p) => LatLng(p.lat, p.lng)).toList())
+                    },
+                    zoomControlsEnabled: false,
+                    myLocationButtonEnabled: false,
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Cerrar')),
+                ElevatedButton(onPressed: () => _openInGoogleMaps(r), child: const Text('Navegar')),
+              ],
+            ));
+  }
+
+  Future<void> _openInGoogleMaps(UserRoute r) async {
+    if (r.pdis.isEmpty) return;
+    try {
+      final coords = r.pdis.map((p) => '${p.lat},${p.lng}').toList();
+      final origin = coords.first;
+      final destination = coords.last;
+      String waypoints = '';
+      if (coords.length > 2) {
+        waypoints = coords.sublist(1, coords.length - 1).join('|');
+      }
+      final uriString = 'https://www.google.com/maps/dir/?api=1&origin=${Uri.encodeComponent(origin)}&destination=${Uri.encodeComponent(destination)}${waypoints.isNotEmpty ? '&waypoints=${Uri.encodeComponent(waypoints)}' : ''}&travelmode=driving';
+      final uri = Uri.parse(uriString);
+
+      // record history
+      try {
+        final uid = FirebaseAuth.instance.currentUser?.uid;
+        if (uid != null) {
+          final first = r.pdis.first;
+          FirebaseFirestore.instance.collection('users').doc(uid).collection('history').add({
+            'action': 'open_route_navigation',
+            'routeId': r.id,
+            'routeName': r.name,
+            'pointsCount': r.pdis.length,
+            'timestamp': FieldValue.serverTimestamp(),
+          });
+          FirebaseFirestore.instance.collection('users').doc(uid).collection('history_places').add({
+            'name': r.name,
+            'category': 'route',
+            'latitude': first.lat,
+            'longitude': first.lng,
+            'source': 'route_navigation',
+            'sourceId': r.id,
+            'poiId': null,
+            'timestamp': FieldValue.serverTimestamp(),
+          });
+        }
+      } catch (_) {}
+
+      if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No se pudo abrir Google Maps')));
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error abriendo Google Maps: $e')));
+    }
+  }
+
+  Future<void> _editOwnRoute(String routeId, Map<String, dynamic> data) async {
+    final nameCtrl = TextEditingController(text: data['name'] ?? '');
+    final descCtrl = TextEditingController(text: data['description'] ?? '');
+
+    final ok = await showDialog<bool>(context: context, builder: (ctx) => AlertDialog(
+      title: const Text('Editar ruta'),
+      content: Column(mainAxisSize: MainAxisSize.min, children: [
+        TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: 'Nombre')),
+        TextField(controller: descCtrl, decoration: const InputDecoration(labelText: 'Descripción')),
+      ]),
+      actions: [TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Cancelar')), ElevatedButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('Guardar'))],
+    ));
+
+    if (ok != true) return;
+
+    try {
+      await FirebaseFirestore.instance.collection('user_routes').doc(routeId).update({
+        'name': nameCtrl.text.trim(),
+        'description': descCtrl.text.trim(),
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Ruta actualizada')));
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error actualizando ruta: $e')));
+    }
+  }
+
+  Future<void> _editRoutePoints(UserRoute route) async {
+    // Open a full-screen editor that shows a map with draggable markers
+    // and a reorderable list. Edits on the map/list sync and are saved on
+    // Save. We push a new page to keep the UI responsive and avoid large
+    // nested dialogs.
+  final result = await Navigator.of(context).push<bool>(MaterialPageRoute(builder: (_) => EditRoutePointsScreen(route: route)));
+    if (result == true) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Puntos actualizados')));
+    }
+  }
+
+  /// List PDIs the user submitted (user_pois where submittedBy == uid)
+  // _buildAddedPoisList removed: 'Añadidos' tab has been removed from Mis lugares.
+
+  /// List PDIs the user submitted (user_pois where submittedBy == uid)
+  // _buildAddedPoisList removed: 'Añadidos' tab has been removed from Mis lugares.
+
   Widget _buildPlaceList(BuildContext context, String uid, String collection) {
+    // Special handling for history_places: show Pending and Aprobados sections
+    if (collection == 'history_places') {
+      // Show only navigation/history entries here. Exclude PDI submissions
+      // (which have source == 'user_pois') so PDIs are shown in the
+      // Recompensas popups instead.
+      return StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance.collection('users').doc(uid).collection(collection).orderBy('timestamp', descending: true).snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) return const Center(child: Text('No hay historial.'));
+          final docs = snapshot.data!.docs.where((d) {
+            final m = d.data() as Map<String, dynamic>;
+            return (m['source'] ?? '') != 'user_pois';
+          }).toList();
+          if (docs.isEmpty) return const Center(child: Text('No hay historial.'));
+
+          return ListView.builder(
+            itemCount: docs.length,
+            itemBuilder: (context, index) {
+              final placeDoc = docs[index];
+              final place = placeDoc.data() as Map<String, dynamic>;
+              return ListTile(
+                leading: const Icon(Icons.history, color: Colors.blueGrey),
+                title: Text(place['name'] ?? ''),
+                subtitle: Text(place['category'] ?? ''),
+                trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+                onTap: () {
+                  double? lat = (place['latitude'] is num) ? (place['latitude'] as num).toDouble() : null;
+                  double? lng = (place['longitude'] is num) ? (place['longitude'] as num).toDouble() : null;
+                  Navigator.of(context).pushNamed('/home', arguments: {
+                    'focus': {
+                      if (lat != null && lng != null) 'lat': lat,
+                      if (lat != null && lng != null) 'lng': lng,
+                      'name': place['name'] ?? '',
+                      'category': place['category'] ?? '',
+                    }
+                  });
+                },
+              );
+            },
+          );
+        },
+      );
+    }
+
+    // Default behaviour for other collections
     return StreamBuilder(
       stream: FirebaseFirestore.instance.collection('users').doc(uid).collection(collection).snapshots(),
       builder: (context, snapshot) {
@@ -564,6 +956,43 @@ class ProfileScreen extends StatelessWidget {
               title: Text(place['name'] ?? ''),
               subtitle: Text(place['category'] ?? '', style: const TextStyle(fontSize: 12)),
               trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+              onTap: () {
+                // Try to extract coordinates from the stored place map. Support
+                // several formats (position string 'lat,lng', or map with lat/lng).
+                double? lat;
+                double? lng;
+                final p = place.data();
+                try {
+                  final pos = p['position'];
+                  if (pos is String && pos.contains(',')) {
+                    final parts = pos.split(',');
+                    lat = double.tryParse(parts[0].trim());
+                    lng = double.tryParse(parts[1].trim());
+                  } else if (pos is Map) {
+                    final rawLat = pos['lat'] ?? pos['latitude'];
+                    final rawLng = pos['lng'] ?? pos['longitude'];
+                    lat = (rawLat is num) ? rawLat.toDouble() : double.tryParse(rawLat?.toString() ?? '');
+                    lng = (rawLng is num) ? rawLng.toDouble() : double.tryParse(rawLng?.toString() ?? '');
+                  } else if (p['latitude'] != null && p['longitude'] != null) {
+                    final rawLat = p['latitude'];
+                    final rawLng = p['longitude'];
+                    lat = (rawLat is num) ? rawLat.toDouble() : double.tryParse(rawLat?.toString() ?? '');
+                    lng = (rawLng is num) ? rawLng.toDouble() : double.tryParse(rawLng?.toString() ?? '');
+                  }
+                } catch (_) {
+                  lat = null; lng = null;
+                }
+
+                // Navigate to home and request initial focus on the coordinates.
+                Navigator.of(context).pushNamed('/home', arguments: {
+                  'focus': {
+                    if (lat != null && lng != null) 'lat': lat,
+                    if (lat != null && lng != null) 'lng': lng,
+                    'name': p['name'] ?? '',
+                    'category': p['category'] ?? '',
+                  }
+                });
+              },
             );
           },
         );
@@ -637,7 +1066,7 @@ class ProfileScreen extends StatelessWidget {
                     StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
                       stream: resilientStream(
                         querySnapshotsCompat(
-                          FirebaseFirestore.instance.collectionGroup('reviews').where('userId', isEqualTo: uid),
+                          FirebaseFirestore.instance.collection('users').doc(uid).collection('reviews'),
                         ),
                         name: 'profile_rewards_reviews_count',
                       ),
@@ -680,14 +1109,116 @@ class ProfileScreen extends StatelessWidget {
               },
             ),
             const SizedBox(height: 12),
-            // Small CTA button
-            ElevatedButton.icon(
-              onPressed: () {
-                // Navigate to add POI or to valorar screen; best effort: go to Mis lugares tab
-                DefaultTabController.of(context).animateTo(1);
-              },
-              icon: const Icon(Icons.add_location),
-              label: const Text('Contribuir/Valorar PDI'),
+            // Two buttons: show pending and approved PDIs in a popup
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange,
+                      foregroundColor: Colors.white,
+                      elevation: 4,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    onPressed: () {
+                      showDialog<void>(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          title: const Text('PDIs pendientes'),
+                          content: SizedBox(
+                            width: double.maxFinite,
+                              child: StreamBuilder<QuerySnapshot>(
+                              // Query only by submitter to avoid requiring a composite index.
+                              stream: FirebaseFirestore.instance.collection('user_pois').where('submittedBy', isEqualTo: uid).snapshots(),
+                              builder: (context, snap) {
+                                if (snap.connectionState == ConnectionState.waiting) return const SizedBox(height: 120, child: Center(child: CircularProgressIndicator()));
+                                if (!snap.hasData || snap.data!.docs.isEmpty) return const SizedBox(height: 120, child: Center(child: Text('No hay PDIs pendientes.')));
+                                // Filter client-side for pending status and sort by submittedAt desc
+                                final docsAll = snap.data!.docs;
+                                final pendingDocs = docsAll.where((d) {
+                                  final p = d.data() as Map<String, dynamic>;
+                                  return (p['status'] ?? 'pending') == 'pending' && (p['submittedBy'] ?? '') == uid;
+                                }).toList();
+                                pendingDocs.sort((a, b) {
+                                  final pa = a.data() as Map<String, dynamic>;
+                                  final pb = b.data() as Map<String, dynamic>;
+                                  final ta = pa['submittedAt'] is Timestamp ? (pa['submittedAt'] as Timestamp).toDate().millisecondsSinceEpoch : 0;
+                                  final tb = pb['submittedAt'] is Timestamp ? (pb['submittedAt'] as Timestamp).toDate().millisecondsSinceEpoch : 0;
+                                  return tb.compareTo(ta);
+                                });
+
+                                if (pendingDocs.isEmpty) return const SizedBox(height: 120, child: Center(child: Text('No hay PDIs pendientes.')));
+
+                                return ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: pendingDocs.length,
+                                  itemBuilder: (context, i) {
+                                    final d = pendingDocs[i];
+                                    final p = d.data() as Map<String, dynamic>;
+                                    return ListTile(
+                                      leading: const Icon(Icons.hourglass_top, color: Colors.orange),
+                                      title: Text(p['name'] ?? ''),
+                                      subtitle: Text(p['category'] ?? ''),
+                                      onTap: () {
+                                        double? lat = (p['latitude'] is num) ? (p['latitude'] as num).toDouble() : null;
+                                        double? lng = (p['longitude'] is num) ? (p['longitude'] as num).toDouble() : null;
+                                        Navigator.of(context).pushNamed('/home', arguments: {'focus': {if (lat != null) 'lat': lat, if (lng != null) 'lng': lng, 'name': p['name'] ?? '', 'category': p['category'] ?? ''}});
+                                        Navigator.of(ctx).pop();
+                                      },
+                                    );
+                                  },
+                                );
+                              },
+                            ),
+                          ),
+                          actions: [TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Cerrar'))],
+                        ),
+                      );
+                    },
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        CircleAvatar(
+                          radius: 16,
+                          backgroundColor: Colors.orange.shade50,
+                          child: const Icon(Icons.hourglass_top, color: Colors.orange, size: 18),
+                        ),
+                        const SizedBox(height: 6),
+                        const Text('PDIs pendientes', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.w700)),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      foregroundColor: Colors.white,
+                      elevation: 4,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).push(MaterialPageRoute(builder: (_) => ApprovedPoisScreen(uid: uid)));
+                    },
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        CircleAvatar(
+                          radius: 16,
+                          backgroundColor: Colors.green.shade50,
+                          child: const Icon(Icons.check_circle, color: Colors.green, size: 18),
+                        ),
+                        const SizedBox(height: 6),
+                        const Text('PDIs aprobados', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.w700)),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -695,3 +1226,5 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 }
+
+

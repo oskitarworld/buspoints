@@ -55,6 +55,55 @@
         { "fieldPath": "createdAt", "mode": "DESCENDING" },
         { "fieldPath": "__name__", "mode": "DESCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "reviews",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        { "fieldPath": "pdiId", "mode": "ASCENDING" },
+        { "fieldPath": "status", "mode": "ASCENDING" },
+        { "fieldPath": "__name__", "mode": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "user_routes",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "isPublic", "mode": "ASCENDING" },
+        { "fieldPath": "createdAt", "mode": "DESCENDING" },
+        { "fieldPath": "__name__", "mode": "DESCENDING" }
+      ]
+    }
+    ,
+    {
+      "collectionGroup": "user_routes",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "createdBy", "mode": "ASCENDING" },
+        { "fieldPath": "createdAt", "mode": "DESCENDING" },
+        { "fieldPath": "__name__", "mode": "DESCENDING" }
+      ]
+    }
+    ,
+    {
+      "collectionGroup": "user_routes",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "approved", "mode": "ASCENDING" },
+        { "fieldPath": "createdAt", "mode": "DESCENDING" },
+        { "fieldPath": "__name__", "mode": "DESCENDING" }
+      ]
+    }
+    ,
+    {
+      "collectionGroup": "user_routes",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "needsApproval", "mode": "ASCENDING" },
+        { "fieldPath": "approved", "mode": "ASCENDING" },
+        { "fieldPath": "createdAt", "mode": "DESCENDING" },
+        { "fieldPath": "__name__", "mode": "DESCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []

@@ -60,6 +60,11 @@ class _UserMessagesMainScreenState extends State<UserMessagesMainScreen> {
         }
         if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
         var docs = snapshot.data!.docs;
+        // Exclude documents that the recipient (current user) has soft-deleted
+        docs = docs.where((d) {
+          final data = d.data() as Map<String, dynamic>;
+          return data['deletedByRecipient'] == null;
+        }).toList();
         if (docs.isEmpty) return const Center(child: Text('No hay mensajes.'));
 
         docs.sort((a, b) {
@@ -141,7 +146,9 @@ class _UserMessagesMainScreenState extends State<UserMessagesMainScreen> {
                     (msg.data() as Map<String, dynamic>)['read'] != true
                   ).length;
 
-                  final senderName = lastData['senderName'] ?? lastData['fromName'] ?? lastData['fromEmail'] ?? 'Usuario';
+          final senderName = (lastData['fromAdmin'] == true)
+            ? 'Equipo BusPoints'
+            : (lastData['senderName'] ?? lastData['fromName'] ?? lastData['fromEmail'] ?? 'Usuario').toString();
                   final lastMessagePreview = (lastData['message'] ?? '').toString().length > 40 
                       ? '${(lastData['message'] as String).substring(0, 40)}...'
                       : (lastData['message'] ?? '');
@@ -253,13 +260,17 @@ class _UserMessagesMainScreenState extends State<UserMessagesMainScreen> {
                                       );
                                       if (confirm == true) {
                                         try {
+                                          // Soft-delete for recipient: mark deletedByRecipient so sender/admin copies remain
                                           await FirebaseFirestore.instance
                                               .collection('user_messages')
                                               .doc(doc.id)
-                                              .delete();
+                                              .update({
+                                            'deletedByRecipient': user.uid,
+                                            'deletedByRecipientAt': FieldValue.serverTimestamp(),
+                                          });
                                           if (context.mounted) {
                                             ScaffoldMessenger.of(context).showSnackBar(
-                                              const SnackBar(content: Text('Eliminado.')),
+                                              const SnackBar(content: Text('Eliminado.'), backgroundColor: Colors.green),
                                             );
                                           }
                                         } catch (e) {
@@ -502,12 +513,16 @@ class _UserMessagesMainScreenState extends State<UserMessagesMainScreen> {
                       ],
                     ),
                   );
-                  if (confirm == true) {
+                    if (confirm == true) {
                     try {
+                      // Soft-delete sender copy so recipient/admin copies remain
                       await FirebaseFirestore.instance
                           .collection('user_messages')
                           .doc(docs[index].id)
-                          .delete();
+                          .update({
+                        'deletedBySender': user.uid,
+                        'deletedBySenderAt': FieldValue.serverTimestamp(),
+                      });
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text('Eliminado.')),
@@ -564,14 +579,18 @@ class _UserMessagesMainScreenState extends State<UserMessagesMainScreen> {
                           );
                           if (confirm == true) {
                             try {
+                              // Soft-delete sender copy so recipient/admin copies remain
                               await FirebaseFirestore.instance
                                   .collection('user_messages')
                                   .doc(docs[index].id)
-                                  .delete();
+                                  .update({
+                                'deletedBySender': user.uid,
+                                'deletedBySenderAt': FieldValue.serverTimestamp(),
+                              });
                               if (context.mounted) {
                                 Navigator.of(ctx).pop();
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Eliminado.')),
+                                  const SnackBar(content: Text('Eliminado.'), backgroundColor: Colors.green),
                                 );
                               }
                             } catch (e) {

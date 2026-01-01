@@ -1,5 +1,9 @@
-import 'dart:math';
+// dart:math previously used for random id generation; no longer required.
 import 'dart:developer' as developer;
+import 'dart:convert';
+import 'package:crypto/crypto.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:uuid/uuid.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -137,19 +141,43 @@ class AuthService {
 
   // Generate or return a persistent device session id saved in SharedPreferences.
   Future<String> _getOrCreateDeviceId() async {
-    final prefs = await SharedPreferences.getInstance();
-    const key = 'device_session_id';
-    String? id = prefs.getString(key);
+    // Prefer secure storage for persistence between app restarts.
+    const key = 'installation_id_v1';
+    final secure = const FlutterSecureStorage();
+    String? id = await secure.read(key: key);
     if (id != null && id.isNotEmpty) return id;
 
-    // Create a simple but reasonably unique id: timestamp + random int
-    final rand = Random.secure();
-    id = '${DateTime.now().millisecondsSinceEpoch}-${rand.nextInt(1 << 32)}';
-    await prefs.setString(key, id);
+    // Fallback: try SharedPreferences for older installs
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      id = prefs.getString(key);
+      if (id != null && id.isNotEmpty) {
+        // copy into secure storage for future resilience
+        await secure.write(key: key, value: id);
+        return id;
+      }
+    } catch (e) {
+      developer.log('Warning: SharedPreferences not available when reading device id: $e', name: 'AuthService');
+    }
+
+    // Generate a stable UUID for this installation and persist it.
+    final uuid = const Uuid();
+    id = uuid.v4();
+    try {
+      await secure.write(key: key, value: id);
+    } catch (e) {
+      // If secure storage fails, fall back to SharedPreferences
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString(key, id);
+      } catch (e2) {
+        developer.log('Warning: could not persist installation id: $e2', name: 'AuthService');
+      }
+    }
     return id;
   }
 
-  Future<User?> register(String name, String email, String phone, String password) async {
+  Future<User?> register(String name, String email, String phone, String password, {bool wantsTrial = false}) async {
     try {
   developer.log('Iniciando registro para $email', name: 'AuthService');
       // Verificar que el nombre de usuario sea único
@@ -232,12 +260,14 @@ class AuthService {
         // easier to present to the user from the UI that is responsible
         // for verification flows.
 
-        final userData = {
+  final userData = {
           'name': name,
           'nameLower': name.toLowerCase(),
           'email': email,
           'phone': phone,
           'role': 'user',
+          // New users are created in pending state for admin approval of full access.
+          // If wantsTrial is true we auto-activate a 48h trial (trialStatus: 'active')
           'status': 'pending',
           'approvedPoisCount': 0,
           'subscriptionHistory': [],
@@ -245,7 +275,38 @@ class AuthService {
         };
   developer.log('Intentando crear documento en Firestore: $userData', name: 'AuthService');
         try {
-          await _firestore.collection('users').doc(user.uid).set(userData);
+          // If the user requested a trial, compute expiry and augment the user doc.
+          if (wantsTrial) {
+            final expiryDate = DateTime.now().toUtc().add(const Duration(hours: 48));
+            final expiryTs = Timestamp.fromDate(expiryDate);
+
+            // device id used to bind this trial; reuse existing device-session id logic
+            final deviceId = await _getOrCreateDeviceId();
+            final deviceHash = sha256.convert(utf8.encode(deviceId)).toString();
+
+            userData.addAll({
+              'trialRequested': true,
+              'trialStatus': 'active',
+              'trialRequestedAt': FieldValue.serverTimestamp(),
+              'trialExpiry': expiryTs,
+              'trialDeviceId': deviceHash,
+              'trialAutoApproved': true,
+            });
+
+            // write user doc
+            await _firestore.collection('users').doc(user.uid).set(userData);
+
+            // register device trial to reduce reuse (server-side check still required)
+            final deviceDoc = _firestore.collection('device_trials').doc(deviceHash);
+            await deviceDoc.set({
+              'deviceIdHash': deviceHash,
+              'firstUsedAt': FieldValue.serverTimestamp(),
+              'userId': user.uid,
+              'blocked': true,
+            }, SetOptions(merge: true));
+          } else {
+            await _firestore.collection('users').doc(user.uid).set(userData);
+          }
           developer.log('Documento creado en Firestore para ${user.uid}', name: 'AuthService');
         } on FirebaseException catch (e) {
           developer.log('Firestore error creating user doc: $e', name: 'AuthService', error: e, stackTrace: StackTrace.current);

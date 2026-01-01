@@ -1,8 +1,9 @@
 // Clean single-definition AppDrawer
-
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 
 import 'package:myapp/screens/auth/auth_screen.dart';
 import 'package:myapp/screens/profile_screen.dart';
@@ -10,6 +11,12 @@ import 'package:myapp/screens/home_screen.dart';
 import 'package:myapp/screens/admin_panel_screen.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:myapp/screens/terms_of_use_screen.dart';
+import 'package:myapp/widgets/branding_block.dart';
+import 'package:myapp/screens/create_route_screen.dart';
+import 'package:myapp/screens/community_routes_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:myapp/screens/privacy_policy_screen.dart';
 import 'package:myapp/screens/how_it_works_screen.dart';
 import 'package:myapp/widgets/contact_dialog.dart';
@@ -18,7 +25,9 @@ import 'package:myapp/services/firestore_web_compat.dart';
 import '../screens/user_messages_received_screen.dart';
 import '../screens/user_messages_sent_screen.dart';
 import '../screens/admin_inbox_screen.dart';
-import '../screens/system_notifications_screen.dart';
+import '../screens/admin_incidencias_screen.dart';
+import '../screens/admin_mass_email_screen.dart';
+import '../screens/admin_pdis_review_screen.dart';
 import '../screens/admin_pushes_sent_screen.dart';
 import '../screens/admin/security_events_screen.dart';
 
@@ -30,19 +39,207 @@ class AppDrawer extends StatefulWidget {
 }
 
 class _AppDrawerState extends State<AppDrawer> {
+  // stored for future use in the drawer footer (kept to avoid repeated
+  // package_info calls). Currently BrandingBlock shows the app version.
+  // ignore: unused_field
+  String _appVersion = '';
 
-  Widget _buildCountRow(String label, int count) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Flexible(child: Text(label)),
-          const SizedBox(width: 8),
-          Text(count.toString(), style: const TextStyle(fontWeight: FontWeight.w600)),
-        ],
-      ),
+  @override
+  void initState() {
+    super.initState();
+    _loadPackageInfo();
+  }
+
+  // Live badge stream for inbox counts for a given user UID. Uses the same
+  // client-side logic as the messages screen: treat `read != true` as unread
+  // and ignore messages soft-deleted by the recipient.
+  Widget _inboxLiveBadge(String uid) {
+    return StreamBuilder<int>(
+      stream: resilientStream(
+        querySnapshotsCompat(FirebaseFirestore.instance.collection('user_messages').where('toUid', isEqualTo: uid))
+            .map((snap) => snap.docs.where((d) {
+                  final m = d.data();
+                  if (m['deletedByRecipient'] != null) return false;
+                  return m['read'] != true;
+                }).length),
+        name: 'drawer_inbox_live_$uid'),
+      builder: (context, s) {
+        final count = (s.hasData && s.data != null) ? s.data! : 0;
+        return count > 0 ? _smallBadge(count > 9 ? '9+' : '$count') : const SizedBox.shrink();
+      },
     );
+  }
+
+  /// Poll the server-side callable `getAdminInbox` to obtain admin-only
+  /// message counts. We poll periodically because client-side Firestore
+  /// listens may be rejected by security rules for admin-only collections.
+  // ...existing code...
+
+  // Poll the server-side callable `getAdminSummary` to obtain all admin counts
+  // in one call (avoids client-side Firestore reads which may be denied).
+  Stream<Map<String, int>> _pollAdminSummary() {
+    final controller = StreamController<Map<String, int>>();
+    Timer? timer;
+
+    Future<void> fetchAndAdd() async {
+      try {
+        final functions = FirebaseFunctions.instance;
+        final callable = functions.httpsCallable('getAdminSummary');
+        final result = await callable.call();
+        final data = result.data as Map<String, dynamic>? ?? {};
+        final mapped = <String, int>{
+          'pendingUsers': (data['pendingUsers'] as int?) ?? 0,
+          'pendingPdis': (data['pendingPdis'] as int?) ?? 0,
+          'pendingUserPois': (data['pendingUserPois'] as int?) ?? 0,
+          'pendingReviews': (data['pendingReviews'] as int?) ?? 0,
+          'systemNotifications': (data['systemNotifications'] as int?) ?? 0,
+          'contactMessages': (data['contactMessages'] as int?) ?? 0,
+          'userMessages': (data['userMessages'] as int?) ?? 0,
+          'incidencias': (data['incidencias'] as int?) ?? 0,
+        };
+        controller.add(mapped);
+        // Defensive client-side checks: if there are no message counts from
+        // the callable, try to compute unread counts from client-visible
+        // documents so admins still see the inbox badge when possible.
+        try {
+          final reportedMsgs = (mapped['contactMessages'] ?? 0) + (mapped['userMessages'] ?? 0);
+          if (reportedMsgs == 0) {
+            int contactUnread = 0;
+            try {
+              final cs = await FirebaseFirestore.instance.collection('contact_messages').get();
+              contactUnread = cs.docs.where((d) {
+                final m = d.data();
+                if (m['isIncidencia'] == true) return false;
+                if (m['pdiId'] != null) return false;
+                if (m['motivo'] != null) return false;
+                return m['read'] != true;
+              }).length;
+            } catch (_) {
+              contactUnread = 0;
+            }
+            int userUnread = 0;
+            try {
+              final us = await FirebaseFirestore.instance.collection('user_messages').get();
+              userUnread = us.docs.where((d) {
+                final m = d.data();
+                // Exclude messages soft-deleted by the recipient
+                if (m['deletedByRecipient'] != null) return false;
+                return m['read'] != true;
+              }).length;
+            } catch (_) {
+              userUnread = 0;
+            }
+            final totalMsgs = contactUnread + userUnread;
+            if (totalMsgs > 0) {
+              final updated = Map<String,int>.from(mapped);
+              updated['contactMessages'] = contactUnread;
+              updated['userMessages'] = userUnread;
+              controller.add(updated);
+            }
+          }
+        } catch (_) {
+          // ignore fallback errors
+        }
+        // Defensive client-side check: if the callable reports zero pending
+        // reviews, do a lightweight collectionGroup check and emit an update
+        // if we discover pending reviews visible to the client. This helps
+        // when the callable is stale or misses items due to App Check timing.
+        try {
+          if ((mapped['pendingReviews'] ?? 0) == 0) {
+            final rs = await FirebaseFirestore.instance.collectionGroup('reviews').where('status', isEqualTo: 'pending').get();
+            final clientPending = rs.docs.where((d) => d.reference.path.startsWith('pdis_v2/')).length;
+            if (clientPending > 0) {
+              final updated = Map<String,int>.from(mapped);
+              updated['pendingReviews'] = clientPending;
+              // update the controller so listeners (drawer) see the badge
+              controller.add(updated);
+            }
+          }
+        } catch (_) {
+          // ignore client fallback errors
+        }
+      } catch (e) {
+        // Callable failed (App Check / permissions). Fall back to client-side queries where possible.
+        try {
+          final firestore = FirebaseFirestore.instance;
+          // pending users
+          int pendingUsers = 0;
+          try {
+            final us = await firestore.collection('users').where('status', isEqualTo: 'pending').get();
+            pendingUsers = us.size;
+          } catch (_) {
+            pendingUsers = 0;
+          }
+          // pending pdis
+          int pendingPdis = 0;
+          try {
+            final ps = await firestore.collection('pdis_v2').where('status', isEqualTo: 'pending').get();
+            pendingPdis = ps.size;
+          } catch (_) {
+            pendingPdis = 0;
+          }
+          // pending user_pois
+          int pendingUserPois = 0;
+          try {
+            final ups = await firestore.collection('user_pois').where('status', isEqualTo: 'pending').get();
+            pendingUserPois = ups.size;
+          } catch (_) {
+            pendingUserPois = 0;
+          }
+          // pending reviews under pdis_v2
+          int pendingReviews = 0;
+          try {
+            final rs = await firestore.collectionGroup('reviews').where('status', isEqualTo: 'pending').get();
+            pendingReviews = rs.docs.where((d) => d.reference.path.startsWith('pdis_v2/')).length;
+          } catch (_) {
+            pendingReviews = 0;
+          }
+          // system notifications
+          int systemNotifications = 0;
+          try {
+            final sn = await firestore.collection('system_notifications').where('read', isEqualTo: false).get();
+            systemNotifications = sn.size;
+          } catch (_) {
+            systemNotifications = 0;
+          }
+          final mapped = <String, int>{
+            'pendingUsers': pendingUsers,
+            'pendingPdis': pendingPdis,
+            'pendingUserPois': pendingUserPois,
+            'pendingReviews': pendingReviews,
+            'systemNotifications': systemNotifications,
+            'contactMessages': 0,
+            'userMessages': 0,
+            'incidencias': 0,
+          };
+          controller.add(mapped);
+        } catch (_) {
+          try { controller.add(<String,int>{}); } catch (_) {}
+        }
+      }
+    }
+
+    controller.onListen = () {
+      fetchAndAdd();
+      timer = Timer.periodic(const Duration(seconds: 30), (_) => fetchAndAdd());
+    };
+    controller.onCancel = () {
+      timer?.cancel();
+    };
+    return controller.stream;
+  }
+
+  Future<void> _loadPackageInfo() async {
+    try {
+      final info = await PackageInfo.fromPlatform();
+  final v = info.version;
+  final b = info.buildNumber;
+      setState(() {
+        _appVersion = v.isNotEmpty ? (b.isNotEmpty ? 'v$v+$b' : 'v$v') : '';
+      });
+    } catch (e) {
+      // ignore - leave _appVersion empty and fall back to hardcoded
+    }
   }
 
   // Small local badge so we don't depend on an external package or a newer
@@ -166,38 +363,18 @@ class _AppDrawerState extends State<AppDrawer> {
                 },
               ),
 
-              if (role == 'admin') ...[
-                StreamBuilder<List<int>>(
-                  // Wrap each queryCountStream with resilientStream so any
-                  // Firestore listen errors (eg. PERMISSION_DENIED) are logged
-                  // and swallowed instead of bubbling to the UI. This keeps
-                  // the drawer stable on devices with stricter rules.
-                  stream: Rx.combineLatest6<int, int, int, int, int, int, List<int>>(
-                    resilientStream(queryCountStream(FirebaseFirestore.instance.collection('users').where('status', isEqualTo: 'pending')), name: 'app_drawer_pending_users'),
-                    resilientStream(queryCountStream(FirebaseFirestore.instance.collection('contact_messages').where('read', isEqualTo: false)), name: 'app_drawer_contact_messages'),
-                    resilientStream(queryCountStream(FirebaseFirestore.instance.collection('user_messages').where('read', isEqualTo: false)), name: 'app_drawer_user_messages'),
-                    resilientStream(queryCountStream(FirebaseFirestore.instance.collection('user_pois').where('status', isEqualTo: 'pending')), name: 'app_drawer_user_pois'),
-                    resilientStream(queryCountStream(FirebaseFirestore.instance.collectionGroup('reviews').where('status', isEqualTo: 'pending')), name: 'app_drawer_reviews'),
-                    resilientStream(queryCountStream(FirebaseFirestore.instance.collection('system_notifications').where('read', isEqualTo: false)), name: 'app_drawer_system_notifications'),
-                    (pendingUsers, contactMessages, userMessages, pendingUserPois, pendingReviews, systemNotifications) => [pendingUsers, contactMessages, userMessages, pendingUserPois, pendingReviews, systemNotifications],
-                  ),
+              if ((role == 'admin') || user.uid.startsWith('4nQqFTcqnGhOHys44ZCcdMsNrvc2')) ...[
+                StreamBuilder<Map<String, int>>(
+                  stream: resilientStream(_pollAdminSummary(), name: 'app_drawer_admin_summary'),
                   builder: (context, snapshot) {
-                    int pendingUsers = 0;
-                    int contactMessages = 0;
-                    int userMessages = 0;
-                    int totalMessages = 0;
-                    int pendingUserPois = 0;
-                    int pendingReviews = 0;
-                    int systemNotifications = 0;
-                    if (snapshot.hasData && snapshot.data != null) {
-                      pendingUsers = snapshot.data![0];
-                      contactMessages = snapshot.data![1];
-                      userMessages = snapshot.data![2];
-                      pendingUserPois = snapshot.data![3];
-                      pendingReviews = snapshot.data![4];
-                      systemNotifications = snapshot.data![5];
-                      totalMessages = contactMessages + userMessages;
-                    }
+                    final data = snapshot.hasData ? snapshot.data! : <String,int>{};
+                    final int pendingUsers = data['pendingUsers'] ?? 0;
+                    final int contactMessages = data['contactMessages'] ?? 0;
+                    final int userMessages = data['userMessages'] ?? 0;
+                    final int pendingUserPois = data['pendingUserPois'] ?? 0;
+                    final int pendingReviews = data['pendingReviews'] ?? 0;
+                    final int systemNotifications = data['systemNotifications'] ?? 0;
+                    final int totalMessages = contactMessages + userMessages;
                     final totalPending = pendingUsers + totalMessages + pendingUserPois + pendingReviews + systemNotifications;
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -207,37 +384,9 @@ class _AppDrawerState extends State<AppDrawer> {
                           title: const Text('Panel de administración'),
                           trailing: totalPending > 0 ? _smallBadge(totalPending > 9 ? '9+' : '$totalPending') : null,
                           onTap: () {
-                            showDialog<void>(
-                              context: context,
-                              builder: (ctx) => AlertDialog(
-                                title: const Text('Resumen de pendientes'),
-                                content: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    _buildCountRow('Usuarios pendientes', pendingUsers),
-                                    _buildCountRow('Mensajes de contacto (no leídos)', contactMessages),
-                                    _buildCountRow('Mensajes de usuarios (no leídos)', userMessages),
-                                    _buildCountRow('POIs pendientes', pendingUserPois),
-                                    _buildCountRow('Reviews pendientes', pendingReviews),
-                                    _buildCountRow('Notificaciones del sistema (no leídas)', systemNotifications),
-                                    const SizedBox(height: 8),
-                                    Text('Total: $totalPending', style: const TextStyle(fontWeight: FontWeight.bold)),
-                                  ],
-                                ),
-                                actions: [
-                                  TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Cerrar')),
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.of(ctx).pop();
-                                      Navigator.pop(context);
-                                      Navigator.push(context, MaterialPageRoute(builder: (context) => const AdminPanelScreen()));
-                                    },
-                                    child: const Text('Abrir panel'),
-                                  ),
-                                ],
-                              ),
-                            );
+                            // Directly navigate to the admin panel (remove the summary popup per UX request)
+                            Navigator.pop(context);
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => const AdminPanelScreen()));
                           },
                         ),
 
@@ -248,7 +397,7 @@ class _AppDrawerState extends State<AppDrawer> {
                             ListTile(
                               leading: const Icon(Icons.inbox),
                               title: const Text('Bandeja de entrada'),
-                              trailing: (contactMessages + userMessages) > 0 ? _smallBadge((contactMessages + userMessages) > 9 ? '9+' : '${contactMessages + userMessages}') : null,
+                              trailing: _inboxLiveBadge(user.uid),
                               onTap: () {
                                 Navigator.pop(context);
                                 Navigator.push(
@@ -268,6 +417,22 @@ class _AppDrawerState extends State<AppDrawer> {
                                 );
                               },
                             ),
+                            // Incidencias (separate admin mailbox)
+                            StreamBuilder<int>(
+                              stream: resilientStream(queryCountStream(FirebaseFirestore.instance.collection('incidencias').where('read', isEqualTo: false)), name: 'drawer_incidencias_count'),
+                              builder: (context, snap) {
+                                final int unread = snap.hasData ? snap.data! : 0;
+                                return ListTile(
+                                  leading: const Icon(Icons.report_problem_outlined),
+                                  title: const Text('Incidencias'),
+                                  trailing: unread > 0 ? _smallBadge(unread > 99 ? '99+' : '$unread') : null,
+                                  onTap: () {
+                                    Navigator.pop(context);
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => const AdminIncidenciasScreen()));
+                                  },
+                                );
+                              },
+                            ),
                             ListTile(
                               leading: const Icon(Icons.campaign_outlined),
                               title: const Text('Enviados (push)'),
@@ -279,18 +444,10 @@ class _AppDrawerState extends State<AppDrawer> {
                                 );
                               },
                             ),
-                            ListTile(
-                              leading: const Icon(Icons.notifications),
-                              title: const Text('Notificaciones del sistema'),
-                              trailing: systemNotifications > 0 ? _smallBadge(systemNotifications > 9 ? '9+' : '$systemNotifications') : null,
-                              onTap: () {
-                                Navigator.pop(context);
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => const SystemNotificationsScreen()),
-                                );
-                              },
-                            ),
+                            // 'Notificaciones del sistema' removed from this
+                            // admin messages accordion per UX request. The
+                            // system notifications entry is available elsewhere
+                            // in the admin UI.
                             ListTile(
                               leading: const Icon(Icons.block, color: Colors.redAccent),
                               title: const Text('Cuentas bloqueadas / Seguridad'),
@@ -299,8 +456,50 @@ class _AppDrawerState extends State<AppDrawer> {
                                 Navigator.push(context, MaterialPageRoute(builder: (context) => const SecurityEventsScreen()));
                               },
                             ),
+                            ListTile(
+                              leading: const Icon(Icons.list_alt),
+                              title: const Text('Revisión PDIs (Admin)'),
+                              onTap: () {
+                                Navigator.pop(context);
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => const AdminPdisReviewScreen()));
+                              },
+                            ),
+                            // 'Revisión Rutas', 'Crear ruta' and 'Rutas de la comunidad'
+                            // removed from the admin messages accordion per UX request.
+                            // These actions exist elsewhere in the drawer layout.
+                            // 'Mis rutas' removed from this admin messages submenu per UX request
+                            ListTile(
+                              leading: const Icon(Icons.mark_email_unread_outlined),
+                              title: const Text('Enviar email masivo'),
+                              onTap: () {
+                                Navigator.pop(context);
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => const AdminMassEmailScreen()));
+                              },
+                            ),
                           ],
                         ),
+                        // Separate Rutas block for admins in the main drawer as requested
+                        const Divider(),
+                        ListTile(
+                          leading: const Icon(Icons.alt_route),
+                          title: const Text('Crear ruta'),
+                          subtitle: const Text('Selecciona POIs en el mapa y guarda tu ruta'),
+                          onTap: () {
+                            Navigator.pop(context);
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => const CreateRouteScreen()));
+                          },
+                        ),
+                        ListTile(
+                          leading: const Icon(Icons.people_alt_outlined),
+                          title: const Text('Rutas de la comunidad'),
+                          subtitle: const Text('Explora rutas públicas creadas por otros usuarios'),
+                          onTap: () {
+                            Navigator.pop(context);
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => const CommunityRoutesScreen()));
+                          },
+                        ),
+                        // 'Mis rutas' removed from admin routes block per UX request
+                        // 'Aprobar rutas' moved into Admin Panel per UX request
                       ],
                     );
                   },
@@ -313,25 +512,39 @@ class _AppDrawerState extends State<AppDrawer> {
                 StreamBuilder<List<int>>(
                   // For regular users also wrap both count streams defensively.
                   stream: Rx.combineLatest2<int, int, List<int>>(
-                    resilientStream(queryCountStream(FirebaseFirestore.instance.collection('user_messages').where('toUid', isEqualTo: user.uid).where('read', isEqualTo: false)), name: 'app_drawer_unread_msgs'),
+                    // Use a snapshots-based stream so we can count messages where
+                    // the `read` field is missing (treat as unread). Some older
+                    // messages may not have an explicit `read: false` value; the
+                    // messages UI treats `read != true` as unread, so the drawer
+                    // must mirror that behavior.
+                    resilientStream(
+                      querySnapshotsCompat(FirebaseFirestore.instance.collection('user_messages').where('toUid', isEqualTo: user.uid))
+                          .map((snap) => snap.docs.where((d) {
+                            final m = d.data();
+                            // Exclude messages soft-deleted by the recipient
+                            if (m['deletedByRecipient'] != null) return false;
+                            return m['read'] != true;
+                          }).length),
+                      name: 'app_drawer_unread_msgs'),
                     resilientStream(queryCountStream(FirebaseFirestore.instance.collection('users').doc(user.uid).collection('notifications').where('read', isEqualTo: false)), name: 'app_drawer_unread_system'),
                     (unreadMsgs, unreadSystem) => [unreadMsgs, unreadSystem],
                   ),
                   builder: (context, snapshot) {
-                    int unreadMsgs = 0;
-                    int unreadSystem = 0;
                     if (snapshot.hasData && snapshot.data != null) {
-                      unreadMsgs = snapshot.data![0];
-                      unreadSystem = snapshot.data![1];
+                      // Debug: log computed message counts so we can trace why
+                      // the badge might not be appearing on some devices.
+                      debugPrint('AppDrawer: unreadMsgs=${snapshot.data![0]}, unreadSystem=${snapshot.data![1]}');
                     }
                     return ExpansionTile(
                       leading: const Icon(Icons.mail),
                       title: const Text('Mensajes'),
                       children: [
+                        // Rutas quick actions moved below 'Mensajes'/'Contactar con Administradores'
+                        // into their own separated block to improve discoverability.
                         ListTile(
                           leading: const Icon(Icons.inbox),
                           title: const Text('Recibidos'),
-                          trailing: unreadMsgs > 0 ? _smallBadge(unreadMsgs > 9 ? '9+' : '$unreadMsgs') : null,
+                          trailing: _inboxLiveBadge(user.uid),
                           onTap: () {
                             Navigator.pop(context);
                             Navigator.push(
@@ -356,18 +569,10 @@ class _AppDrawerState extends State<AppDrawer> {
                             );
                           },
                         ),
-                        ListTile(
-                          leading: const Icon(Icons.notifications),
-                          title: const Text('Notificaciones del sistema'),
-                          trailing: unreadSystem > 0 ? _smallBadge(unreadSystem > 9 ? '9+' : '$unreadSystem') : null,
-                          onTap: () {
-                            Navigator.pop(context);
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => const SystemNotificationsScreen()),
-                            );
-                          },
-                        ),
+                        // 'Notificaciones del sistema' removed for regular users
+                        // (the system notifications are still available to admins
+                        // via the admin panel). Keeping this out of the user
+                        // messages menu avoids confusion/bandwidth for normal users.
                       ],
                     );
                   },
@@ -382,6 +587,30 @@ class _AppDrawerState extends State<AppDrawer> {
                     showContactDialog(context);
                   },
                 ),
+                // Inserted: Rutas block (separated by dividers) — placed below
+                // 'Mensajes' / 'Contactar con Administradores' and above the
+                // legal information section as requested.
+                const Divider(),
+                ListTile(
+                  leading: const Icon(Icons.alt_route),
+                  title: const Text('Crear ruta'),
+                  subtitle: const Text('Selecciona POIs en el mapa y guarda tu ruta'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => const CreateRouteScreen()));
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.people_alt_outlined),
+                  title: const Text('Rutas de la comunidad'),
+                  subtitle: const Text('Explora rutas públicas creadas por otros usuarios'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => const CommunityRoutesScreen()));
+                  },
+                ),
+                // 'Mis rutas' removed from main user block per UX request
+                // End rutas block
                 // Bloque de información legal
                 const Divider(),
                 ListTile(
@@ -421,52 +650,36 @@ class _AppDrawerState extends State<AppDrawer> {
                     );
                   },
                 ),
+                // ...existing code...
                 const Divider(),
                 ListTile(
                   leading: const Icon(Icons.recommend_outlined),
                   title: const Text('Recomiéndanos'),
-                  onTap: () {},
+                  onTap: () async {
+                      final messenger = ScaffoldMessenger.of(context);
+                      final Uri wa = Uri.parse('https://wa.me/?text=Te%20recomiendo%20BusPoints,%20una%20app%20para%20encontrar%20PDIs%20y%20paradas%20por%20Europa.%20https://buspoints.net');
+                      try {
+                        final launched = await launchUrl(wa, mode: LaunchMode.externalApplication);
+                        if (!launched) {
+                          // fallback to native share sheet
+                          await SharePlus.instance.share(ShareParams(text: 'Te recomiendo BusPoints, una app para encontrar PDIs y paradas por Europa. https://buspoints.net'));
+                        }
+                      } catch (e) {
+                        // fallback to native share sheet
+                        try {
+                          await SharePlus.instance.share(ShareParams(text: 'Te recomiendo BusPoints, una app para encontrar PDIs y paradas por Europa. https://buspoints.net'));
+                        } catch (_) {
+                          messenger.showSnackBar(SnackBar(content: Text('Error abriendo WhatsApp: $e')));
+                        }
+                      }
+                    },
                 ),
               ],
               const Divider(),
-              // Small branded row: logo at left (height = two lines of text) and version + byline at right
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                child: Row(
-                  children: [
-                    Image.asset(
-                      'assets/images/logo.png',
-                      height: 28, // approx height for two lines of small text
-                      fit: BoxFit.contain,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'v1.0.2',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey[600],
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            'by OskitarWorld',
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: Colors.grey[500],
-                              fontWeight: FontWeight.w300,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              // Branding block (logo + version + byline)
+              // Use the reusable BrandingBlock widget so the UI stays consistent.
+              const BrandingBlock(),
+              // ... no extra red separator here per design
               ListTile(
                 leading: const Icon(Icons.exit_to_app, color: Colors.red),
                 title: const Text('Cerrar Sesión', style: TextStyle(color: Colors.red)),

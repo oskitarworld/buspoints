@@ -96,8 +96,17 @@ class AdminPushesSentScreen extends StatelessWidget {
                         ),
                       );
                       if (confirm == true) {
-                        try {
-                          await FirebaseFirestore.instance.collection(type == 'broadcast' ? 'system_notifications' : 'user_messages').doc(id).delete();
+                          try {
+                          if (type == 'direct') {
+                            // For direct messages, avoid deleting the underlying user_messages document.
+                            await FirebaseFirestore.instance.collection('user_messages').doc(id).update({
+                              'deletedByAdmin': currentUser.uid,
+                              'deletedByAdminAt': FieldValue.serverTimestamp(),
+                            });
+                          } else {
+                            // Broadcast/system notifications can be deleted normally
+                            await FirebaseFirestore.instance.collection('system_notifications').doc(id).delete();
+                          }
                           if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Registro eliminado')));
                         } catch (e) {
                           if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));

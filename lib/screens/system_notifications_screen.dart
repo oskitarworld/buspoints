@@ -76,7 +76,29 @@ class _SystemNotificationsScreenState extends State<SystemNotificationsScreen> {
               return ListTile(
                 title: Text(message, maxLines: 2, overflow: TextOverflow.ellipsis),
                 subtitle: Text('$fromName · ${_formatTimestamp(data['timestamp'])}'),
-                trailing: isRead ? const Icon(Icons.check, color: Colors.green) : const Icon(Icons.fiber_new, color: Colors.red),
+                trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+                  isRead ? const Icon(Icons.check, color: Colors.green) : const Icon(Icons.fiber_new, color: Colors.red),
+                  const SizedBox(width: 8),
+                  IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    tooltip: 'Eliminar notificación',
+                    onPressed: () async {
+                      final messenger = ScaffoldMessenger.of(context);
+                      final confirm = await showDialog<bool>(context: context, builder: (d) => AlertDialog(title: const Text('Confirmar'), content: const Text('¿Eliminar esta notificación?'), actions: [TextButton(onPressed: () => Navigator.of(d).pop(false), child: const Text('No')), TextButton(onPressed: () => Navigator.of(d).pop(true), child: const Text('Sí'))]));
+                      if (confirm == true) {
+                        try {
+                          await FirebaseFirestore.instance.collection('system_notifications').doc(doc.id).delete();
+                          if (!mounted) return;
+                          messenger.showSnackBar(const SnackBar(content: Text('Notificación eliminada'), backgroundColor: Colors.green));
+                          setState(() {});
+                        } catch (e) {
+                          if (!mounted) return;
+                          messenger.showSnackBar(SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red));
+                        }
+                      }
+                    },
+                  ),
+                ]),
                 onTap: () {
                   // Mark as read in background, don't await to avoid using
                   // BuildContext across async gaps.

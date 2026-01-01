@@ -3,6 +3,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:geoflutterfire_plus/geoflutterfire_plus.dart';
+import 'dart:developer' as developer;
 
 class AddPoiScreen extends StatefulWidget {
   final LatLng? initialPosition;
@@ -91,10 +92,25 @@ class _AddPoiScreenState extends State<AddPoiScreen> {
         final geoFirePoint = GeoFirePoint(GeoPoint(
             _selectedLocation!.latitude, _selectedLocation!.longitude));
 
-        await FirebaseFirestore.instance.collection('user_pois').add({
+        final userPoisRef = FirebaseFirestore.instance.collection('user_pois');
+        final newUserPoiRef = userPoisRef.doc();
+
+        String normalizeCategory(String? raw) {
+          if (raw == null) return 'otros';
+          final t = raw.trim();
+          if (t.isEmpty) return 'otros';
+          // lowercase and replace spaces or hyphens with underscores
+          final normalized = t.toLowerCase().replaceAll(RegExp(r'[\s\-]+'), '_');
+          return normalized;
+        }
+        final normalizedCategory = normalizeCategory(_selectedCategory);
+
+        // Use a batch to atomically create the user_pois doc and the history_places entry
+        final batch = FirebaseFirestore.instance.batch();
+        batch.set(newUserPoiRef, {
           'name': _nameController.text.trim(),
           'description': _descriptionController.text.trim(),
-          'category': _selectedCategory,
+          'category': normalizedCategory,
           // Helpful coordinate shapes for later processing/approval
           'latitude': _selectedLocation!.latitude,
           'longitude': _selectedLocation!.longitude,
@@ -105,10 +121,56 @@ class _AddPoiScreenState extends State<AddPoiScreen> {
           'status': 'pending',
         });
 
+        // Use the same ID for the history entry as the user_pois doc so that
+        // updates (approval) can reliably find and update the history entry
+        // by ID. This avoids mismatches between sourceId and history doc id.
+        final historyRef = FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .collection('history_places')
+            .doc(newUserPoiRef.id);
+
+        batch.set(historyRef, {
+          'name': _nameController.text.trim(),
+          'category': normalizedCategory,
+          'latitude': _selectedLocation!.latitude,
+          'longitude': _selectedLocation!.longitude,
+          'source': 'user_pois',
+          'sourceId': newUserPoiRef.id,
+          // also include the canonical poi id to make lookups simpler
+          'poiId': newUserPoiRef.id,
+          'status': 'pending',
+          'timestamp': FieldValue.serverTimestamp(),
+        });
+
+        try {
+          await batch.commit();
+          developer.log('user_pois + history_places written: ${newUserPoiRef.id}', name: 'AddPoiScreen');
+        } catch (e, s) {
+          developer.log('Failed to write user_pois+history batch: $e', name: 'AddPoiScreen', error: e, stackTrace: s);
+          rethrow;
+        }
+
         if (mounted) {
           Navigator.of(context).pop();
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('¡Gracias! Tu punto ha sido enviado para su revisión.')),
+          // Show modal popup with the created document ID to help debugging / verification
+          showDialog(
+            context: context,
+            builder: (ctx) => AlertDialog(
+              title: const Text('Enviado'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('¡Gracias! Tu punto ha sido enviado para su revisión.'),
+                  const SizedBox(height: 12),
+                  SelectableText('ID del envío: ${newUserPoiRef.id}', style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                ],
+              ),
+              actions: [
+                TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Cerrar')),
+              ],
+            ),
           );
         }
       } on FirebaseException catch (e) {
@@ -119,13 +181,27 @@ class _AddPoiScreenState extends State<AddPoiScreen> {
         } else {
           errorMessage = 'Ocurrió un error inesperado. Por favor, inténtalo de nuevo más tarde.';
         }
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(errorMessage)),
+        showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: const Text('Error'),
+            content: Text(errorMessage),
+            actions: [
+              TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Cerrar')),
+            ],
+          ),
         );
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error al enviar el punto: $e')),
+          showDialog(
+            context: context,
+            builder: (ctx) => AlertDialog(
+              title: const Text('Error'),
+              content: Text('Error al enviar el punto: $e'),
+              actions: [
+                TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Cerrar')),
+              ],
+            ),
           );
         }
       }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import '../models/user_model.dart';
 import 'package:myapp/widgets/firestore_error_widget.dart';
 
@@ -62,6 +63,33 @@ class UserApprovalScreen extends StatelessWidget {
     }
   }
 
+  Future<void> _endTrial(BuildContext context, String uid) async {
+    try {
+      final callable = FirebaseFunctions.instance.httpsCallable('adminEndTrial');
+  await callable.call(<String, dynamic>{'userId': uid});
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Periodo de prueba terminado')),
+        );
+      }
+    } on FirebaseFunctionsException catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al terminar la prueba: ${e.message}'), backgroundColor: Colors.red),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al terminar la prueba: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
+  }
+
+  
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -112,6 +140,19 @@ class UserApprovalScreen extends StatelessWidget {
               final phone = data['phone'] ?? 'Sin teléfono';
               final createdAt = data['createdAt'] as Timestamp?;
               final createdDate = createdAt?.toDate() ?? DateTime.now();
+              final trialStatus = data['trialStatus'] as String?;
+              final trialExpiry = data['trialExpiry'] as Timestamp?;
+              String trialInfo = '';
+              if (trialStatus != null) {
+                if (trialStatus == 'active' && trialExpiry != null) {
+                  final d = trialExpiry.toDate();
+                  trialInfo = 'En prueba hasta ${d.day}/${d.month}/${d.year} ${d.hour.toString().padLeft(2,'0')}:${d.minute.toString().padLeft(2,'0')}';
+                } else if (trialStatus == 'pending') {
+                  trialInfo = 'Prueba pendiente';
+                } else if (trialStatus == 'expired') {
+                  trialInfo = 'Prueba expirada';
+                }
+              }
 
               return Card(
                 margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -135,8 +176,16 @@ class UserApprovalScreen extends StatelessWidget {
                         style: const TextStyle(fontSize: 12, color: Colors.grey),
                       ),
                       const SizedBox(height: 16),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
+                      if (trialInfo.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8.0),
+                          child: Text(trialInfo, style: const TextStyle(color: Colors.orange, fontWeight: FontWeight.w600)),
+                        ),
+                      // Use Wrap so buttons flow to next line on small widths instead of overflowing
+                      Wrap(
+                        alignment: WrapAlignment.end,
+                        spacing: 12,
+                        runSpacing: 8,
                         children: [
                           ElevatedButton.icon(
                             icon: const Icon(Icons.close),
@@ -152,7 +201,6 @@ class UserApprovalScreen extends StatelessWidget {
                               () => _rejectUser(context, uid, email),
                             ),
                           ),
-                          const SizedBox(width: 12),
                           ElevatedButton.icon(
                             icon: const Icon(Icons.check),
                             label: const Text('Aprobar'),
@@ -167,6 +215,21 @@ class UserApprovalScreen extends StatelessWidget {
                               () => _approveUser(context, uid, email),
                             ),
                           ),
+                          if (trialStatus == 'active')
+                            ElevatedButton.icon(
+                              icon: const Icon(Icons.stop_circle_outlined),
+                              label: const Text('Terminar prueba'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.orange,
+                                foregroundColor: Colors.white,
+                              ),
+                              onPressed: () => _showConfirmDialog(
+                                context,
+                                '¿Terminar la prueba de $name?',
+                                'Esto finalizará el periodo de prueba inmediatamente para este usuario.',
+                                () => _endTrial(context, uid),
+                              ),
+                            ),
                         ],
                       ),
                     ],

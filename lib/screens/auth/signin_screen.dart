@@ -7,6 +7,7 @@ import 'package:myapp/services/auth_service.dart';
 import 'package:myapp/screens/forgot_password_screen.dart';
 import 'package:myapp/widgets/dialogs.dart';
 import 'package:myapp/widgets/contact_dialog.dart';
+import 'package:myapp/widgets/branding_block.dart';
 
 class SignInScreen extends StatefulWidget {
   final VoidCallback onToggleAuthMode;
@@ -191,6 +192,9 @@ class _SignInScreenState extends State<SignInScreen> {
                   icon: const Text('📧', style: TextStyle(fontSize: 18)),
                   label: const Text('Contacto'),
                 ),
+                const SizedBox(height: 24),
+                // Branding block (logo + version + byline) - reusable widget
+                const BrandingBlock(),
               ],
             ),
           ),

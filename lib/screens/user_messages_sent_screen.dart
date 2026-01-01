@@ -27,6 +27,11 @@ class UserMessagesSentScreen extends StatelessWidget {
           }
           if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
           var docs = snapshot.data!.docs;
+          // Exclude messages that the sender soft-deleted
+          docs = docs.where((d) {
+            final data = d.data() as Map<String, dynamic>;
+            return data['deletedBySender'] == null;
+          }).toList();
           if (docs.isEmpty) return const Center(child: Text('No hay mensajes.'));
           docs.sort((a, b) {
             final aTs = (a.data() as Map<String, dynamic>)['timestamp'];
@@ -85,7 +90,10 @@ class UserMessagesSentScreen extends StatelessWidget {
                         await FirebaseFirestore.instance
                             .collection('user_messages')
                             .doc(docs[index].id)
-                            .delete();
+                            .update({
+                          'deletedBySender': user.uid,
+                          'deletedBySenderAt': FieldValue.serverTimestamp(),
+                        });
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(content: Text('Mensaje eliminado.')),
@@ -150,7 +158,10 @@ class UserMessagesSentScreen extends StatelessWidget {
                                 await FirebaseFirestore.instance
                                     .collection('user_messages')
                                     .doc(docs[index].id)
-                                    .delete();
+                                    .update({
+                                  'deletedBySender': user.uid,
+                                  'deletedBySenderAt': FieldValue.serverTimestamp(),
+                                });
                                 if (context.mounted) {
                                   Navigator.of(ctx).pop();
                                   ScaffoldMessenger.of(context).showSnackBar(

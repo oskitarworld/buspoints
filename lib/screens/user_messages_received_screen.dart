@@ -69,10 +69,12 @@ class _UserMessagesReceivedScreenState
         final currentUser = FirebaseAuth.instance.currentUser;
         if (currentUser == null) return;
 
-        await FirebaseFirestore.instance
-            .collection('user_messages')
-            .doc(docId)
-            .delete();
+        // Soft-delete for recipient: mark deletedByRecipient so the sender/admin
+        // copies remain intact.
+        await FirebaseFirestore.instance.collection('user_messages').doc(docId).update({
+          'deletedByRecipient': currentUser.uid,
+          'deletedByRecipientAt': FieldValue.serverTimestamp(),
+        });
 
         messenger.showSnackBar(
           const SnackBar(
@@ -461,6 +463,12 @@ class _UserMessagesReceivedScreenState
               })
               .toList();
 
+          // Excluir mensajes que el destinatario ya haya eliminado (soft-delete)
+          docs = docs.where((doc) {
+            final data = doc.data() as Map<String, dynamic>;
+            return data['deletedByRecipient'] == null;
+          }).toList();
+
           // Ordenar por timestamp descendente
           docs.sort((a, b) {
             final aTs = (a.data() as Map<String, dynamic>)['timestamp'];
@@ -532,7 +540,10 @@ class _UserMessagesReceivedScreenState
                     // Lógica NORMAL: read == true significa LEÍDO
                     final readValue = data['read'];
                     final isRead = readValue == true;
-                    final senderName = data['senderName'] ?? data['fromName'] ?? 'Admin';
+          // Prefer explicit admin label when the message is sent by an admin
+          final senderName = (data['fromAdmin'] == true)
+            ? 'Equipo BusPoints'
+            : (data['senderName'] ?? data['fromName'] ?? data['fromEmail'] ?? '?').toString();
                     final message = data['message'] ?? '';
                     final timestamp = data['timestamp'];
                     final fromUid = data['fromUid'] ?? '';

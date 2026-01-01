@@ -34,6 +34,8 @@ class UserModel {
   final int approvedPoisCount;
   final List<Subscription> subscriptionHistory;
   final bool subscriptionFrozen;
+  final String? trialStatus;
+  final DateTime? trialExpiry;
 
   UserModel({
     required this.uid,
@@ -45,7 +47,15 @@ class UserModel {
     this.approvedPoisCount = 0,
     this.subscriptionHistory = const [], // Default to an empty list
     this.subscriptionFrozen = false,
+    this.trialStatus,
+    this.trialExpiry,
   });
+
+  // Check if the user currently has an active trial
+  bool get isTrialActive {
+    if (trialStatus == null || trialExpiry == null) return false;
+    return trialStatus == 'active' && trialExpiry!.isAfter(DateTime.now());
+  }
 
   // A getter to find the latest subscription end date.
   DateTime? get latestSubscriptionEndDate {
@@ -113,6 +123,8 @@ class UserModel {
       approvedPoisCount: data['approvedPoisCount'] ?? 0,
       subscriptionHistory: history,
       subscriptionFrozen: data['subscriptionFrozen'] ?? false,
+      trialStatus: data['trialStatus'] as String?,
+      trialExpiry: data['trialExpiry'] is Timestamp ? (data['trialExpiry'] as Timestamp).toDate() : null,
     );
   }
 
@@ -130,6 +142,8 @@ class UserModel {
       'subscriptionHistory':
           subscriptionHistory.map((sub) => sub.toMap()).toList(),
       'subscriptionFrozen': subscriptionFrozen,
+      if (trialStatus != null) 'trialStatus': trialStatus,
+      if (trialExpiry != null) 'trialExpiry': Timestamp.fromDate(trialExpiry!),
     };
   }
 }

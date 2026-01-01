@@ -1,0 +1,20 @@
+// Shared categories used by the app (lupa / filters / admin dropdown)
+const List<String> kAvailableCategories = [
+  'parada_bus',
+  'bus_stops',
+  'parada_de_bus',
+  'parking',
+  'parking_de_pago',
+  'carga_y_descarga',
+  'zona_espera',
+  'zonas_de_espera_o_autocares',
+  'gasolinera',
+  'gasolineras',
+  'hotel',
+  'restaurante',
+  'hoteles_y_restaurantes',
+  'otros',
+  'lista_blanca',
+  'lista_negra',
+  'lista_gold',
+];

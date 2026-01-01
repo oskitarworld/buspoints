@@ -7,9 +7,10 @@ service cloud.firestore {
     function isAdmin() {
       // Check if the user is authenticated and has role 'admin'
       return request.auth != null &&
+             (request.auth.token.admin == true ||
              exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
              (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
-              get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true);
+              get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true));
     }
 
     // Rules for the 'users' collection.
@@ -29,6 +30,21 @@ service cloud.firestore {
       // Allow administrators to list, read, and update any document in the 'users' collection.
       // This is separated from the user-specific rule to avoid recursive checks.
       allow read, update: if isAdmin();
+
+      // Subcollections under each user document (e.g. saved_places, favorite_places, reports, notifications)
+      // Allow the owner to read/list/create documents in their own subcollections. Admins can read/list/update/delete.
+      match /{subcollection}/{docId} {
+        // Owner or admin can read single docs and list the collection
+        allow read, list: if request.auth != null && (request.auth.uid == userId || isAdmin());
+
+          // Owner can create documents in their own subcollections (e.g., add a favorite)
+          // Also allow administrators to create documents in user subcollections
+          // (needed so admins can create e.g. users/{uid}/added_pois when approving a submission).
+          allow create: if request.auth != null && (request.auth.uid == userId || isAdmin());
+
+        // Owner or admin can update/delete documents in the subcollections
+        allow update, delete: if request.auth != null && (request.auth.uid == userId || isAdmin());
+      }
     }
 
     // Rules for the 'pois' (Points of Interest) collection.
@@ -79,12 +95,20 @@ service cloud.firestore {
         // Allow authenticated users to create a review (submit a comment)
         allow create: if request.auth != null;
 
-        // Allow the author to read their own review, admins can read all
-        allow read: if request.auth != null &&
-                     (request.auth.uid == resource.data.userId || isAdmin());
+        // Allow reading approved reviews publicly (authenticated users).
+        // Also allow the author to read their own review and admins to read all.
+        allow read: if (
+          // public approved reviews (treat missing status as approved for
+          // legacy documents that lack the field)
+          (resource.data.status == 'approved' || resource.data.status == null) && request.auth != null
+        ) || (
+          // the author can always read their own review
+          request.auth != null && request.auth.uid == resource.data.userId
+        ) || isAdmin();
 
-        // Only administrators can update or delete reviews (approve/reject)
-        allow update, delete: if isAdmin();
+        // Allow the author to update their own review. Administrators can update or delete any review.
+        allow update: if request.auth != null && (request.auth.uid == resource.data.userId || isAdmin());
+        allow delete: if isAdmin();
       }
     }
 
@@ -95,13 +119,44 @@ service cloud.firestore {
       // Allow authenticated users to create a review (submit a comment)
       allow create: if request.auth != null;
 
-      // Allow the author to read their own review, admins can read all.
-      // This also permits admin queries over collectionGroup('reviews').
-      allow read: if request.auth != null &&
-                   (request.auth.uid == resource.data.userId || isAdmin());
+      // CollectionGroup rule: permit authenticated users to read reviews
+      // that are approved, permit the author to read their own, and
+      // permit admins to read all. This enables collectionGroup queries
+      // (used by admin dashboards) while keeping unpublished reviews
+      // private.
+      allow read: if (
+        // public approved reviews (treat missing status as approved for
+        // legacy documents that lack the field)
+        (resource.data.status == 'approved' || resource.data.status == null) && request.auth != null
+      ) || (
+        // author can read their own
+        request.auth != null && request.auth.uid == resource.data.userId
+      ) || isAdmin();
 
-      // Only administrators can update or delete reviews (approve/reject)
-      allow update, delete: if isAdmin();
+      // Allow the author to update their own review. Administrators can update or delete any review.
+      allow update: if request.auth != null && (request.auth.uid == resource.data.userId || isAdmin());
+      allow delete: if isAdmin();
+    }
+    
+    // Legacy/singular 'review' subcollections used by older imports/mirrors.
+    // Provide the same access model as for 'reviews' so approved reviews
+    // in singular subcollections are visible to authenticated users and
+    // authors/admins retain appropriate permissions.
+    match /{path=**}/review/{reviewId} {
+      // Allow authenticated users to create a review (submit a comment)
+      allow create: if request.auth != null;
+
+      // Permit authenticated users to read reviews that are approved,
+      // permit authors to read their own, and permit admins to read all.
+      allow read: if (
+        (resource.data.status == 'approved' || resource.data.status == null) && request.auth != null
+      ) || (
+        request.auth != null && request.auth.uid == resource.data.userId
+      ) || isAdmin();
+
+      // Allow the author to update their own review. Administrators can update or delete any review.
+      allow update: if request.auth != null && (request.auth.uid == resource.data.userId || isAdmin());
+      allow delete: if isAdmin();
     }
     
     // Rules for public bus stops.
@@ -130,6 +185,15 @@ service cloud.firestore {
       // Solo admins pueden leer y actualizar
       allow read, update: if isAdmin();
     }
+
+    // Rules for incidencias (POI reports sent by users)
+    match /incidencias/{incId} {
+      // Authenticated users can create an incidencia
+      allow create: if request.auth != null;
+
+      // The author may read/update/delete their own incidencia; admins can read/update/delete all
+      allow read, update, delete: if request.auth != null && (isAdmin() || request.auth.uid == resource.data.fromUid);
+    }
     
     // Rules for user_messages (propuestas de mejora and other messages)
     match /user_messages/{messageId} {
@@ -151,11 +215,12 @@ service cloud.firestore {
                         request.auth.uid == resource.data.fromUid ||
                         (isAdmin() && resource.data.isContact != true));
       
-      // Users can delete messages they sent or received, admins can delete any EXCEPT contact copies
-      allow delete: if request.auth != null && 
-                       (request.auth.uid == resource.data.fromUid || 
-                        request.auth.uid == resource.data.toUid || 
-                        (isAdmin() && resource.data.isContact != true));
+  // Users can delete messages they sent or received. Administrators may delete any message.
+  // Note: previously admins were prevented from deleting 'contact' copies; allow admins to delete them as well.
+  allow delete: if request.auth != null && 
+           (request.auth.uid == resource.data.fromUid || 
+        request.auth.uid == resource.data.toUid || 
+        isAdmin());
     }
     
     // --- TESTING ONLY: Permit authenticated reads on pdis and places ---
@@ -166,9 +231,66 @@ service cloud.firestore {
       allow read: if request.auth != null;
     }
 
+    // Allow authenticated reads on the migrated canonical collection
+    // `Pdis_full`. This collection is written by our admin/import scripts
+    // and must be readable by authenticated users in the mobile client.
+    // Keep this rule minimal: only authenticated reads are allowed.
+    match /Pdis_full/{docId} {
+      allow read: if request.auth != null;
+    }
+
+    // Allow authenticated reads on the pre-categorized assets collection
+    // `pdi_categoris`. This collection is populated from KML/asset imports
+    // by admin scripts and should be visible to authenticated mobile clients.
+    match /pdi_categoris/{docId} {
+      allow read: if request.auth != null;
+    }
+
     match /places/{docId} {
       // Allow any authenticated user to read 'places' used by the client.
       allow read: if request.auth != null;
+    }
+
+    // Rules for user-created routes
+    match /user_routes/{routeId} {
+      // Allow authenticated users to create a route but enforce constraints:
+      // - createdBy must match the authenticated UID
+      // - routes must start as not approved and not public
+      // - name must be a non-empty string
+      // - pdis must be an array with between 2 and 20 entries
+      allow create: if request.auth != null
+        && request.resource.data.createdBy == request.auth.uid
+        && request.resource.data.approved == false
+        && request.resource.data.isPublic == false
+        && (request.resource.data.name is string)
+        && (request.resource.data.name.size() > 0)
+        && (request.resource.data.pdis is list)
+        && (request.resource.data.pdis.size() >= 2)
+        && (request.resource.data.pdis.size() <= 20);
+
+      // Reading: public routes are visible to authenticated users; the
+      // creator and admins can read their own / all routes respectively.
+      allow read: if request.auth != null && (
+        resource.data.isPublic == true ||
+        request.auth.uid == resource.data.createdBy ||
+        isAdmin()
+      );
+
+      // Listing queries must be executed by authenticated users. Note: Firestore
+      // will reject queries that would return documents the caller cannot read.
+      allow list: if request.auth != null;
+
+      // Updates: administrators can update any route. Route owners may update
+      // their own route prior to approval, but must not be allowed to set
+      // approval-related fields (approved, isPublic, approvedBy, approvedAt).
+      allow update: if request.auth != null && (
+        isAdmin() ||
+        (request.auth.uid == resource.data.createdBy &&
+          !request.resource.data.keys().hasAny(['approved','isPublic','approvedBy','approvedAt']))
+      );
+
+      // Deletion: owners can delete their own routes; admins can delete any.
+      allow delete: if request.auth != null && (isAdmin() || request.auth.uid == resource.data.createdBy);
     }
   }
 }

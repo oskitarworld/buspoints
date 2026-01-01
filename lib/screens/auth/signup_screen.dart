@@ -26,6 +26,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
   bool _acceptedTerms = false;
+  bool _wantsTrial = false;
 
   void _signUp() async {
     if (!_formKey.currentState!.validate()) {
@@ -44,12 +45,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
         _emailController.text,
         _phoneController.text,
         _passwordController.text,
+        wantsTrial: _wantsTrial,
       );
       if (mounted && user != null) {
         // Ensure navigation happens after the current frame to avoid
         // interfering with any rebuilds triggered by auth state listeners.
         debugPrint('[SignUpScreen] Registro completado para ${user.email}; programando navegación a VerifyEmailScreen');
-        WidgetsBinding.instance.addPostFrameCallback((_) {
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
           if (!mounted) return;
           try {
             Navigator.of(context).pushReplacement(
@@ -141,6 +143,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                   ),
                   const SizedBox(height: 12),
+                  
                   Container(
                     constraints: const BoxConstraints(maxWidth: 350),
                     child: TextFormField(
@@ -262,6 +265,69 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                   ),
                   const SizedBox(height: 12),
+                  // Trial request checkbox placed just above the terms acceptance as requested
+                  Container(
+                    constraints: const BoxConstraints(maxWidth: 350),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Checkbox(
+                          value: _wantsTrial,
+                          onChanged: (val) async {
+                            final newVal = val ?? false;
+                            if (newVal) {
+                              // Show a professional confirmation dialog when requesting trial
+                              await showDialog(
+                                context: context,
+                                builder: (_) => AlertDialog(
+                                  title: const Text('Prueba gratuita'),
+                                  content: const Text('Has solicitado una prueba gratuita. Recuerda que sólo puedes solicitar una única prueba por dispositivo.'),
+                                  actions: [
+                                    TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Aceptar')),
+                                  ],
+                                ),
+                              );
+                            }
+                            setState(() {
+                              _wantsTrial = newVal;
+                            });
+                          },
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () async {
+                              // Toggle when tapping the label area for better UX
+                              final newVal = !_wantsTrial;
+                              if (newVal) {
+                                await showDialog(
+                                  context: context,
+                                  builder: (_) => AlertDialog(
+                                    title: const Text('Prueba gratuita'),
+                                    content: const Text('Has solicitado una prueba gratuita. Recuerda que sólo puedes solicitar una única prueba por dispositivo.'),
+                                    actions: [
+                                      TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Aceptar')),
+                                    ],
+                                  ),
+                                );
+                              }
+                              setState(() {
+                                _wantsTrial = newVal;
+                              });
+                            },
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: const [
+                                Text('Prueba gratuita', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+                                SizedBox(height: 2),
+                                Text('48 horas gratuitas. Sólo 1 prueba por dispositivo.', style: TextStyle(fontSize: 12, color: Colors.black54)),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [

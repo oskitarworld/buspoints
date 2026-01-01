@@ -81,7 +81,10 @@ class ManageUsersScreen extends StatelessWidget {
                                   )
                                 : const Icon(Icons.send),
                             label: Text(isSending ? 'Enviando...' : 'Enviar a todos'),
-                            style: ElevatedButton.styleFrom(backgroundColor: Colors.blue[700]),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Theme.of(ctx).primaryColor,
+                              foregroundColor: Colors.white,
+                            ),
                             onPressed: isSending
                                 ? null
                                 : () async {
@@ -592,9 +595,9 @@ class UserListItem extends StatelessWidget {
                         label: const Text('Editar Datos Personales'),
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
+                          backgroundColor: Theme.of(ctx).primaryColor,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         ),
                         onPressed: () {
                           Navigator.of(ctx).pop();
@@ -602,17 +605,32 @@ class UserListItem extends StatelessWidget {
                         },
                       ),
                       const SizedBox(height: 12),
-                      // Envío de mensajes individual a usuarios deshabilitado desde el panel.
+
+                      // Enviar mensaje directo al usuario (desde admin)
+                      ElevatedButton.icon(
+                        icon: const Icon(Icons.send),
+                        label: const Text('Enviar Mensaje'),
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          backgroundColor: Theme.of(ctx).primaryColor,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        onPressed: () {
+                          Navigator.of(ctx).pop();
+                          _showSendMessageDialog(context, data, userId);
+                        },
+                      ),
                       const SizedBox(height: 12),
+
                       ElevatedButton.icon(
                         icon: const Icon(Icons.card_membership),
                         label: const Text('Administrar Suscripción'),
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 14),
-                          backgroundColor: Colors.green[700],
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
+                          backgroundColor: Theme.of(ctx).primaryColor,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         ),
                         onPressed: () {
                           Navigator.of(ctx).pop();
@@ -622,15 +640,11 @@ class UserListItem extends StatelessWidget {
                       const SizedBox(height: 12),
                       ElevatedButton.icon(
                         icon: Icon(frozen ? Icons.lock_open : Icons.lock),
-                        label: Text(
-                            frozen ? 'Descongelar Cuenta' : 'Congelar Cuenta'),
+                        label: Text(frozen ? 'Descongelar Cuenta' : 'Congelar Cuenta'),
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 14),
-                          backgroundColor:
-                              frozen ? Colors.orange[700] : Colors.red[700],
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
+                          backgroundColor: frozen ? Colors.orange[700] : Colors.red[700],
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         ),
                         onPressed: () {
                           Navigator.of(ctx).pop();
@@ -815,6 +829,66 @@ class UserListItem extends StatelessWidget {
     );
   }
 
+  void _showSendMessageDialog(BuildContext context, Map<String, dynamic> data, String userId) {
+    final messageController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        bool isSending = false;
+        return StatefulBuilder(builder: (context, setState) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: const Text('Enviar mensaje al usuario'),
+            content: TextField(
+              controller: messageController,
+              maxLines: 4,
+              decoration: const InputDecoration(hintText: 'Escribe tu mensaje...'),
+            ),
+            actions: [
+              TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Cancelar')),
+              ElevatedButton(
+                onPressed: isSending
+                    ? null
+                    : () async {
+                        final msg = messageController.text.trim();
+                        if (msg.isEmpty) return;
+                        setState(() => isSending = true);
+                        try {
+                          final current = FirebaseAuth.instance.currentUser;
+                          final fromUid = current?.uid ?? 'system';
+                          final fromName = current?.displayName ?? 'Administrador';
+                          await FirebaseFirestore.instance.collection('user_messages').add({
+                            'fromUid': fromUid,
+                            'toUid': userId,
+                            'fromName': fromName,
+                            'toName': data['name'] ?? '',
+                            'fromEmail': current?.email ?? '',
+                            'toEmail': data['email'] ?? '',
+                            'message': msg,
+                            'timestamp': FieldValue.serverTimestamp(),
+                            'read': false,
+                            'fromAdmin': true,
+                          });
+                          if (ctx.mounted) Navigator.of(ctx).pop();
+                          if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Mensaje enviado'), backgroundColor: Colors.green));
+                        } catch (e) {
+                          setState(() => isSending = false);
+                          if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error enviando mensaje: $e'), backgroundColor: Colors.red));
+                        }
+                      },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(ctx).primaryColor,
+                  foregroundColor: Colors.white,
+                ),
+                child: isSending ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation<Color>(Colors.white))) : const Text('Enviar'),
+              ),
+            ],
+          );
+        });
+      },
+    );
+  }
+
   void _showManageSubscriptionDialog(
       BuildContext context, Map<String, dynamic> data, String userId) {
     final bool currentStatus = data['subscriptionActive'] ?? false;
@@ -864,16 +938,16 @@ class UserListItem extends StatelessWidget {
                     const SizedBox(height: 12),
                     Row(
                       children: [
-                        Icon(Icons.play_circle_outline,
-                            size: 18, color: Colors.blue[700]),
+            Icon(Icons.play_circle_outline,
+              size: 18, color: Theme.of(ctx).primaryColor),
                         const SizedBox(width: 8),
                         Text(
                           'Inicio: $startDateText',
                           style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.blue[700],
-                            fontWeight: FontWeight.w500,
-                          ),
+                              fontSize: 14,
+                              color: Theme.of(ctx).primaryColor,
+                              fontWeight: FontWeight.w500,
+                            ),
                         ),
                       ],
                     ),

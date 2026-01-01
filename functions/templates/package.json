@@ -1,0 +1,7 @@
+{
+  "name": "buspoints-email-templates",
+  "version": "1.0.0",
+  "description": "Helpers and templates for BusPoints email rendering (Mustache)",
+  "private": true,
+  "main": "index.js"
+}
