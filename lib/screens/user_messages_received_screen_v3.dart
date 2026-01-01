@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:myapp/widgets/firestore_error_widget.dart';
 
 class UserMessagesReceivedScreen extends StatefulWidget {
   const UserMessagesReceivedScreen({super.key});
@@ -78,19 +79,18 @@ class _UserMessagesReceivedScreenState
           .collection('user_messages')
           .doc(docId)
           .update({'read': read});
+      if (!mounted) return;
       setState(() {
         _messagesFuture = _loadMessages();
       });
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
-        );
-      }
+      // No UI interaction here (background operation). Log the error instead.
+      debugPrint('Error setting read status: $e');
     }
   }
 
   Future<void> _deleteMessage(String docId) async {
+    final messenger = ScaffoldMessenger.of(context);
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -119,19 +119,17 @@ class _UserMessagesReceivedScreenState
           setState(() {
             _messagesFuture = _loadMessages();
           });
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('✅ Mensaje eliminado'),
-              backgroundColor: Colors.green,
-            ),
-          );
         }
+        messenger.showSnackBar(
+          const SnackBar(
+            content: Text('✅ Mensaje eliminado'),
+            backgroundColor: Colors.green,
+          ),
+        );
       } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
-          );
-        }
+        messenger.showSnackBar(
+          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+        );
       }
     }
   }
@@ -232,6 +230,9 @@ class _UserMessagesReceivedScreenState
                 return;
               }
 
+              final dialogNavigator = Navigator.of(ctx);
+              final messenger = ScaffoldMessenger.of(context);
+
               try {
                 await FirebaseFirestore.instance
                     .collection('user_messages')
@@ -246,24 +247,20 @@ class _UserMessagesReceivedScreenState
                   'timestamp': FieldValue.serverTimestamp(),
                 });
 
-                if (mounted) {
-                  Navigator.pop(ctx);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('✅ Respuesta enviada'),
-                      backgroundColor: Colors.green,
-                    ),
-                  );
-                }
+                dialogNavigator.pop();
+                messenger.showSnackBar(
+                  const SnackBar(
+                    content: Text('✅ Respuesta enviada'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
               } catch (e) {
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Error: $e'),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                }
+                messenger.showSnackBar(
+                  SnackBar(
+                    content: Text('Error: $e'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
               }
             },
             child: const Text('Responder'),
@@ -302,27 +299,22 @@ class _UserMessagesReceivedScreenState
           }
 
           if (snapshot.hasError) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.error, color: Colors.red, size: 48),
-                  const SizedBox(height: 16),
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Text('Error: ${snapshot.error}'),
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        _messagesFuture = _loadMessages();
-                      });
-                    },
-                    child: const Text('Reintentar'),
-                  ),
-                ],
-              ),
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.error, color: Colors.red, size: 48),
+                const SizedBox(height: 16),
+                Expanded(child: firestoreErrorWidget(context, snapshot.error)),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      _messagesFuture = _loadMessages();
+                    });
+                  },
+                  child: const Text('Reintentar'),
+                ),
+              ],
             );
           }
 
@@ -343,9 +335,9 @@ class _UserMessagesReceivedScreenState
                   padding: const EdgeInsets.all(12),
                   margin: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.1),
+                    color: Colors.blue.withAlpha((0.1 * 255).round()),
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.blue.withOpacity(0.3)),
+                    border: Border.all(color: Colors.blue.withAlpha((0.3 * 255).round())),
                   ),
                   child: Row(
                     children: [
@@ -387,7 +379,7 @@ class _UserMessagesReceivedScreenState
                     return Card(
                       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       elevation: isRead ? 1 : 3,
-                      color: isRead ? null : Colors.blue.withOpacity(0.05),
+                      color: isRead ? null : Colors.blue.withAlpha((0.05 * 255).round()),
                       child: InkWell(
                         onTap: () => _showMessageDialog(
                           docId,

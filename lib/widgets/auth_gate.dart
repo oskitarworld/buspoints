@@ -3,6 +3,9 @@ import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:developer' as developer;
+import 'package:myapp/services/firestore_web_compat.dart';
 
 import 'package:myapp/services/auth_service.dart';
 import 'package:myapp/screens/auth/auth_screen.dart';
@@ -36,30 +39,46 @@ class UserRoleGate extends StatelessWidget {
   Widget build(BuildContext context) {
     Future<void> subscribeToRoleTopic(String role) async {
       try {
-        if (role == 'admin') {
-          await FirebaseMessaging.instance.subscribeToTopic('admins');
+        // Topic subscriptions are not supported on Web clients via the
+        // Firebase Messaging SDK. Skip these calls when running on web to
+        // avoid UnimplementedError (they're managed differently for web).
+        if (kIsWeb) {
+          developer.log('Running on web: skipping topic subscriptions (use server-side topic management for web)', name: 'AuthGate');
         } else {
-          await FirebaseMessaging.instance.subscribeToTopic('users');
+          if (role == 'admin') {
+            await FirebaseMessaging.instance.subscribeToTopic('admins');
+          } else {
+            await FirebaseMessaging.instance.subscribeToTopic('users');
+          }
+          // Subscribe to a per-user topic so admins can send notifications to a
+          // specific user by topic name `user_<uid>`.
+          await FirebaseMessaging.instance.subscribeToTopic('user_${user.uid}');
         }
-        // Subscribe to a per-user topic so admins can send notifications to a
-        // specific user by topic name `user_<uid>`.
-        await FirebaseMessaging.instance.subscribeToTopic('user_${user.uid}');
         // Register FCM token for this device in the user document so server
         // can send per-device messages (and set APNs badge numbers).
-        try {
-          final token = await FirebaseMessaging.instance.getToken();
-          if (token != null) {
-            await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
-              'fcmTokens': FieldValue.arrayUnion([token])
-            }, SetOptions(merge: true));
+        // On web the recommended flow differs (tokens are managed via the
+        // firebase-js APIs and topic subscriptions are not supported). To
+        // avoid platform-specific SDK issues we skip automatic token writes
+        // from the web client and log the condition. Server-side token
+        // registration or an explicit client flow should be used for web.
+        if (!kIsWeb) {
+          try {
+            final token = await FirebaseMessaging.instance.getToken();
+            if (token != null) {
+              await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+                'fcmTokens': FieldValue.arrayUnion([token])
+              }, SetOptions(merge: true));
+            }
+            FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
+              await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+                'fcmTokens': FieldValue.arrayUnion([newToken])
+              }, SetOptions(merge: true));
+            });
+          } catch (e, s) {
+            developer.log('No se pudo registrar el token FCM: $e', name: 'AuthGate', error: e, stackTrace: s);
           }
-          FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
-            await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
-              'fcmTokens': FieldValue.arrayUnion([newToken])
-            }, SetOptions(merge: true));
-          });
-        } catch (e) {
-          debugPrint('No se pudo registrar el token FCM: $e');
+        } else {
+          developer.log('Running on web: skipping automatic FCM token registration in user document', name: 'AuthGate');
         }
       } catch (e) {
         debugPrint('Error al suscribirse a topic FCM: $e');
@@ -67,7 +86,7 @@ class UserRoleGate extends StatelessWidget {
     }
 
     return StreamBuilder<DocumentSnapshot>(
-      stream: FirebaseFirestore.instance.collection('users').doc(user.uid).snapshots(),
+      stream: resilientStream(FirebaseFirestore.instance.collection('users').doc(user.uid).snapshots(), name: 'auth_gate_user_doc'),
       builder: (context, snapshot) {
         // If the stream yields an error (e.g. permission-denied), don't
         // immediately sign the user out — show a friendly message and

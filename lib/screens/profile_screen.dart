@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:myapp/services/firestore_web_compat.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:myapp/models/user_model.dart'; // Import the updated model
 
 class ProfileScreen extends StatelessWidget {
   // --- MÉTODOS DE VALORACIONES (antes de build) ---
   Widget _buildUserReviewsTab(BuildContext context, String uid) {
-    return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance
-          .collectionGroup('reviews')
-          .where('userId', isEqualTo: uid)
-          .where('status', isEqualTo: 'approved')
-          .snapshots(),
+    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+      stream: resilientStream(
+        querySnapshotsCompat(
+          FirebaseFirestore.instance
+              .collectionGroup('reviews')
+              .where('userId', isEqualTo: uid)
+              .where('status', isEqualTo: 'approved'),
+        ),
+        name: 'profile_user_reviews',
+      ),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -25,7 +30,7 @@ class ProfileScreen extends StatelessWidget {
           itemCount: reviews.length,
           itemBuilder: (context, index) {
             final review = reviews[index];
-            final data = review.data() as Map<String, dynamic>;
+            final data = review.data();
             return Card(
               margin: const EdgeInsets.symmetric(vertical: 8),
               child: ListTile(
@@ -99,11 +104,13 @@ class ProfileScreen extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () async {
+              final dialogNavigator = Navigator.of(ctx);
+              final messenger = ScaffoldMessenger.of(context);
               final newComment = controller.text.trim();
               final newRating = int.tryParse(ratingController.text.trim()) ?? data['rating'];
               await review.reference.update({'comment': newComment, 'rating': newRating});
-              Navigator.of(ctx).pop();
-              ScaffoldMessenger.of(context).showSnackBar(
+              dialogNavigator.pop();
+              messenger.showSnackBar(
                 const SnackBar(content: Text('Valoración actualizada')),
               );
             },
@@ -115,6 +122,7 @@ class ProfileScreen extends StatelessWidget {
   }
 
   void _deleteReview(BuildContext context, QueryDocumentSnapshot review) async {
+    final messenger = ScaffoldMessenger.of(context);
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -134,7 +142,7 @@ class ProfileScreen extends StatelessWidget {
     );
     if (confirm == true) {
       await review.reference.delete();
-      ScaffoldMessenger.of(context).showSnackBar(
+      messenger.showSnackBar(
         const SnackBar(content: Text('Valoración eliminada')),
       );
     }
@@ -165,12 +173,14 @@ class ProfileScreen extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () async {
+              final dialogNavigator = Navigator.of(ctx);
+              final messenger = ScaffoldMessenger.of(context);
               final newValue = controller.text.trim();
               final usersRef = FirebaseFirestore.instance.collection('users');
               if (field == 'email') {
                 final emailDup = await usersRef.where('email', isEqualTo: newValue).get();
                 if (emailDup.docs.any((doc) => doc.id != uid)) {
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  messenger.showSnackBar(
                     const SnackBar(content: Text('Ya existe una cuenta con ese correo electrónico'), backgroundColor: Colors.red),
                   );
                   return;
@@ -178,15 +188,15 @@ class ProfileScreen extends StatelessWidget {
               } else {
                 final phoneDup = await usersRef.where('phone', isEqualTo: newValue).get();
                 if (phoneDup.docs.any((doc) => doc.id != uid)) {
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  messenger.showSnackBar(
                     const SnackBar(content: Text('Ya existe una cuenta con ese teléfono'), backgroundColor: Colors.red),
                   );
                   return;
                 }
               }
               await usersRef.doc(uid).update({field: newValue});
-              Navigator.of(ctx).pop();
-              ScaffoldMessenger.of(context).showSnackBar(
+              dialogNavigator.pop();
+              messenger.showSnackBar(
                 const SnackBar(content: Text('Datos actualizados')),
               );
             },
@@ -317,7 +327,7 @@ class ProfileScreen extends StatelessWidget {
                 // RECOMPENSAS
                 Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: _buildRewardsCard(context, user.approvedPoisCount),
+                  child: _buildRewardsCard(context, user.uid),
                 ),
               ],
             );
@@ -468,7 +478,7 @@ class ProfileScreen extends StatelessWidget {
 
   Widget _buildMyPlacesCard(BuildContext context, String uid) {
     return DefaultTabController(
-      length: 3,
+      length: 4,
       child: Card(
         elevation: 2,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -482,6 +492,7 @@ class ProfileScreen extends StatelessWidget {
                 Tab(icon: Icon(Icons.bookmark), text: 'Guardados'),
                 Tab(icon: Icon(Icons.favorite), text: 'Favoritos'),
                 Tab(icon: Icon(Icons.history), text: 'Historial'),
+                Tab(icon: Icon(Icons.add_location), text: 'Añadidos'),
               ],
             ),
             SizedBox(
@@ -491,12 +502,45 @@ class ProfileScreen extends StatelessWidget {
                   _buildPlaceList(context, uid, 'saved_places'),
                   _buildPlaceList(context, uid, 'favorite_places'),
                   _buildPlaceList(context, uid, 'history_places'),
+                  _buildAddedPoisList(context, uid),
                 ],
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  /// List PDIs the user submitted (user_pois where submittedBy == uid)
+  Widget _buildAddedPoisList(BuildContext context, String uid) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance.collection('user_pois').where('submittedBy', isEqualTo: uid).orderBy('createdAt', descending: true).snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return const Center(child: Text('No has añadido PDIs.'));
+        }
+        return ListView.builder(
+          itemCount: snapshot.data!.docs.length,
+          itemBuilder: (context, index) {
+            final doc = snapshot.data!.docs[index];
+            final data = doc.data() as Map<String, dynamic>;
+            final status = (data['status'] ?? '').toString();
+            return ListTile(
+              leading: const Icon(Icons.place, color: Colors.deepPurple),
+              title: Text(data['title'] ?? data['name'] ?? 'PDI sin título'),
+              subtitle: Text('Estado: ${status.isNotEmpty ? status : 'pendiente'}'),
+              trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+              onTap: () {
+                // Optional: navigate to PDI detail screen if exists
+              },
+            );
+          },
+        );
+      },
     );
   }
 
@@ -527,7 +571,7 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildRewardsCard(BuildContext context, int prizeCount) {
+  Widget _buildRewardsCard(BuildContext context, String uid) {
     return Card(
       elevation: 4,
       shadowColor: Colors.black.withAlpha(26),
@@ -543,46 +587,108 @@ class ProfileScreen extends StatelessWidget {
                   .titleLarge
                   ?.copyWith(fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                FaIcon(FontAwesomeIcons.trophy,
-                    size: 40, color: Colors.amber.shade700),
-                const SizedBox(width: 24),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+            const SizedBox(height: 12),
+            // Stream user doc to get awardsHistory
+            StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+              stream: FirebaseFirestore.instance.collection('users').doc(uid).snapshots(),
+              builder: (context, snap) {
+                final userData = (snap.hasData && snap.data!.exists) ? snap.data!.data() ?? {} : {};
+                final awards = (userData['awardsHistory'] is List) ? List.from(userData['awardsHistory']) : <dynamic>[];
+                final awardsCount = awards.length;
+                final totalDays = awards.fold<int>(0, (acc, a) => acc + ((a is Map && a['days'] is int) ? a['days'] as int : 0));
+
+                return Column(
                   children: [
-                    Text(
-                      '$prizeCount',
-                      style: Theme.of(context)
-                          .textTheme
-                          .headlineMedium
-                          ?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.amber.shade800),
+                    Row(
+                      children: [
+                        FaIcon(FontAwesomeIcons.trophy, size: 42, color: Colors.amber.shade700),
+                        const SizedBox(width: 20),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('$awardsCount', style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold, color: Colors.amber.shade800)),
+                              Text('Premios recibidos', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey[600])),
+                            ],
+                          ),
+                        ),
+                        // Total days badge
+                        Column(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              decoration: BoxDecoration(color: Colors.blue.shade50, borderRadius: BorderRadius.circular(12)),
+                              child: Column(
+                                children: [
+                                  Text('$totalDays', style: const TextStyle(fontWeight: FontWeight.bold)),
+                                  const SizedBox(height: 4),
+                                  Text('Días totales', style: TextStyle(fontSize: 10, color: Colors.grey[700])),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
-                    Text(
-                      'Premios Ganados',
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyMedium
-                          ?.copyWith(color: Colors.grey[600]),
+                    const SizedBox(height: 12),
+                    Text('2 días por PDI aprobado', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey[600])),
+                    const SizedBox(height: 12),
+                    // Reviews counter & CTA
+                    StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                      stream: resilientStream(
+                        querySnapshotsCompat(
+                          FirebaseFirestore.instance.collectionGroup('reviews').where('userId', isEqualTo: uid),
+                        ),
+                        name: 'profile_rewards_reviews_count',
+                      ),
+                      builder: (context, revSnap) {
+                        final reviewsCount = revSnap.hasData ? revSnap.data!.docs.length : 0;
+                        return Row(
+                          children: [
+                            // Animated encouragement icon
+                            TweenAnimationBuilder<double>(
+                              tween: Tween(begin: 1.0, end: 1.05),
+                              duration: const Duration(milliseconds: 800),
+                              curve: Curves.easeInOut,
+                              builder: (context, scale, child) {
+                                return Transform.scale(scale: scale, child: child);
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(color: Colors.green.shade50, shape: BoxShape.circle),
+                                child: const Icon(Icons.thumb_up, color: Colors.green, size: 28),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text('$reviewsCount', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+                                  Text('Valoraciones realizadas', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey[600])),
+                                  const SizedBox(height: 8),
+                                  Text('Sigue valorando PDI y ayudando a la comunidad — ¡cada aportación suma!', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey[600])),
+                                ],
+                              ),
+                            ),
+                          ],
+                        );
+                      },
                     ),
                   ],
-                )
-              ],
+                );
+              },
             ),
             const SizedBox(height: 12),
-            Text(
-              '¡Ganas 2 días de membresía por cada PDI aprobado!',
-              textAlign: TextAlign.center,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodySmall
-                  ?.copyWith(color: Colors.grey[500]),
-            )
+            // Small CTA button
+            ElevatedButton.icon(
+              onPressed: () {
+                // Navigate to add POI or to valorar screen; best effort: go to Mis lugares tab
+                DefaultTabController.of(context).animateTo(1);
+              },
+              icon: const Icon(Icons.add_location),
+              label: const Text('Contribuir/Valorar PDI'),
+            ),
           ],
         ),
       ),

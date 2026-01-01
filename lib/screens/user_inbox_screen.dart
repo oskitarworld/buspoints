@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:myapp/services/firestore_web_compat.dart';
 
 class UserInboxScreen extends StatefulWidget {
   const UserInboxScreen({super.key});
@@ -43,11 +44,14 @@ class _UserInboxScreenState extends State<UserInboxScreen> {
         title: const Text('Bandeja de entrada'),
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('user_messages')
-            .where('toUid', isEqualTo: user.uid)
-            .orderBy('timestamp', descending: true)
-            .snapshots(),
+        stream: resilientStream(
+          FirebaseFirestore.instance
+              .collection('user_messages')
+              .where('toUid', isEqualTo: user.uid)
+              .orderBy('timestamp', descending: true)
+              .snapshots(),
+          name: 'user_inbox_stream',
+        ),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());

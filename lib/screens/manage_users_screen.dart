@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:myapp/services/firestore_web_compat.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'create_user_screen.dart';
@@ -136,8 +137,10 @@ class ManageUsersScreen extends StatelessWidget {
                                         }
                                       } catch (e) {
                                         setState(() => isSending = false);
-                                        if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(
+                                        if (context.mounted) {
+                                          ScaffoldMessenger.of(context).showSnackBar(
                                             SnackBar(content: Text('Error al enviar broadcast: $e'), backgroundColor: Colors.red));
+                                        }
                                       }
                                     }
                                   },
@@ -230,8 +233,8 @@ class _UserListState extends State<UserList> {
         ),
         // Lista de usuarios
         Expanded(
-          child: StreamBuilder(
-            stream: FirebaseFirestore.instance.collection('users').snapshots(),
+          child: StreamBuilder<QuerySnapshot>(
+            stream: resilientStream(FirebaseFirestore.instance.collection('users').snapshots(), name: 'manage_users_list'),
             builder: (context, snapshot) {
               if (snapshot.hasError) {
                 return const Center(child: Text('Error al cargar usuarios.'));
@@ -245,7 +248,7 @@ class _UserListState extends State<UserList> {
               // Aplicar filtros
               if (_searchQuery.isNotEmpty) {
                 users = users.where((doc) {
-                  final data = doc.data();
+                  final data = doc.data() as Map<String, dynamic>;
                   final name = (data['name'] ?? '').toString().toLowerCase();
                   final email = (data['email'] ?? '').toString().toLowerCase();
                   return name.contains(_searchQuery) ||
@@ -255,7 +258,7 @@ class _UserListState extends State<UserList> {
 
               if (_filterRole != 'todos') {
                 users = users.where((doc) {
-                  final data = doc.data();
+                  final data = doc.data() as Map<String, dynamic>;
                   return (data['role'] ?? 'user') == _filterRole;
                 }).toList();
               }
@@ -385,18 +388,11 @@ class UserListItem extends StatelessWidget {
                   ],
                 ),
               ),
-              // Acciones rápidas: enviar push y ver detalles
+              // Acciones rápidas: ver detalles (envío de mensajes individuales deshabilitado)
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.campaign, color: Colors.blue),
-                    tooltip: 'Enviar notificación a este usuario',
-                    onPressed: () {
-                      // Abrir diálogo de envío de mensaje al usuario concreto
-                      _showSendMessageDialog(context, userDoc.id, name, email);
-                    },
-                  ),
+                  // Envío de notificaciones a usuarios individuales eliminado por política.
                   Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey[400]),
                 ],
               ),
@@ -411,9 +407,9 @@ class UserListItem extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withAlpha((0.1 * 255).round()),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withAlpha((0.3 * 255).round())),
       ),
       child: Text(
         label,
@@ -606,21 +602,7 @@ class UserListItem extends StatelessWidget {
                         },
                       ),
                       const SizedBox(height: 12),
-                      ElevatedButton.icon(
-                        icon: const Icon(Icons.message),
-                        label: const Text('Enviar Mensaje'),
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          backgroundColor: Colors.blue[700],
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        onPressed: () {
-                          Navigator.of(ctx).pop();
-                          _showSendMessageDialog(context, userId, name, email);
-                        },
-                      ),
+                      // Envío de mensajes individual a usuarios deshabilitado desde el panel.
                       const SizedBox(height: 12),
                       ElevatedButton.icon(
                         icon: const Icon(Icons.card_membership),
@@ -1196,205 +1178,7 @@ class UserListItem extends StatelessWidget {
     );
   }
 
-  void _showSendMessageDialog(BuildContext context, String toUserId,
-      String toUserName, String toUserEmail) {
-    final messageController = TextEditingController();
-    final formKey = GlobalKey<FormState>();
-    bool isSending = false;
-
-    showDialog(
-      context: context,
-      builder: (ctx) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16)),
-              title: Row(
-                children: [
-                  const Icon(Icons.message, color: Colors.blue),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('Enviar Mensaje'),
-                        Text(
-                          'Para: $toUserName',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey[600],
-                            fontWeight: FontWeight.normal,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              content: Form(
-                key: formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.blue[50],
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(Icons.info_outline,
-                              color: Colors.blue[700], size: 20),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              'Este mensaje se enviará directamente al usuario',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.blue[900],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: messageController,
-                      decoration: InputDecoration(
-                        labelText: 'Mensaje',
-                        hintText: 'Escribe tu mensaje aquí...',
-                        border: const OutlineInputBorder(),
-                        prefixIcon: const Icon(Icons.edit),
-                        filled: true,
-                        fillColor: Colors.grey[50],
-                      ),
-                      maxLines: 5,
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return 'El mensaje no puede estar vacío';
-                        }
-                        if (value.trim().length < 10) {
-                          return 'El mensaje debe tener al menos 10 caracteres';
-                        }
-                        return null;
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: isSending ? null : () => Navigator.of(ctx).pop(),
-                  child: const Text('Cancelar'),
-                ),
-                ElevatedButton.icon(
-                  icon: isSending
-                      ? const SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.white),
-                          ),
-                        )
-                      : const Icon(Icons.send),
-                  label: Text(isSending ? 'Enviando...' : 'Enviar'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue[700],
-                  ),
-                  onPressed: isSending
-                      ? null
-                      : () async {
-                          if (formKey.currentState?.validate() ?? false) {
-                            setState(() => isSending = true);
-
-                            try {
-                              // Obtener información del admin que envía
-                              final currentUser =
-                                  FirebaseAuth.instance.currentUser;
-                              if (currentUser == null) {
-                                throw Exception('No hay usuario autenticado');
-                              }
-
-                              // Obtener datos del admin
-                              final adminDoc = await FirebaseFirestore.instance
-                                  .collection('users')
-                                  .doc(currentUser.uid)
-                                  .get();
-                              final adminData = adminDoc.data();
-                              final adminName = adminData?['name'] ??
-                                  currentUser.displayName ??
-                                  'Administrador';
-                              final adminEmail = adminData?['email'] ??
-                                  currentUser.email ??
-                                  '';
-
-                              // Enviar el mensaje
-                              await FirebaseFirestore.instance
-                                  .collection('user_messages')
-                                  .add({
-                                'fromUid': currentUser.uid,
-                                'fromName': adminName,
-                                'fromEmail': adminEmail,
-                                // legacy fields
-                                'toUid': toUserId,
-                                'toName': toUserName,
-                                'toEmail': toUserEmail,
-                                // new canonical field read by Cloud Functions
-                                'to': toUserId,
-                                'message': messageController.text.trim(),
-                                'timestamp': FieldValue.serverTimestamp(),
-                                'read': false,
-                                'fromAdmin': true,
-                              });
-
-                              if (ctx.mounted) {
-                                Navigator.of(ctx).pop();
-                              }
-                              if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Row(
-                                      children: [
-                                        const Icon(Icons.check_circle,
-                                            color: Colors.white),
-                                        const SizedBox(width: 12),
-                                        Expanded(
-                                          child: Text(
-                                              'Mensaje enviado a $toUserName'),
-                                        ),
-                                      ],
-                                    ),
-                                    backgroundColor: Colors.green[700],
-                                    duration: const Duration(seconds: 3),
-                                  ),
-                                );
-                              }
-                            } catch (e) {
-                              setState(() => isSending = false);
-                              if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('Error al enviar: $e'),
-                                    backgroundColor: Colors.red,
-                                  ),
-                                );
-                              }
-                            }
-                          }
-                        },
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
+  // _showSendMessageDialog removed: sending individual messages from admin panel is disabled by policy.
 
   
 }

@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:myapp/screens/auth/auth_screen.dart';
 import 'package:myapp/screens/profile_screen.dart';
 import 'package:myapp/screens/home_screen.dart';
@@ -12,6 +13,7 @@ import 'package:myapp/screens/terms_of_use_screen.dart';
 import 'package:myapp/screens/privacy_policy_screen.dart';
 import 'package:myapp/screens/how_it_works_screen.dart';
 import 'package:myapp/widgets/contact_dialog.dart';
+import 'package:myapp/services/firestore_web_compat.dart';
 
 import '../screens/user_messages_received_screen.dart';
 import '../screens/user_messages_sent_screen.dart';
@@ -43,6 +45,31 @@ class _AppDrawerState extends State<AppDrawer> {
     );
   }
 
+  // Small local badge so we don't depend on an external package or a newer
+  // Flutter SDK Badge widget. Keeps a compact circular red badge with white text.
+  Widget _smallBadge(String label, {Color backgroundColor = Colors.red, Color textColor = Colors.white}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      // Conservative bounds: keep badge compact but allow up to ~56px when the
+      // label is longer (we show an ellipsis). This prevents extremely wide
+      // badges when the label becomes unexpectedly long.
+      constraints: const BoxConstraints(minWidth: 20, minHeight: 18, maxWidth: 56, maxHeight: 22),
+      child: Center(
+        child: Text(
+          label,
+          style: TextStyle(color: textColor, fontSize: 11, fontWeight: FontWeight.bold),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
+  }
+
   Future<void> _confirmSignOut(BuildContext context) async {
     final navigator = Navigator.of(context);
     final didRequestSignOut = await showDialog<bool>(
@@ -66,6 +93,7 @@ class _AppDrawerState extends State<AppDrawer> {
     );
     if (didRequestSignOut == true) {
       await FirebaseAuth.instance.signOut();
+      if (!mounted) return;
       navigator.pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => const AuthScreen(), settings: const RouteSettings(name: '/auth')),
         (Route<dynamic> route) => false,
@@ -91,13 +119,13 @@ class _AppDrawerState extends State<AppDrawer> {
       return const Drawer();
     }
     return Drawer(
-      child: StreamBuilder<DocumentSnapshot>(
-        stream: FirebaseFirestore.instance.collection('users').doc(user.uid).snapshots(),
+      child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>> (
+        stream: resilientStream(FirebaseFirestore.instance.collection('users').doc(user.uid).snapshots(), name: 'app_drawer_user_doc'),
         builder: (context, snapshot) {
           String? userName = user.email;
           String? role;
           if (snapshot.connectionState == ConnectionState.active && snapshot.hasData) {
-            final data = snapshot.data?.data() as Map<String, dynamic>?;
+            final data = snapshot.data?.data();
             userName = data?['name'] ?? user.email;
             role = data?['role'];
           }
@@ -138,87 +166,47 @@ class _AppDrawerState extends State<AppDrawer> {
                 },
               ),
 
-              if (role == 'admin')
-                Column(
-                  children: [
-                    StreamBuilder<List<int>>(
-                      stream: Rx.combineLatest6<int, int, int, int, int, int, List<int>>(
-                        FirebaseFirestore.instance
-                          .collection('users')
-                          .where('status', isEqualTo: 'pending')
-                          .snapshots()
-                          .map((snap) => snap.docs.length),
-                        FirebaseFirestore.instance
-                          .collection('contact_messages')
-                          .where('read', isEqualTo: false)
-                          .snapshots()
-                          .map((snap) => snap.docs.length),
-                        FirebaseFirestore.instance
-                          .collection('user_messages')
-                          .where('read', isEqualTo: false)
-                          .snapshots()
-                          .map((snap) => snap.docs.length),
-                        FirebaseFirestore.instance
-                          .collection('user_pois')
-                          .where('status', isEqualTo: 'pending')
-                          .snapshots()
-                          .map((snap) => snap.docs.length),
-                        FirebaseFirestore.instance
-                          .collectionGroup('reviews')
-                          .where('status', isEqualTo: 'pending')
-                          .snapshots()
-                          .map((snap) => snap.docs.length),
-                        FirebaseFirestore.instance
-                          .collection('system_notifications')
-                          .where('read', isEqualTo: false)
-                          .snapshots()
-                          .map((snap) => snap.docs.length),
-                        (pendingUsers, contactMessages, userMessages, pendingUserPois, pendingReviews, systemNotifications) => [pendingUsers, contactMessages, userMessages, pendingUserPois, pendingReviews, systemNotifications],
-                      ),
-                      builder: (context, snapshot) {
-                        int pendingUsers = 0;
-                        int contactMessages = 0;
-                        int userMessages = 0;
-                        int totalMessages = 0;
-                        int pendingUserPois = 0;
-                        int pendingReviews = 0;
-                        int systemNotifications = 0;
-                        if (snapshot.hasData && snapshot.data != null) {
-                          pendingUsers = snapshot.data![0];
-                          contactMessages = snapshot.data![1];
-                          userMessages = snapshot.data![2];
-                          pendingUserPois = snapshot.data![3];
-                          pendingReviews = snapshot.data![4];
-                          systemNotifications = snapshot.data![5];
-                          totalMessages = contactMessages + userMessages;
-                        }
-                        final totalPending = pendingUsers + totalMessages + pendingUserPois + pendingReviews + systemNotifications;
-                        final showBadge = totalPending > 0;
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            ListTile(
+              if (role == 'admin') ...[
+                StreamBuilder<List<int>>(
+                  // Wrap each queryCountStream with resilientStream so any
+                  // Firestore listen errors (eg. PERMISSION_DENIED) are logged
+                  // and swallowed instead of bubbling to the UI. This keeps
+                  // the drawer stable on devices with stricter rules.
+                  stream: Rx.combineLatest6<int, int, int, int, int, int, List<int>>(
+                    resilientStream(queryCountStream(FirebaseFirestore.instance.collection('users').where('status', isEqualTo: 'pending')), name: 'app_drawer_pending_users'),
+                    resilientStream(queryCountStream(FirebaseFirestore.instance.collection('contact_messages').where('read', isEqualTo: false)), name: 'app_drawer_contact_messages'),
+                    resilientStream(queryCountStream(FirebaseFirestore.instance.collection('user_messages').where('read', isEqualTo: false)), name: 'app_drawer_user_messages'),
+                    resilientStream(queryCountStream(FirebaseFirestore.instance.collection('user_pois').where('status', isEqualTo: 'pending')), name: 'app_drawer_user_pois'),
+                    resilientStream(queryCountStream(FirebaseFirestore.instance.collectionGroup('reviews').where('status', isEqualTo: 'pending')), name: 'app_drawer_reviews'),
+                    resilientStream(queryCountStream(FirebaseFirestore.instance.collection('system_notifications').where('read', isEqualTo: false)), name: 'app_drawer_system_notifications'),
+                    (pendingUsers, contactMessages, userMessages, pendingUserPois, pendingReviews, systemNotifications) => [pendingUsers, contactMessages, userMessages, pendingUserPois, pendingReviews, systemNotifications],
+                  ),
+                  builder: (context, snapshot) {
+                    int pendingUsers = 0;
+                    int contactMessages = 0;
+                    int userMessages = 0;
+                    int totalMessages = 0;
+                    int pendingUserPois = 0;
+                    int pendingReviews = 0;
+                    int systemNotifications = 0;
+                    if (snapshot.hasData && snapshot.data != null) {
+                      pendingUsers = snapshot.data![0];
+                      contactMessages = snapshot.data![1];
+                      userMessages = snapshot.data![2];
+                      pendingUserPois = snapshot.data![3];
+                      pendingReviews = snapshot.data![4];
+                      systemNotifications = snapshot.data![5];
+                      totalMessages = contactMessages + userMessages;
+                    }
+                    final totalPending = pendingUsers + totalMessages + pendingUserPois + pendingReviews + systemNotifications;
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ListTile(
                           leading: const Icon(Icons.admin_panel_settings),
-                          title: Row(
-                            children: [
-                              const Text('Panel de administración'),
-                              if (showBadge)
-                                Container(
-                                  margin: const EdgeInsets.only(left: 8),
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    color: Colors.red,
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Text(
-                                    totalPending.toString(),
-                                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
-                                  ),
-                                ),
-                            ],
-                          ),
+                          title: const Text('Panel de administración'),
+                          trailing: totalPending > 0 ? _smallBadge(totalPending > 9 ? '9+' : '$totalPending') : null,
                           onTap: () {
-                            // Show breakdown dialog so admins can see which counts contribute to the badge
                             showDialog<void>(
                               context: context,
                               builder: (ctx) => AlertDialog(
@@ -253,7 +241,56 @@ class _AppDrawerState extends State<AppDrawer> {
                           },
                         ),
 
-                            // Link directo a cuentas bloqueadas / eventos de seguridad
+                        ExpansionTile(
+                          leading: const Icon(Icons.mail),
+                          title: const Text('Mensajes'),
+                          children: [
+                            ListTile(
+                              leading: const Icon(Icons.inbox),
+                              title: const Text('Bandeja de entrada'),
+                              trailing: (contactMessages + userMessages) > 0 ? _smallBadge((contactMessages + userMessages) > 9 ? '9+' : '${contactMessages + userMessages}') : null,
+                              onTap: () {
+                                Navigator.pop(context);
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const AdminInboxScreen()),
+                                );
+                              },
+                            ),
+                            ListTile(
+                              leading: const Icon(Icons.send),
+                              title: const Text('Mensajes enviados'),
+                              onTap: () {
+                                Navigator.pop(context);
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const UserMessagesSentScreen()),
+                                );
+                              },
+                            ),
+                            ListTile(
+                              leading: const Icon(Icons.campaign_outlined),
+                              title: const Text('Enviados (push)'),
+                              onTap: () {
+                                Navigator.pop(context);
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const AdminPushesSentScreen()),
+                                );
+                              },
+                            ),
+                            ListTile(
+                              leading: const Icon(Icons.notifications),
+                              title: const Text('Notificaciones del sistema'),
+                              trailing: systemNotifications > 0 ? _smallBadge(systemNotifications > 9 ? '9+' : '$systemNotifications') : null,
+                              onTap: () {
+                                Navigator.pop(context);
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const SystemNotificationsScreen()),
+                                );
+                              },
+                            ),
                             ListTile(
                               leading: const Icon(Icons.block, color: Colors.redAccent),
                               title: const Text('Cuentas bloqueadas / Seguridad'),
@@ -263,121 +300,38 @@ class _AppDrawerState extends State<AppDrawer> {
                               },
                             ),
                           ],
-                        );
-                      },
-                    ),
-                    ExpansionTile(
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ] else ...[
+                const Divider(),
+                // For regular users show live badges for unread messages and
+                // system notifications. We combine two snapshot streams so the
+                // badge updates live without extra client logic.
+                StreamBuilder<List<int>>(
+                  // For regular users also wrap both count streams defensively.
+                  stream: Rx.combineLatest2<int, int, List<int>>(
+                    resilientStream(queryCountStream(FirebaseFirestore.instance.collection('user_messages').where('toUid', isEqualTo: user.uid).where('read', isEqualTo: false)), name: 'app_drawer_unread_msgs'),
+                    resilientStream(queryCountStream(FirebaseFirestore.instance.collection('users').doc(user.uid).collection('notifications').where('read', isEqualTo: false)), name: 'app_drawer_unread_system'),
+                    (unreadMsgs, unreadSystem) => [unreadMsgs, unreadSystem],
+                  ),
+                  builder: (context, snapshot) {
+                    int unreadMsgs = 0;
+                    int unreadSystem = 0;
+                    if (snapshot.hasData && snapshot.data != null) {
+                      unreadMsgs = snapshot.data![0];
+                      unreadSystem = snapshot.data![1];
+                    }
+                    return ExpansionTile(
                       leading: const Icon(Icons.mail),
                       title: const Text('Mensajes'),
                       children: [
                         ListTile(
                           leading: const Icon(Icons.inbox),
-                          title: const Text('Bandeja de entrada'),
-                          onTap: () {
-                            Navigator.pop(context);
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => const AdminInboxScreen()),
-                            );
-                          },
-                        ),
-                        // Reordered per request: Mensajes enviados, Enviados (push), Notificaciones del sistema
-                        ListTile(
-                          leading: const Icon(Icons.send),
-                          title: const Text('Mensajes enviados'),
-                          onTap: () {
-                            Navigator.pop(context);
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => const UserMessagesSentScreen()),
-                            );
-                          },
-                        ),
-                        ListTile(
-                          leading: const Icon(Icons.campaign_outlined),
-                          title: const Text('Enviados (push)'),
-                          onTap: () {
-                            Navigator.pop(context);
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => const AdminPushesSentScreen()),
-                            );
-                          },
-                        ),
-                        ListTile(
-                          leading: const Icon(Icons.notifications),
-                          title: const Text('Notificaciones del sistema'),
-                          onTap: () {
-                            Navigator.pop(context);
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => const SystemNotificationsScreen()),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  ],
-                )
-              else ...[
-                const Divider(),
-                    StreamBuilder<List<int>>(
-                  stream: Rx.combineLatest3<int, int, int, List<int>>(
-                    FirebaseFirestore.instance
-                      .collection('user_messages')
-                      .where('toUid', isEqualTo: user.uid)
-                      .where('read', isEqualTo: false)
-                      .snapshots()
-                      .map((snap) => snap.docs.length),
-                    FirebaseFirestore.instance
-                      .collection('user_pois')
-                      .where('submittedBy', isEqualTo: user.uid)
-                      .where('status', isEqualTo: 'pending')
-                      .snapshots()
-                      .map((snap) => snap.docs.length),
-                    FirebaseFirestore.instance
-                      .collection('users')
-                      .doc(user.uid)
-                      .collection('notifications')
-                      .where('read', isEqualTo: false)
-                      .snapshots()
-                      .map((snap) => snap.docs.length),
-                    (unreadCount, myPendingPois, unreadSystem) => [unreadCount, myPendingPois, unreadSystem],
-                  ),
-                  builder: (context, snapshot) {
-                    int unreadCount = 0;
-                    int myPendingPois = 0;
-                    int unreadSystem = 0;
-                    if (snapshot.hasData && snapshot.data != null) {
-                      unreadCount = snapshot.data![0];
-                      myPendingPois = snapshot.data![1];
-                      unreadSystem = snapshot.data![2];
-                    }
-                    final userTotal = unreadCount + myPendingPois + unreadSystem;
-                    return ExpansionTile(
-                      leading: const Icon(Icons.mail),
-                      title: Row(
-                        children: [
-                          const Text('Mensajes'),
-                          if (userTotal > 0)
-                            Container(
-                              margin: const EdgeInsets.only(left: 8),
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: Colors.red,
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Text(
-                                userTotal.toString(),
-                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
-                              ),
-                            ),
-                        ],
-                      ),
-                      children: [
-                        ListTile(
-                          leading: const Icon(Icons.inbox),
                           title: const Text('Recibidos'),
+                          trailing: unreadMsgs > 0 ? _smallBadge(unreadMsgs > 9 ? '9+' : '$unreadMsgs') : null,
                           onTap: () {
                             Navigator.pop(context);
                             Navigator.push(
@@ -405,6 +359,7 @@ class _AppDrawerState extends State<AppDrawer> {
                         ListTile(
                           leading: const Icon(Icons.notifications),
                           title: const Text('Notificaciones del sistema'),
+                          trailing: unreadSystem > 0 ? _smallBadge(unreadSystem > 9 ? '9+' : '$unreadSystem') : null,
                           onTap: () {
                             Navigator.pop(context);
                             Navigator.push(

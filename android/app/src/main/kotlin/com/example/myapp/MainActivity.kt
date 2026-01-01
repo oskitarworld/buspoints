@@ -1,5 +1,7 @@
-package com.example.myapp
+// This file was left for historical reasons and has been neutralized to avoid
+// Kotlin redeclaration errors after package refactor. The active MainActivity
+// lives at `android/app/src/main/kotlin/com/app/buspoints/MainActivity.kt`.
 
-import io.flutter.embedding.android.FlutterActivity
+// ...existing code...
 
-class MainActivity: FlutterActivity()
+// class MainActivityOld: FlutterActivity()  // removed

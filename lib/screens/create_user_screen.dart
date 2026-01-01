@@ -119,7 +119,7 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
           errorMessage = 'Ocurrió un error inesperado. Por favor, inténtalo de nuevo más tarde.';
       }
       _showErrorSnackBar(errorMessage);
-    } on TimeoutException catch (e) {
+    } on TimeoutException {
       _showErrorSnackBar('La operación tardó demasiado. Por favor, inténtalo de nuevo.');
     } catch (e) {
       _showErrorSnackBar('Ocurrió un error inesperado: ${e.toString()}');

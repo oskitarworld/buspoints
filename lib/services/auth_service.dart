@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:developer' as developer;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -150,13 +151,13 @@ class AuthService {
 
   Future<User?> register(String name, String email, String phone, String password) async {
     try {
-      print('[AuthService] Iniciando registro para $email');
+  developer.log('Iniciando registro para $email', name: 'AuthService');
       // Verificar que el nombre de usuario sea único
       try {
         final usernameExists = await _firestore.collection('users')
           .where('name', isEqualTo: name)
           .get();
-        print('[AuthService] usernameExists: ${usernameExists.docs.length}');
+  developer.log('usernameExists: ${usernameExists.docs.length}', name: 'AuthService');
         if (usernameExists.docs.isNotEmpty) {
           throw FirebaseAuthException(
             code: 'username-already-in-use',
@@ -169,9 +170,9 @@ class AuthService {
         // the signup flow. We'll log a warning and continue; auth will still
         // enforce email uniqueness. A proper uniqueness check for username/phone
         // should be implemented server-side (Cloud Function) in production.
-        print('[AuthService] Firestore error during username check: $e');
+        developer.log('Firestore error during username check: $e', name: 'AuthService', error: e, stackTrace: StackTrace.current);
         if (e.code == 'permission-denied' || (e.message ?? '').toLowerCase().contains('permission')) {
-          print('[AuthService] Permission denied when checking username; skipping pre-check.');
+          developer.log('Permission denied when checking username; skipping pre-check.', name: 'AuthService');
         } else {
           throw FirebaseAuthException(code: 'firestore-error', message: 'No se pudo verificar el usuario: ${e.message}');
         }
@@ -181,7 +182,7 @@ class AuthService {
         final emailExists = await _firestore.collection('users')
           .where('email', isEqualTo: email)
           .get();
-        print('[AuthService] emailExists: ${emailExists.docs.length}');
+  developer.log('emailExists: ${emailExists.docs.length}', name: 'AuthService');
         if (emailExists.docs.isNotEmpty) {
           throw FirebaseAuthException(
             code: 'email-already-in-use',
@@ -189,9 +190,9 @@ class AuthService {
           );
         }
       } on FirebaseException catch (e) {
-        print('[AuthService] Firestore error during email check: $e');
+        developer.log('Firestore error during email check: $e', name: 'AuthService', error: e, stackTrace: StackTrace.current);
         if (e.code == 'permission-denied' || (e.message ?? '').toLowerCase().contains('permission')) {
-          print('[AuthService] Permission denied when checking email; skipping pre-check.');
+          developer.log('Permission denied when checking email; skipping pre-check.', name: 'AuthService');
         } else {
           throw FirebaseAuthException(code: 'firestore-error', message: 'No se pudo verificar el correo: ${e.message}');
         }
@@ -201,7 +202,7 @@ class AuthService {
         final phoneExists = await _firestore.collection('users')
           .where('phone', isEqualTo: phone)
           .get();
-        print('[AuthService] phoneExists: ${phoneExists.docs.length}');
+  developer.log('phoneExists: ${phoneExists.docs.length}', name: 'AuthService');
         if (phoneExists.docs.isNotEmpty) {
           throw FirebaseAuthException(
             code: 'phone-already-in-use',
@@ -209,9 +210,9 @@ class AuthService {
           );
         }
       } on FirebaseException catch (e) {
-        print('[AuthService] Firestore error during phone check: $e');
+        developer.log('Firestore error during phone check: $e', name: 'AuthService', error: e, stackTrace: StackTrace.current);
         if (e.code == 'permission-denied' || (e.message ?? '').toLowerCase().contains('permission')) {
-          print('[AuthService] Permission denied when checking phone; skipping pre-check.');
+          developer.log('Permission denied when checking phone; skipping pre-check.', name: 'AuthService');
         } else {
           throw FirebaseAuthException(code: 'firestore-error', message: 'No se pudo verificar el teléfono: ${e.message}');
         }
@@ -220,7 +221,7 @@ class AuthService {
       UserCredential result = await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
       User? user = result.user;
-      print('[AuthService] Usuario creado en Auth: ${user?.uid}');
+  developer.log('Usuario creado en Auth: ${user?.uid}', name: 'AuthService');
 
       if (user != null) {
         await user.updateDisplayName(name);
@@ -242,24 +243,24 @@ class AuthService {
           'subscriptionHistory': [],
           'createdAt': FieldValue.serverTimestamp(),
         };
-        print('[AuthService] Intentando crear documento en Firestore: $userData');
+  developer.log('Intentando crear documento en Firestore: $userData', name: 'AuthService');
         try {
           await _firestore.collection('users').doc(user.uid).set(userData);
-          print('[AuthService] Documento creado en Firestore para ${user.uid}');
+          developer.log('Documento creado en Firestore para ${user.uid}', name: 'AuthService');
         } on FirebaseException catch (e) {
-          print('[AuthService] Firestore error creating user doc: $e');
+          developer.log('Firestore error creating user doc: $e', name: 'AuthService', error: e, stackTrace: StackTrace.current);
           throw FirebaseAuthException(code: 'firestore-error', message: 'No se pudo crear el perfil de usuario: ${e.message}');
         } catch (e) {
-          print('[AuthService] Error al crear documento en Firestore: $e');
+          developer.log('Error al crear documento en Firestore: $e', name: 'AuthService', error: e, stackTrace: StackTrace.current);
           throw Exception('Firestore error: $e');
         }
       }
       return user;
     } on FirebaseAuthException catch (e) {
-      print('[AuthService] FirebaseAuthException: ${e.code} - ${e.message}');
+      developer.log('FirebaseAuthException: ${e.code} - ${e.message}', name: 'AuthService', error: e, stackTrace: StackTrace.current);
       rethrow;
     } catch (e) {
-      print('[AuthService] Error inesperado: $e');
+      developer.log('Error inesperado: $e', name: 'AuthService', error: e, stackTrace: StackTrace.current);
       throw Exception('Error inesperado: $e');
     }
   }
@@ -288,7 +289,7 @@ class AuthService {
       }
     } catch (e) {
       // non-fatal: don't block sign-out if firestore update fails
-      print('[AuthService] Warning: could not clear sessionActive on signOut: $e');
+      developer.log('Warning: could not clear sessionActive on signOut: $e', name: 'AuthService', error: e, stackTrace: StackTrace.current);
     }
 
     await _googleSignIn.signOut();

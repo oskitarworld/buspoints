@@ -60,10 +60,11 @@ class AppDrawer extends StatelessWidget {
               title: const Text('Hacerte administrador'),
               onTap: () async {
                 final uid = user.uid;
+                final messenger = ScaffoldMessenger.of(context);
                 await FirebaseFirestore.instance.collection('users').doc(uid).set({
                   'isAdmin': true,
                 }, SetOptions(merge: true));
-                ScaffoldMessenger.of(context).showSnackBar(
+                messenger.showSnackBar(
                   const SnackBar(content: Text('¡Ahora eres administrador!')),
                 );
               },
@@ -101,8 +102,9 @@ class AppDrawer extends StatelessWidget {
                     leading: const Icon(Icons.exit_to_app),
                     title: const Text('Cerrar sesión'),
                     onTap: () async {
+                      final nav = Navigator.of(context);
                       await FirebaseAuth.instance.signOut();
-                      Navigator.of(context).popUntil((route) => route.isFirst);
+                      nav.popUntil((route) => route.isFirst);
                     },
                   ),
           // ...otros items del menú...

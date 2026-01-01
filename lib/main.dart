@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
@@ -37,7 +38,7 @@ void main() async {
       // El archivo ya existe en la raíz del proyecto
       await FirebaseMessaging.instance.setDeliveryMetricsExportToBigQuery(true);
     } catch (e) {
-      print('Error inicializando FCM en web: $e');
+      developer.log('Error inicializando FCM en web: $e', name: 'main', error: e);
     }
   }
   try {
@@ -58,22 +59,46 @@ void main() async {
         FirebaseFirestore.instance.settings = const Settings(persistenceEnabled: false);
         developer.log('[APP START] Firestore persistence disabled for debug', name: 'main');
       } catch (e) {
-        // ignore: avoid_print
-        print('Could not change Firestore settings: $e');
+        developer.log('Could not change Firestore settings: $e', name: 'main', error: e);
       }
 
       final snapshot = await firestore.collection('places').limit(1).get();
-      print('[TEST FIRESTORE] Conexión OK. Docs encontrados: \\${snapshot.docs.length}');
+      developer.log('[TEST FIRESTORE] Conexión OK. Docs encontrados: ${snapshot.docs.length}', name: 'main');
       if (snapshot.docs.isNotEmpty) {
-        print('[TEST FIRESTORE] Primer doc: \\${snapshot.docs.first.data()}');
+        developer.log('[TEST FIRESTORE] Primer doc: ${snapshot.docs.first.data()}', name: 'main');
       }
     } catch (e) {
-      print('[TEST FIRESTORE] ERROR: \\${e.toString()}');
+      developer.log('[TEST FIRESTORE] ERROR: ${e.toString()}', name: 'main', error: e);
     }
   } catch (e) {
     initializationError = e;
   }
-  runApp(MyApp(initializationError: initializationError));
+  // Install global error handlers so uncaught exceptions are logged and
+  // the app doesn't show the red error screen in production-like flows.
+  FlutterError.onError = (FlutterErrorDetails details) {
+    developer.log('Uncaught Flutter error: ${details.exception}', name: 'main', error: details.exception, stackTrace: details.stack);
+    // Do NOT call FlutterError.presentError(details) here to avoid the
+    // red-screen overlay in debug; we still want the error logged.
+  };
+
+  // Customize the ErrorWidget shown in the UI (the red error box) so that
+  // Firestore permission errors (which we expect in some deployments) do
+  // not surface as a blocking red box to users. We still log the error.
+  // Globally suppress the visible ErrorWidget (red screen) and replace it
+  // with a non-blocking empty widget. All errors are still logged using
+  // developer.log so they can be reviewed in logs. The user requested that
+  // the red error screen not be shown on devices.
+  ErrorWidget.builder = (FlutterErrorDetails details) {
+    developer.log('Suppressed ErrorWidget shown to user: ${details.exception}', name: 'main', error: details.exception, stackTrace: details.stack);
+    // Return a tiny, non-blocking widget so the app UI keeps rendering.
+    return const SizedBox.shrink();
+  };
+
+  runZonedGuarded(() {
+    runApp(MyApp(initializationError: initializationError));
+  }, (error, stack) {
+    developer.log('Uncaught zone error: $error', name: 'main', error: error, stackTrace: stack);
+  });
 }
 
 // Mostrar notificaciones push en primer plano
@@ -82,9 +107,10 @@ void setupFCMForegroundNotifications() {
     if (message.notification != null) {
       final notification = message.notification!;
       // Mostrar un SnackBar global con el mensaje
-      final context = navigatorKey.currentContext;
-      if (context != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
+      final nav = navigatorKey.currentState;
+      if (nav != null && nav.mounted) {
+        final messenger = ScaffoldMessenger.of(nav.context);
+        messenger.showSnackBar(
           SnackBar(
             content: Text(notification.title != null
                 ? '${notification.title}: ${notification.body ?? ''}'

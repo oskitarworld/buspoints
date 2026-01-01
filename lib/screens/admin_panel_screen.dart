@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'admin_inbox_screen.dart';
+import 'package:myapp/services/firestore_web_compat.dart';
+// admin_inbox_screen is no longer referenced here; drawer provides access to the inbox.
 import 'manage_users_screen.dart';
 import 'poi_approval_screen.dart';
 import 'review_approval_screen.dart';
@@ -107,10 +108,11 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                 const SizedBox(height: 16),
                 // Aprobar Reviews/Valoraciones con badge de pendientes
                 StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                  stream: FirebaseFirestore.instance
-                      .collectionGroup('reviews')
-                      .where('status', isEqualTo: 'pending')
-                      .snapshots(),
+                  stream: querySnapshotsCompat(
+                    FirebaseFirestore.instance
+                        .collectionGroup('reviews')
+                        .where('status', isEqualTo: 'pending'),
+                  ),
                   builder: (context, snapshot) {
                     int pendingCount = 0;
                     if (snapshot.hasData) {
@@ -167,79 +169,8 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
     );
   }
 
-  Widget _buildInboxBadge(BuildContext context) {
-    return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance
-          .collection('contact_messages')
-          .snapshots(),
-      builder: (context, contactSnapshot) {
-        return StreamBuilder<QuerySnapshot>(
-          stream: FirebaseFirestore.instance
-              .collection('user_messages')
-              .snapshots(),
-          builder: (context, userMessagesSnapshot) {
-            int totalUnread = 0;
-            
-            // Contar mensajes sin leer de contact_messages
-            if (contactSnapshot.hasData) {
-              totalUnread += contactSnapshot.data!.docs
-                  .where((doc) => (doc.data() as Map<String, dynamic>)['read'] != true)
-                  .length;
-            }
-            
-            // Contar mensajes sin leer de user_messages
-            if (userMessagesSnapshot.hasData) {
-              totalUnread += userMessagesSnapshot.data!.docs
-                  .where((doc) => (doc.data() as Map<String, dynamic>)['read'] != true)
-                  .length;
-            }
-            
-            return Stack(
-              children: [
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                    ),
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => const AdminInboxScreen()),
-                      );
-                    },
-                    child: const Text('Bandeja de entrada', style: TextStyle(fontSize: 16)),
-                  ),
-                ),
-                if (totalUnread > 0)
-                  Positioned(
-                    top: -10,
-                    right: 12,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: const BoxDecoration(
-                        color: Colors.red,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Text(
-                        totalUnread.toString(),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
+  // _buildInboxBadge removed: badge is now displayed centrally in the drawer
+  // and in the admin menu where appropriate to avoid duplicated logic.
 
   Widget _buildButtonWithBadge(
     BuildContext context,

@@ -1,5 +1,6 @@
-package com.example.trucker_app
+// Neutralized duplicate MainActivity to avoid Kotlin redeclaration during build.
+// Active MainActivity: android/app/src/main/kotlin/com/app/buspoints/MainActivity.kt
 
-import io.flutter.embedding.android.FlutterActivity
+// ...existing code...
 
-class MainActivity : FlutterActivity()
+// class MainActivityOld : FlutterActivity()  // removed

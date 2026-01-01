@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:myapp/services/firestore_web_compat.dart';
 
 class UserMessagesSentScreen extends StatelessWidget {
   const UserMessagesSentScreen({super.key});
@@ -16,10 +17,10 @@ class UserMessagesSentScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Mensajes enviados')),
       body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('user_messages')
-            .where('fromUid', isEqualTo: user.uid)
-            .snapshots(),
+        stream: resilientStream(
+          FirebaseFirestore.instance.collection('user_messages').where('fromUid', isEqualTo: user.uid).snapshots(),
+          name: 'user_messages_sent_stream',
+        ),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return const Center(child: Text('Error al cargar mensajes.'));

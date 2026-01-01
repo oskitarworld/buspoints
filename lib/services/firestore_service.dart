@@ -3,6 +3,7 @@ import 'dart:developer' as developer;
 import 'package:flutter/foundation.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:myapp/services/firestore_web_compat.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:myapp/models/place.dart';
@@ -184,22 +185,15 @@ class FirestoreService {
     developer.log(
         '[map.firestore] FORENSICS: Subscribing to Firestore collection: $_collectionName',
         name: 'map.firestore');
-    return _firestore
-        .collection(_collectionName)
-        .snapshots()
-        .handleError((error) {
-      developer.log(
-        '[map.firestore] FORENSICS: Error in Firestore stream.',
-        error: error,
-        name: 'map.firestore',
-      );
-      // The stream is automatically closed on error, but we could transform it to an error state if needed.
-    });
+    return resilientStream(
+      _firestore.collection(_collectionName).snapshots(),
+      name: 'get_bus_location_stream',
+    );
   }
 
   Future<void> addPointOfInterest(
       String name, String description, GeoPoint location) {
-    final slug = _slugify('${name}');
+    final slug = _slugify(name);
     return _firestore.collection(_collectionName).add({
       'name': name,
       'description': description,
@@ -368,10 +362,10 @@ class FirestoreService {
   Stream<QuerySnapshot> pendingUserPoisStream() {
     developer.log('[FirestoreService] pendingUserPoisStream(): subscribing to user_pois (status==pending)',
         name: 'FirestoreService');
-    return _firestore
-        .collection(_userPoisCollectionName)
-        .where('status', isEqualTo: 'pending')
-        .snapshots();
+    return resilientStream(
+      _firestore.collection(_userPoisCollectionName).where('status', isEqualTo: 'pending').snapshots(),
+      name: 'pending_user_pois_stream',
+    );
   }
 
   /// Approve a user-submitted POI by updating its status to 'approved'.

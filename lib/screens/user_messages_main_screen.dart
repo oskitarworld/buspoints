@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:myapp/services/firestore_web_compat.dart';
 
 class UserMessagesMainScreen extends StatefulWidget {
   final int tabIndex;
@@ -46,10 +47,13 @@ class _UserMessagesMainScreenState extends State<UserMessagesMainScreen> {
 
   Widget _buildReceivedMessages(BuildContext context, User user) {
     return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance
-          .collection('user_messages')
-          .where('toUid', isEqualTo: user.uid)
-          .snapshots(),
+      stream: resilientStream(
+        FirebaseFirestore.instance
+            .collection('user_messages')
+            .where('toUid', isEqualTo: user.uid)
+            .snapshots(),
+        name: 'user_messages_received_stream',
+      ),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return const Center(child: Text('Error al cargar mensajes.'));
@@ -108,7 +112,7 @@ class _UserMessagesMainScreenState extends State<UserMessagesMainScreen> {
             if (unreadCount > 0)
               Container(
                 padding: const EdgeInsets.all(12),
-                color: Colors.blue.withOpacity(0.1),
+                color: Colors.blue.withAlpha((0.1 * 255).round()),
                 child: Row(
                   children: [
                     Container(
@@ -197,7 +201,7 @@ class _UserMessagesMainScreenState extends State<UserMessagesMainScreen> {
 
                           return Container(
                             decoration: BoxDecoration(
-                              color: isUnread ? Colors.red.withOpacity(0.08) : Colors.green.withOpacity(0.06),
+                              color: isUnread ? Colors.red.withAlpha((0.08 * 255).round()) : Colors.green.withAlpha((0.06 * 255).round()),
                               border: Border(
                                 left: BorderSide(
                                   color: isUnread ? Colors.red : Colors.green,
@@ -277,7 +281,7 @@ class _UserMessagesMainScreenState extends State<UserMessagesMainScreen> {
                                       .doc(doc.id)
                                       .update({'read': true})
                                       .onError((error, stackTrace) {
-                                        print('Error: $error');
+                                        debugPrint('Error: $error');
                                         return null;
                                       });
                                 }

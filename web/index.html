@@ -33,9 +33,25 @@
   <link rel="manifest" href="manifest.json">
 
   <!-- Google Maps API (beta para AutocompleteSuggestion) -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBtEYqVfNtm14WstANwadcr7SRLyhc_wCk&libraries=places&v=beta"></script>
+  <!-- Load maps async+defer to avoid blocking and follow recommended loader patterns. -->
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBtEYqVfNtm14WstANwadcr7SRLyhc_wCk&libraries=places&v=beta"></script>
   
   
+  <!-- Pin Firebase JS SDK to 12.2.0 to avoid known regression in 12.3.0
+    (the app previously loaded 12.3.0 which triggered onSnapshot errors
+    in some cloud_firestore_web interop code). Loading these scripts
+    explicitly ensures the web runtime uses this stable version.) -->
+  <!-- Use the compat builds so they can be loaded as non-module scripts and
+    expose the expected global compat APIs used by FlutterFire web interop.
+    This avoids errors like "Unexpected token 'export'" or
+    "Cannot use import statement outside a module" when the SDK is
+    distributed as ESM. If you migrate your web interop to ES modules,
+    prefer loading the module variants with type="module" instead. -->
+  <script src="https://www.gstatic.com/firebasejs/12.2.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.2.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.2.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.2.0/firebase-messaging-compat.js"></script>
+
   <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
   
   
@@ -102,6 +118,44 @@
       document.getElementById("splash")?.remove();
       document.getElementById("splash-branding")?.remove();
       document.body.style.background = "transparent";
+    }
+  </script>
+  <!-- Suppress noisy Dev error overlays for known benign Firestore permission errors
+       by preventing the default handling of window error/rejection events when
+       they match known patterns. This keeps the UI usable for end-users while
+       still logging suppressed errors to console as warnings. -->
+  <script>
+    try {
+      window.addEventListener('error', function (e) {
+        try {
+          var msg = (e && e.message) ? String(e.message).toLowerCase() : '';
+          if (msg.indexOf('cloud_firestore') !== -1 || msg.indexOf('permission-denied') !== -1 || msg.indexOf('permission denied') !== -1) {
+            console.warn('Suppressed error event (firestore/permission):', e.message);
+            e.preventDefault();
+            return true;
+          }
+        } catch (err) {
+          // swallow
+        }
+      }, {capture: false, passive: false});
+
+      window.addEventListener('unhandledrejection', function (e) {
+        try {
+          var reason = '';
+          if (e && e.reason) {
+            reason = (e.reason.message || e.reason.toString || String(e.reason)).toLowerCase();
+          }
+          if (reason.indexOf('cloud_firestore') !== -1 || reason.indexOf('permission-denied') !== -1 || reason.indexOf('permission denied') !== -1) {
+            console.warn('Suppressed unhandledrejection (firestore/permission):', e.reason);
+            e.preventDefault();
+            return true;
+          }
+        } catch (err) {
+          // swallow
+        }
+      }, {capture: false, passive: false});
+    } catch (e) {
+      // if any environment doesn't support these APIs just ignore
     }
   </script>
 </head>

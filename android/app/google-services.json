@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:599296548737:android:ca68c23ed70087d1b65280",
         "android_client_info": {
-          "package_name": "com.example.trucker_app"
+          "package_name": "com.app.buspoints"
         }
       },
       "oauth_client": [
@@ -17,7 +17,7 @@
           "client_id": "599296548737-jj01qjanje7f3g67icn5vhu538s743k1.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.trucker_app",
+            "package_name": "com.app.buspoints",
             "certificate_hash": "57a02963450782e16f9917a0527ff6204ca0c587"
           }
         },

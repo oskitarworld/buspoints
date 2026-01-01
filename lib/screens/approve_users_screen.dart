@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:myapp/models/user_model.dart';
+import 'package:myapp/widgets/firestore_error_widget.dart';
 
 class ApproveUsersScreen extends StatelessWidget {
   const ApproveUsersScreen({super.key});
@@ -66,7 +67,7 @@ class ApproveUsersScreen extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
+            return firestoreErrorWidget(context, snapshot.error);
           }
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
             return const Center(child: Text('No hay usuarios pendientes de aprobación.'));

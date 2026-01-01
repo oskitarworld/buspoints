@@ -82,10 +82,10 @@ class PendingApprovalScreen extends StatelessWidget {
                 icon: const Icon(Icons.logout),
                 label: const Text('Cerrar Sesión'),
                 onPressed: () async {
-                  try {
-                    print('Intentando cerrar sesión...');
+                    try {
+                    debugPrint('Intentando cerrar sesión...');
                     await authService.signOut();
-                    print('Sesión cerrada, navegando a login...');
+                    debugPrint('Sesión cerrada, navegando a login...');
                     if (context.mounted) {
                       Navigator.of(context).pushAndRemoveUntil(
                         MaterialPageRoute(builder: (_) => const AuthScreen()),
@@ -93,8 +93,8 @@ class PendingApprovalScreen extends StatelessWidget {
                       );
                     }
                   } catch (e, st) {
-                    print('Error al cerrar sesión: $e');
-                    print('Stacktrace: $st');
+                    debugPrint('Error al cerrar sesión: $e');
+                    debugPrint('Stacktrace: $st');
                   }
                 },
                 style: ElevatedButton.styleFrom(

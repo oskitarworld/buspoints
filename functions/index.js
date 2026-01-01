@@ -244,6 +244,45 @@ exports.notifyAdminsOnPending = functions.pubsub.schedule('every 10 minutes').on
   return null;
 });
 
+// Callable: getAdminInbox
+// Devuelve { contact_messages: [...], user_messages: [...] } para el admin autenticado
+exports.getAdminInbox = functions.https.onCall(async (data, context) => {
+  try {
+    if (!context.auth || !context.auth.uid) {
+      throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
+    }
+    const uid = context.auth.uid;
+    const userDoc = await admin.firestore().collection('users').doc(uid).get();
+    const userData = userDoc.exists ? userDoc.data() || {} : {};
+    const role = (userData.role || '').toString();
+    const isAdmin = !!userData.isAdmin || role === 'admin';
+    if (!isAdmin) {
+      throw new functions.https.HttpsError('permission-denied', 'User is not an admin');
+    }
+
+    // Read contact_messages (admin-facing messages)
+    const contactSnap = await admin.firestore().collection('contact_messages').orderBy('timestamp', 'desc').limit(500).get();
+    const contactMessages = contactSnap.docs.map(d => {
+      const dd = d.data() || {};
+      return Object.assign({ id: d.id }, dd, { timestamp: dd.timestamp ? (dd.timestamp.toMillis ? dd.timestamp.toMillis() : dd.timestamp) : null });
+    });
+
+    // Read user_messages where admin is recipient OR messages not marked as contact (admins can read non-contact user messages)
+    // We'll fetch messages where toUid equals one of admin UIDs. To support multiple admins, query where toUid == uid OR where isContact != true (admins can read all non-contact according to rules)
+    const userMsgSnap = await admin.firestore().collection('user_messages').orderBy('timestamp', 'desc').limit(1000).get();
+    const userMessages = userMsgSnap.docs.map(d => {
+      const dd = d.data() || {};
+      return Object.assign({ id: d.id }, dd, { timestamp: dd.timestamp ? (dd.timestamp.toMillis ? dd.timestamp.toMillis() : dd.timestamp) : null });
+    });
+
+    return { contact_messages: contactMessages, user_messages: userMessages };
+  } catch (err) {
+    console.error('getAdminInbox error:', err);
+    if (err instanceof functions.https.HttpsError) throw err;
+    throw new functions.https.HttpsError('internal', String(err));
+  }
+});
+
 // Monitor suspiciousAttempts and status changes on users and alert admins
 exports.monitorSuspiciousAttempts = functions.firestore
   .document('users/{userId}')
@@ -286,57 +325,21 @@ exports.monitorSuspiciousAttempts = functions.firestore
             });
             const mailOptions = {
               from: smtpConfig.email,
-              to: smtpConfig.alertsTo || smtpConfig.email,
-              subject: title,
-              text: `${body}\n\nUser ID: ${uid}\nEmail: ${after.email || 'n/a'}`
+              to: smtpConfig.email,
+              subject: `[Seguridad] ${title}`,
+              text: `${body}\n\nUsuarioId: ${uid}`
             };
-            await transporter.sendMail(mailOptions);
-            console.log('Sent security pre-alert email for', uid);
+            try {
+              await transporter.sendMail(mailOptions);
+              console.log('Security alert email sent to admins');
+            } catch (errEmail) {
+              console.error('Error sending security alert email:', errEmail);
+            }
           }
-        } catch (e) {
-          console.error('Error sending security pre-alert email:', e);
+        } catch (err) {
+          console.error('Error preparing/ sending security alert email:', err);
         }
       }
-
-      // If account newly cancelled (status changed to cancelled)
-      if (beforeStatus !== 'cancelled' && afterStatus === 'cancelled') {
-        const title = 'Cuenta cancelada automáticamente';
-        const body = `La cuenta de ${after.name || after.email || uid} ha sido cancelada automáticamente por intentos de acceso simultáneo.`;
-        const payload = {
-          notification: { title, body },
-          data: { type: 'account_cancelled', userId: uid }
-        };
-        try {
-          await admin.messaging().sendToTopic('admins', payload);
-          console.log('Sent account-cancelled alert to admins for', uid);
-        } catch (e) {
-          console.error('Error sending admin cancelled push:', e);
-        }
-
-        // email admins as well if configured
-        try {
-          const smtpConfig = functions.config().smtp || {};
-          if (smtpConfig.email && smtpConfig.password) {
-            const transporter = nodemailer.createTransport({
-              host: smtpConfig.host || 'mail.buspoints.net',
-              port: smtpConfig.port ? Number(smtpConfig.port) : 465,
-              secure: smtpConfig.secure !== 'false',
-              auth: { user: smtpConfig.email, pass: smtpConfig.password }
-            });
-            const mailOptions = {
-              from: smtpConfig.email,
-              to: smtpConfig.alertsTo || smtpConfig.email,
-              subject: title,
-              text: `${body}\n\nUser ID: ${uid}\nEmail: ${after.email || 'n/a'}\nReason: ${after.cancellationReason || 'suspicious activity'}`
-            };
-            await transporter.sendMail(mailOptions);
-            console.log('Sent account-cancelled email for', uid);
-          }
-        } catch (e) {
-          console.error('Error sending account-cancelled email:', e);
-        }
-      }
-
     } catch (err) {
       console.error('Error in monitorSuspiciousAttempts:', err);
     }
@@ -523,38 +526,7 @@ exports.notifyAdminsOnUserPending = functions.firestore
       return null;
     });
 
-// Notify the review author when their review is approved
-exports.notifyUserOnReviewApproved = functions.firestore
-  .document('pdis_v2/{pdiId}/reviews/{reviewId}')
-  .onUpdate(async (change, context) => {
-    const before = change.before.exists ? change.before.data() : null;
-    const after = change.after.exists ? change.after.data() : null;
-    if (!before || !after) return null;
-    if (before.status === 'approved' || after.status !== 'approved') return null;
-
-    const userId = after.userId || after.uid || null;
-    if (!userId) return null;
-    const payload = {
-      notification: {
-        title: 'Valoración aprobada',
-        body: `Tu valoración del PDI ha sido aprobada. ¡Gracias por contribuir!`,
-      },
-      data: {
-        click_action: 'FLUTTER_NOTIFICATION_CLICK',
-        type: 'review_approved',
-        reviewId: context.params.reviewId,
-        pdiId: context.params.pdiId,
-      },
-    };
-    try {
-      const topic = `user_${userId}`;
-      await admin.messaging().sendToTopic(topic, payload);
-      console.log(`Notificación enviada al usuario ${userId} por review aprobada`);
-    } catch (err) {
-      console.error('Error enviando notificación de review aprobada:', err);
-    }
-    return null;
-  });
+// Reviews are auto-approved and do not require admin approval or award days.
 
 // Notify the submitting user when their user_poi is approved
 exports.notifyUserOnUserPoiApproved = functions.firestore
@@ -581,9 +553,149 @@ exports.notifyUserOnUserPoiApproved = functions.firestore
       const topic = `user_${userId}`;
       await admin.messaging().sendToTopic(topic, payload);
       console.log(`Notificación enviada al usuario ${userId} por user_poi aprobado`);
+      // Award: 2 days of subscription for each approved PDI submission.
+      try {
+        // Use a transaction to atomically update subscriptionHistory and awardsHistory for PDI approvals
+        await admin.firestore().runTransaction(async (tx) => {
+          const userRef = admin.firestore().collection('users').doc(userId);
+          const userSnap = await tx.get(userRef);
+          if (!userSnap.exists) return;
+          const udata = userSnap.data() || {};
+          const history = Array.isArray(udata.subscriptionHistory) ? udata.subscriptionHistory.slice() : [];
+          const awards = Array.isArray(udata.awardsHistory) ? udata.awardsHistory.slice() : [];
+          const now = new Date();
+          const nowTs = admin.firestore.Timestamp.fromDate(now);
+          const addDaysMs = 2 * 24 * 60 * 60 * 1000; // 2 days
+
+          const newAward = { type: 'pdi_approved', days: 2, date: nowTs, poiId: context.params.poiId };
+
+          if (history.length === 0) {
+            const newSub = { startDate: nowTs, endDate: admin.firestore.Timestamp.fromDate(new Date(now.getTime() + addDaysMs)) };
+            history.push(newSub);
+            tx.update(userRef, { subscriptionHistory: history, subscriptionStart: newSub.startDate, subscriptionEnd: newSub.endDate, awardsHistory: (awards.concat([newAward])) });
+            console.log(`Awarded 2 days subscription to ${userId} for approved PDI (new history entry) [tx]`);
+          } else {
+            let latestIdx = 0;
+            let latestEnd = new Date(0);
+            for (let i = 0; i < history.length; i++) {
+              try {
+                const item = history[i];
+                const endTs = (item.endDate && item.endDate.toDate) ? item.endDate.toDate() : new Date(item.endDate);
+                if (endTs > latestEnd) { latestEnd = endTs; latestIdx = i; }
+              } catch (e) { /* ignore malformed entries */ }
+            }
+
+            const latest = history[latestIdx];
+            const latestEndDate = (latest.endDate && latest.endDate.toDate) ? latest.endDate.toDate() : new Date(latest.endDate);
+
+            if (latestEndDate > now) {
+              const newEnd = new Date(latestEndDate.getTime() + addDaysMs);
+              history[latestIdx] = { startDate: latest.startDate || nowTs, endDate: admin.firestore.Timestamp.fromDate(newEnd) };
+              tx.update(userRef, { subscriptionHistory: history, subscriptionEnd: admin.firestore.Timestamp.fromDate(newEnd), awardsHistory: (awards.concat([newAward])) });
+              console.log(`Extended subscription for ${userId} by 2 days (merged into existing period) [tx]`);
+            } else {
+              const newSub = { startDate: nowTs, endDate: admin.firestore.Timestamp.fromDate(new Date(now.getTime() + addDaysMs)) };
+              history.push(newSub);
+              tx.update(userRef, { subscriptionHistory: history, subscriptionEnd: newSub.endDate, awardsHistory: (awards.concat([newAward])) });
+              console.log(`Awarded 2 days subscription to ${userId} for approved PDI (appended new period) [tx]`);
+            }
+          }
+        });
+      } catch (err) {
+        console.error('Error awarding subscription days for approved PDI (transaction):', err);
+      }
     } catch (err) {
       console.error('Error enviando notificación de user_poi aprobada:', err);
     }
+    return null;
+  });
+
+// Also handle the case where a user-submitted PDI is created already in 'approved' state
+// (some admin workflows may create the document with status=approved). This ensures the
+// same awarding logic runs on create if needed. We guard against double-awarding by
+// checking awardsHistory for an existing entry with the same poiId inside the transaction.
+exports.awardOnUserPoiCreate = functions.firestore
+  .document('user_pois/{poiId}')
+  .onCreate(async (snap, context) => {
+    const after = snap.data();
+    if (!after) return null;
+    if (after.status !== 'approved') return null; // only award when created as already approved
+    const userId = after.submittedBy || after.userId || null;
+    if (!userId) return null;
+
+    try {
+      await admin.firestore().runTransaction(async (tx) => {
+        const userRef = admin.firestore().collection('users').doc(userId);
+        const userSnap = await tx.get(userRef);
+        if (!userSnap.exists) return;
+        const udata = userSnap.data() || {};
+        const history = Array.isArray(udata.subscriptionHistory) ? udata.subscriptionHistory.slice() : [];
+        const awards = Array.isArray(udata.awardsHistory) ? udata.awardsHistory.slice() : [];
+
+        // Prevent double-award: if awards already contain an entry for this poiId, skip
+        const already = awards.some((a) => a && a.poiId === context.params.poiId);
+        if (already) return;
+
+        const now = new Date();
+        const nowTs = admin.firestore.Timestamp.fromDate(now);
+        const addDaysMs = 2 * 24 * 60 * 60 * 1000; // 2 days
+        const newAward = { type: 'pdi_approved', days: 2, date: nowTs, poiId: context.params.poiId };
+
+        if (history.length === 0) {
+          const newSub = { startDate: nowTs, endDate: admin.firestore.Timestamp.fromDate(new Date(now.getTime() + addDaysMs)) };
+          history.push(newSub);
+          tx.update(userRef, { subscriptionHistory: history, subscriptionStart: newSub.startDate, subscriptionEnd: newSub.endDate, awardsHistory: (awards.concat([newAward])) });
+          console.log(`Awarded 2 days subscription to ${userId} for approved PDI on create (new history entry) [tx]`);
+        } else {
+          let latestIdx = 0;
+          let latestEnd = new Date(0);
+          for (let i = 0; i < history.length; i++) {
+            try {
+              const item = history[i];
+              const endTs = (item.endDate && item.endDate.toDate) ? item.endDate.toDate() : new Date(item.endDate);
+              if (endTs > latestEnd) { latestEnd = endTs; latestIdx = i; }
+            } catch (e) { /* ignore malformed entries */ }
+          }
+
+          const latest = history[latestIdx];
+          const latestEndDate = (latest.endDate && latest.endDate.toDate) ? latest.endDate.toDate() : new Date(latest.endDate);
+
+          if (latestEndDate > now) {
+            const newEnd = new Date(latestEndDate.getTime() + addDaysMs);
+            history[latestIdx] = { startDate: latest.startDate || nowTs, endDate: admin.firestore.Timestamp.fromDate(newEnd) };
+            tx.update(userRef, { subscriptionHistory: history, subscriptionEnd: admin.firestore.Timestamp.fromDate(newEnd), awardsHistory: (awards.concat([newAward])) });
+            console.log(`Extended subscription for ${userId} by 2 days on create (merged into existing period) [tx]`);
+          } else {
+            const newSub = { startDate: nowTs, endDate: admin.firestore.Timestamp.fromDate(new Date(now.getTime() + addDaysMs)) };
+            history.push(newSub);
+            tx.update(userRef, { subscriptionHistory: history, subscriptionEnd: newSub.endDate, awardsHistory: (awards.concat([newAward])) });
+            console.log(`Awarded 2 days subscription to ${userId} for approved PDI on create (appended new period) [tx]`);
+          }
+        }
+      });
+    } catch (err) {
+      console.error('Error awarding subscription days for approved PDI on create (transaction):', err);
+    }
+
+    // Send notification to user topic (best-effort)
+    try {
+      const payload = {
+        notification: {
+          title: 'Tu PDI ha sido aprobado',
+          body: `${after.title || 'Tu PDI'} ha sido aprobado por el equipo.`,
+        },
+        data: {
+          click_action: 'FLUTTER_NOTIFICATION_CLICK',
+          type: 'poi_approved',
+          poiId: context.params.poiId,
+        },
+      };
+      await admin.messaging().sendToTopic(`user_${userId}`, payload);
+      console.log(`Notificación enviada al usuario ${userId} por user_poi aprobado (create)`);
+    } catch (err) {
+      console.error('Error enviando notificación de user_poi aprobada (create):', err);
+    }
+
     return null;
   });
 

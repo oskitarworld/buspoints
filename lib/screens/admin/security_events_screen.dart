@@ -66,9 +66,10 @@ class _SecurityEventsScreenState extends State<SecurityEventsScreen> {
                     const SizedBox(height: 6),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-                      child: const Text('Reactivar', style: TextStyle(fontSize: 12)),
                       onPressed: status.toLowerCase() == 'cancelled' || attempts > 0
                           ? () async {
+                              final nav = Navigator.of(context);
+                              final messenger = ScaffoldMessenger.of(context);
                               final ok = await showDialog<bool>(
                                 context: context,
                                 builder: (ctx) => AlertDialog(
@@ -83,13 +84,16 @@ class _SecurityEventsScreenState extends State<SecurityEventsScreen> {
                               if (ok == true) {
                                 try {
                                   await _reactivateUser(d.id);
-                                  if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Cuenta reactivada')));
+                                  if (!mounted) return;
+                                  messenger.showSnackBar(const SnackBar(content: Text('Cuenta reactivada')));
                                 } catch (e) {
-                                  if (mounted) showDialog(context: context, builder: (c) => AlertDialog(title: const Text('Error'), content: Text('No se pudo reactivar: $e')));
+                                  if (!mounted) return;
+                                  showDialog(context: nav.context, builder: (c) => AlertDialog(title: const Text('Error'), content: Text('No se pudo reactivar: $e')));
                                 }
                               }
                             }
                           : null,
+                      child: const Text('Reactivar', style: TextStyle(fontSize: 12)),
                     ),
                   ],
                 ),

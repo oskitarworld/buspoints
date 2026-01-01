@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:myapp/services/firestore_web_compat.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class SystemNotificationsScreen extends StatefulWidget {
@@ -51,10 +52,13 @@ class _SystemNotificationsScreenState extends State<SystemNotificationsScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Notificaciones del sistema')),
       body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('system_notifications')
-            .orderBy('timestamp', descending: true)
-            .snapshots(),
+        stream: resilientStream(
+          FirebaseFirestore.instance
+              .collection('system_notifications')
+              .orderBy('timestamp', descending: true)
+              .snapshots(),
+          name: 'system_notifications_stream',
+        ),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) return const Center(child: Text('No hay notificaciones del sistema.'));
@@ -71,10 +75,12 @@ class _SystemNotificationsScreenState extends State<SystemNotificationsScreen> {
 
               return ListTile(
                 title: Text(message, maxLines: 2, overflow: TextOverflow.ellipsis),
-                subtitle: Text('${fromName} · ${_formatTimestamp(data['timestamp'])}'),
+                subtitle: Text('$fromName · ${_formatTimestamp(data['timestamp'])}'),
                 trailing: isRead ? const Icon(Icons.check, color: Colors.green) : const Icon(Icons.fiber_new, color: Colors.red),
-                onTap: () async {
-                  await _markAsRead(doc.id);
+                onTap: () {
+                  // Mark as read in background, don't await to avoid using
+                  // BuildContext across async gaps.
+                  _markAsRead(doc.id);
                   showDialog(
                     context: context,
                     builder: (_) => AlertDialog(

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:myapp/services/firestore_web_compat.dart';
+import 'package:myapp/widgets/firestore_error_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class ReviewApprovalScreen extends StatelessWidget {
@@ -46,11 +48,13 @@ class _ReviewListState extends State<ReviewList> {
       final doc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
       final data = doc.data();
       final isAdminFlag = data != null && ((data['role'] == 'admin') || (data['isAdmin'] == true));
+      if (!mounted) return;
       setState(() {
         _isAdmin = isAdminFlag;
         _loading = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _isAdmin = false;
         _loading = false;
@@ -60,11 +64,12 @@ class _ReviewListState extends State<ReviewList> {
 
   Stream<QuerySnapshot<Map<String, dynamic>>> _pendingReviewsStream() {
     // Buscar todos los reviews pendientes en todos los PDIs
-    return FirebaseFirestore.instance
-        .collectionGroup('reviews')
-        .where('status', isEqualTo: 'pending')
-        .orderBy('createdAt', descending: true)
-        .snapshots();
+    return querySnapshotsCompat(
+      FirebaseFirestore.instance
+          .collectionGroup('reviews')
+          .where('status', isEqualTo: 'pending')
+          .orderBy('createdAt', descending: true),
+    );
   }
 
   @override
@@ -83,7 +88,7 @@ class _ReviewListState extends State<ReviewList> {
     return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
       stream: _pendingReviewsStream(),
       builder: (context, snapshot) {
-        if (snapshot.hasError) return Center(child: Text('Error: ${snapshot.error}'));
+        if (snapshot.hasError) return firestoreErrorWidget(context, snapshot.error);
         if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
         if (snapshot.data!.docs.isEmpty) {
           return const Center(
@@ -110,18 +115,13 @@ class ReviewListItem extends StatelessWidget {
   final QueryDocumentSnapshot<Map<String, dynamic>> reviewDoc;
   const ReviewListItem({super.key, required this.reviewDoc});
 
-  void _showSnackBar(BuildContext context, String message, {bool isError = false}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: isError ? Colors.red : Colors.green),
-    );
-  }
 
-  Future<void> _updateReviewStatus(BuildContext context, String status) async {
+  Future<bool> _updateReviewStatus(String status) async {
     try {
       await reviewDoc.reference.update({'status': status});
-      _showSnackBar(context, status == 'approved' ? 'Comentario aprobado.' : 'Comentario rechazado.');
+      return true;
     } catch (e) {
-      _showSnackBar(context, 'Error: $e', isError: true);
+      return false;
     }
   }
 
@@ -160,14 +160,38 @@ class ReviewListItem extends StatelessWidget {
                   icon: const Icon(Icons.check, color: Colors.white),
                   label: const Text('Aprobar'),
                   style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-                  onPressed: () => _updateReviewStatus(context, 'approved'),
+                  onPressed: () async {
+                    final messenger = ScaffoldMessenger.of(context);
+                    final success = await _updateReviewStatus('approved');
+                    if (success) {
+                      messenger.showSnackBar(
+                        const SnackBar(content: Text('Comentario aprobado.'), backgroundColor: Colors.green),
+                      );
+                    } else {
+                      messenger.showSnackBar(
+                        const SnackBar(content: Text('Error al aprobar'), backgroundColor: Colors.red),
+                      );
+                    }
+                  },
                 ),
                 const SizedBox(width: 16),
                 ElevatedButton.icon(
                   icon: const Icon(Icons.close, color: Colors.white),
                   label: const Text('Rechazar'),
                   style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                  onPressed: () => _updateReviewStatus(context, 'rejected'),
+                  onPressed: () async {
+                    final messenger = ScaffoldMessenger.of(context);
+                    final success = await _updateReviewStatus('rejected');
+                    if (success) {
+                      messenger.showSnackBar(
+                        const SnackBar(content: Text('Comentario rechazado.'), backgroundColor: Colors.green),
+                      );
+                    } else {
+                      messenger.showSnackBar(
+                        const SnackBar(content: Text('Error al rechazar'), backgroundColor: Colors.red),
+                      );
+                    }
+                  },
                 ),
               ],
             ),

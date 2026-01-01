@@ -4,6 +4,11 @@
 # keyPassword=your_key_password
 # keyAlias=uploadkey
 # storeFile=/Users/you/keystore.jks
+#
+# Alternatively you can set environment variables used by the build script:
+# KEYSTORE_PATH, KEYSTORE_PASSWORD, KEY_PASSWORD, KEY_ALIAS
+# Or on macOS store passwords in Keychain with item names:
+#   buspoints_storePassword and buspoints_keyPassword
 
 storePassword=
 keyPassword=

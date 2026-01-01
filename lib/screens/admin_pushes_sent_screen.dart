@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:developer' as developer;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
@@ -25,10 +26,11 @@ class AdminPushesSentScreen extends StatelessWidget {
           if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
 
           final result = snapshot.data!;
-          final raw = result.data as Map<String, dynamic>? ?? {};
+          final raw = result.data;
 
-          final broadcasts = List<Map<String, dynamic>>.from(raw['systemNotifications'] ?? []);
-          final directs = List<Map<String, dynamic>>.from(raw['userMessages'] ?? []);
+          // Normalize dynamic results (Map<dynamic,dynamic>) into Map<String,dynamic>
+          final broadcasts = _normalizeList(raw?['systemNotifications']);
+          final directs = _normalizeList(raw?['userMessages']);
 
           final items = <Map<String, dynamic>>[];
           for (var d in broadcasts) {
@@ -138,6 +140,24 @@ class AdminPushesSentScreen extends StatelessWidget {
     return DateTime.tryParse(ts.toString()) ?? DateTime.fromMillisecondsSinceEpoch(0);
   }
 
+  // Normalize a dynamic list (from callable result) into List<Map<String,dynamic>>
+  static List<Map<String, dynamic>> _normalizeList(dynamic input) {
+    if (input == null) return <Map<String,dynamic>>[];
+    if (input is List) {
+      return input.map<Map<String,dynamic>>((e) {
+        if (e is Map) {
+          final out = <String,dynamic>{};
+          e.forEach((k, v) {
+            out[k?.toString() ?? ''] = v;
+          });
+          return out;
+        }
+        return <String,dynamic>{};
+      }).toList();
+    }
+    return <Map<String,dynamic>>[];
+  }
+
   static String _formatDate(dynamic ts) {
     final d = _toDate(ts);
     return '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')} ${d.hour.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')}';
@@ -203,63 +223,70 @@ class AdminPushesSentScreen extends StatelessWidget {
 
   Future<List<Map<String, dynamic>>> _loadRecipients(String type, String id) async {
     final firestore = FirebaseFirestore.instance;
-    final List<Map<String, dynamic>> out = [];
-    if (type == 'direct') {
-      final doc = await firestore.collection('user_messages').doc(id).get();
-      if (!doc.exists) return [];
-      final data = doc.data() as Map<String, dynamic>;
-      final uid = data['to'] ?? data['toUid'];
-      final userDoc = await firestore.collection('users').doc(uid).get();
-      final userData = userDoc.data();
-      out.add({'name': userData?['name'] ?? userData?['email'] ?? '', 'email': userData?['email'] ?? '', 'read': data['read'] == true});
-      return out;
-    }
-
-    // broadcast: if 'to' == 'all', list all users and check readBy subcollection
-    final notifDoc = await firestore.collection('system_notifications').doc(id).get();
-    if (!notifDoc.exists) return [];
-    final notifData = notifDoc.data() as Map<String, dynamic>;
-    final to = notifData['to'] ?? 'all';
-
-    if (to == 'all') {
-      final usersSnap = await firestore.collection('users').get();
-      for (var u in usersSnap.docs) {
-        final udata = u.data();
-        // Prefer per-user notification copy if exists
-        final userNotifDoc = await firestore.collection('users').doc(u.id).collection('notifications').doc(id).get();
-        bool read = false;
-        if (userNotifDoc.exists) {
-          final ndata = userNotifDoc.data() as Map<String, dynamic>;
-          read = ndata['read'] == true;
-        } else {
-          // fallback to legacy readBy subcollection
-          final readDoc = await firestore.collection('system_notifications').doc(id).collection('readBy').doc(u.id).get();
-          read = readDoc.exists;
-        }
-        out.add({'name': udata['name'] ?? '', 'email': udata['email'] ?? '', 'read': read});
+    try {
+      final List<Map<String, dynamic>> out = [];
+      if (type == 'direct') {
+        final doc = await firestore.collection('user_messages').doc(id).get();
+        if (!doc.exists) return [];
+        final data = doc.data() as Map<String, dynamic>;
+        final uid = data['to'] ?? data['toUid'];
+        final userDoc = await firestore.collection('users').doc(uid).get();
+        final userData = userDoc.data();
+        out.add({'name': userData?['name'] ?? userData?['email'] ?? '', 'email': userData?['email'] ?? '', 'read': data['read'] == true});
+        return out;
       }
-      return out;
-    }
 
-    // if to is an array of uids
-    if (to is List) {
-      for (var uid in to) {
-        final userDoc = await firestore.collection('users').doc(uid.toString()).get();
-        final udata = userDoc.data();
-        final userNotifDoc = await firestore.collection('users').doc(uid.toString()).collection('notifications').doc(id).get();
-        bool read = false;
-        if (userNotifDoc.exists) {
-          final ndata = userNotifDoc.data() as Map<String, dynamic>;
-          read = ndata['read'] == true;
-        } else {
-          final readDoc = await firestore.collection('system_notifications').doc(id).collection('readBy').doc(uid.toString()).get();
-          read = readDoc.exists;
+      // broadcast: if 'to' == 'all', list all users and check readBy subcollection
+      final notifDoc = await firestore.collection('system_notifications').doc(id).get();
+      if (!notifDoc.exists) return [];
+      final notifData = notifDoc.data() as Map<String, dynamic>;
+      final to = notifData['to'] ?? 'all';
+
+      if (to == 'all') {
+        final usersSnap = await firestore.collection('users').get();
+        for (var u in usersSnap.docs) {
+          final udata = u.data();
+          // Prefer per-user notification copy if exists
+          final userNotifDoc = await firestore.collection('users').doc(u.id).collection('notifications').doc(id).get();
+          bool read = false;
+          if (userNotifDoc.exists) {
+            final ndata = userNotifDoc.data() as Map<String, dynamic>;
+            read = ndata['read'] == true;
+          } else {
+            // fallback to legacy readBy subcollection
+            final readDoc = await firestore.collection('system_notifications').doc(id).collection('readBy').doc(u.id).get();
+            read = readDoc.exists;
+          }
+          out.add({'name': udata['name'] ?? '', 'email': udata['email'] ?? '', 'read': read});
         }
-        out.add({'name': udata?['name'] ?? '', 'email': udata?['email'] ?? '', 'read': read});
+        return out;
       }
-      return out;
-    }
 
-    return out;
+      // if to is an array of uids
+      if (to is List) {
+        for (var uid in to) {
+          final userDoc = await firestore.collection('users').doc(uid.toString()).get();
+          final udata = userDoc.data();
+          final userNotifDoc = await firestore.collection('users').doc(uid.toString()).collection('notifications').doc(id).get();
+          bool read = false;
+          if (userNotifDoc.exists) {
+            final ndata = userNotifDoc.data() as Map<String, dynamic>;
+            read = ndata['read'] == true;
+          } else {
+            final readDoc = await firestore.collection('system_notifications').doc(id).collection('readBy').doc(uid.toString()).get();
+            read = readDoc.exists;
+          }
+          out.add({'name': udata?['name'] ?? '', 'email': udata?['email'] ?? '', 'read': read});
+        }
+        return out;
+      }
+
+      return out;
+    } catch (e, s) {
+      // Defensive: if permissions block any of these reads, log and return empty
+      // recipients so the UI doesn't throw.
+      developer.log('Failed to load recipients for push $id: $e', name: 'AdminPushes', error: e, stackTrace: s);
+      return <Map<String, dynamic>>[];
+    }
   }
 }

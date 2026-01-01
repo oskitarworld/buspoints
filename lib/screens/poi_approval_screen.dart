@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:myapp/services/firestore_service.dart';
+import 'package:myapp/widgets/firestore_error_widget.dart';
 
 class PoiApprovalScreen extends StatelessWidget {
   const PoiApprovalScreen({super.key});
@@ -26,7 +27,7 @@ class PoiList extends StatelessWidget {
     return StreamBuilder<QuerySnapshot>(
       stream: _fs.pendingUserPoisStream(),
       builder: (context, snapshot) {
-        if (snapshot.hasError) return Center(child: Text('Error: ${snapshot.error}'));
+        if (snapshot.hasError) return firestoreErrorWidget(context, snapshot.error);
         if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
         if (snapshot.data!.docs.isEmpty) {
           return const Center(
