@@ -5,16 +5,20 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:myapp/models/user_route.dart';
 import 'package:myapp/services/route_service.dart';
 import 'package:myapp/utils/marker_utils.dart';
+import 'package:myapp/screens/community_routes_screen.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:myapp/firebase_options.dart';
 
 class CreateRouteScreen extends StatefulWidget {
-  const CreateRouteScreen({super.key});
+  final UserRoute? routeToEdit;
+  const CreateRouteScreen({super.key, this.routeToEdit});
 
   @override
   State<CreateRouteScreen> createState() => _CreateRouteScreenState();
@@ -247,10 +251,99 @@ class _CreateRouteScreenState extends State<CreateRouteScreen> {
       return;
     }
 
-    final nameController = TextEditingController();
-    final descController = TextEditingController();
+    // Prepare controllers and prefill when editing an existing route.
+    final nameController = TextEditingController(text: widget.routeToEdit?.name ?? '');
+    final descController = TextEditingController(text: widget.routeToEdit?.description ?? '');
 
-    bool isPublicChoice = true;
+    String visibilityChoice = widget.routeToEdit != null
+        ? (widget.routeToEdit!.isPublic ? 'public' : 'private')
+        : 'public'; // 'public' | 'private' | 'team'
+    // Load user's companies (may belong to multiple). We'll present a selector
+    // when the user chooses the 'team' visibility so they can pick which
+    // company the route belongs to.
+    List<String> myCompanyIds = [];
+    final List<Map<String, String>> myCompanies = []; // {id,name}
+    String? selectedCompanyId;
+    try {
+      final uid = FirebaseAuth.instance.currentUser?.uid;
+      Map<String, dynamic>? userData;
+      if (uid != null) {
+        final udoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+        if (udoc.exists) {
+          userData = udoc.data();
+          if (userData != null) {
+            if (userData['companyIds'] != null && userData['companyIds'] is List) {
+              myCompanyIds = List<String>.from((userData['companyIds'] as List).map((e) => e.toString()));
+            } else if (userData['companyId'] != null) {
+              myCompanyIds = [(userData['companyId'] as String).toString()];
+            }
+            // If this account itself is a company account (role == 'company'),
+            // allow creating routes for the company represented by this user.
+            // Some company accounts don't populate companyIds; treat uid as companyId.
+            try {
+              final role = (userData['role'] ?? '').toString();
+              if ((myCompanyIds.isEmpty) && role == 'company') {
+                myCompanyIds = [uid];
+              }
+            } catch (_) {}
+          }
+        }
+      }
+
+  // Try to resolve human-readable names using data already available in
+  // the current user's document to avoid additional reads that may be
+  // blocked by security rules (and that produce PERMISSION_DENIED logs).
+      for (final cid in myCompanyIds) {
+        String cname = cid;
+        try {
+          if (userData != null) {
+            // Prefer a mapping like companyNames:{cid: name}
+            if (userData['companyNames'] is Map && (userData['companyNames'] as Map)[cid] != null) {
+              cname = ((userData['companyNames'] as Map)[cid]).toString();
+            } else if (userData['companies'] is List) {
+              // Maybe companies is a list of objects with id/name
+              try {
+                for (final item in (userData['companies'] as List)) {
+                  if (item is Map && (item['id']?.toString() == cid || item['companyId']?.toString() == cid)) {
+                    final cand = item['name'] ?? item['companyName'] ?? item['displayName'];
+                    if (cand != null) { cname = cand.toString(); break; }
+                  }
+                }
+              } catch (_) {}
+            } else if ((userData['companyName'] ?? userData['company']) != null && myCompanyIds.length == 1) {
+              cname = (userData['companyName'] ?? userData['company']).toString();
+            }
+          }
+        } catch (_) {}
+        // Ensure name is a plain String (no widgets or maps). Trim whitespace.
+        final safeName = cname.toString().trim();
+        myCompanies.add({'id': cid, 'name': safeName.isNotEmpty ? safeName : cid});
+      }
+
+      // If we still don't have friendly names (or to ensure authoritative
+      // names), ask the server-side callable which can read company/user
+      // docs using admin privileges. This helps when client-side rules
+      // prevent direct reads of companies/{id}.
+      if (myCompanyIds.isNotEmpty) {
+        try {
+          final callable = FirebaseFunctions.instance.httpsCallable('getCompanyNames');
+          final res = await callable.call({'companyIds': myCompanyIds});
+          final data = res.data;
+          if (data != null && data is Map && data['names'] is Map) {
+            final Map names = data['names'];
+            for (var i = 0; i < myCompanies.length; i++) {
+              final cid = myCompanies[i]['id'];
+              if (cid != null && names[cid] != null) {
+                myCompanies[i]['name'] = names[cid].toString();
+              }
+            }
+          }
+        } catch (e) {
+          // ignore network/callable errors and keep local fallbacks
+        }
+      }
+      if (myCompanies.isNotEmpty) selectedCompanyId = myCompanies.first['id'];
+    } catch (_) {}
     // Capture messenger/navigator before any awaits to avoid using BuildContext
     // across async gaps (use_build_context_synchronously).
     final messenger = ScaffoldMessenger.of(context);
@@ -269,28 +362,87 @@ class _CreateRouteScreenState extends State<CreateRouteScreen> {
                 TextField(controller: nameController, decoration: const InputDecoration(labelText: 'Nombre')),
                 TextField(controller: descController, decoration: const InputDecoration(labelText: 'Descripción')),
                 const SizedBox(height: 8),
-                // Use SegmentedButton (single-selection) instead of deprecated RadioListTile API.
-                Column(
+                // Visibility selector. If the current user belongs to a company,
+                // allow 'Team' visibility. Otherwise the options are public/private.
+                    Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SegmentedButton<bool>(
-                      segments: const <ButtonSegment<bool>>[
-                        ButtonSegment<bool>(value: true, label: Text('Pública')),
-                        ButtonSegment<bool>(value: false, label: Text('Privada')),
-                      ],
-                      selected: <bool>{isPublicChoice},
-                      onSelectionChanged: (Set<bool> newSelection) {
-                        final val = newSelection.isNotEmpty ? newSelection.first : true;
-                        setState(() => isPublicChoice = val);
+                    DropdownButtonFormField<String>(
+                      initialValue: visibilityChoice,
+                      // Use selectedItemBuilder to ensure the displayed selected
+                      // value reflects the currently chosen company name and
+                      // updates when the company selector changes.
+                      selectedItemBuilder: (ctx) {
+                        final List<Widget> widgets = [];
+                        widgets.add(const Text('Pública'));
+                        widgets.add(const Text('Privada (solo yo)'));
+                        if (myCompanies.isNotEmpty) {
+                          final cname = selectedCompanyId != null
+                              ? myCompanies.firstWhere((m) => m['id'] == selectedCompanyId, orElse: () => myCompanies.first)['name']
+                              : null;
+                          widgets.add(Text(cname != null ? 'Rutas de $cname' : 'Rutas de la empresa'));
+                        }
+                        return widgets;
                       },
+                      items: <DropdownMenuItem<String>>[
+                        const DropdownMenuItem(value: 'public', child: Text('Pública')),
+                        DropdownMenuItem(value: 'private', child: Text('Privada (solo yo)')),
+                        if (myCompanies.isNotEmpty)
+                          DropdownMenuItem(value: 'team', child: const Text('Rutas de la empresa')),
+                      ],
+                      onChanged: (v) {
+                        setState(() => visibilityChoice = v ?? 'public');
+                      },
+                      decoration: const InputDecoration(labelText: 'Visibilidad'),
                     ),
+                    const SizedBox(height: 6),
+                    // Explicit plain-text label mirroring the selected visibility.
+                    // This ensures we always show a simple String (no embedded UI)
+                    // even if the Dropdown rendering behaves unexpectedly.
+                    Builder(builder: (labelCtx) {
+                      String selLabel;
+                      if (visibilityChoice == 'public') {
+                        selLabel = 'Pública';
+                      } else if (visibilityChoice == 'private') {
+                        selLabel = 'Privada (solo yo)';
+                      } else {
+                        String cname = selectedCompanyId != null && myCompanies.isNotEmpty
+                            ? myCompanies.firstWhere((m) => m['id'] == selectedCompanyId, orElse: () => myCompanies.first)['name'] ?? 'la empresa'
+                            : 'la empresa seleccionada';
+                        // Force a safe, short string to avoid UI embedding
+                        if (cname.length > 40) cname = '${cname.substring(0, 37)}...';
+                        selLabel = 'Rutas de $cname';
+                      }
+                      return Text(selLabel, style: Theme.of(labelCtx).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600));
+                    }),
                     const SizedBox(height: 8),
-                    Text(
-                      isPublicChoice
-                          ? 'Ruta pública: será revisada por administración y, si se aprueba, se mostrará públicamente.'
-                          : 'Ruta privada: no necesita aprobación y solo será visible para ti.',
-                      style: Theme.of(ctx2).textTheme.bodySmall,
-                    ),
+                    // If team/company visibility selected and user has multiple
+                    // companies, allow selecting which company this route belongs to.
+                    if (visibilityChoice == 'team' && myCompanies.isNotEmpty) ...[
+                      const SizedBox(height: 8),
+                      DropdownButtonFormField<String>(
+                        initialValue: selectedCompanyId,
+                        items: myCompanies.map((m) => DropdownMenuItem(value: m['id'], child: Text(m['name'] ?? m['id'] ?? ''))).toList(),
+                        onChanged: (v) => setState(() => selectedCompanyId = v),
+                        decoration: const InputDecoration(labelText: 'Empresa'),
+                      ),
+                    ],
+                    const SizedBox(height: 8),
+                    Builder(builder: (tCtx) {
+                      String desc;
+                      if (visibilityChoice == 'public') {
+                        desc = 'Ruta pública: será revisada por administración y, si se aprueba, se mostrará públicamente.';
+                      } else if (visibilityChoice == 'private') {
+                        desc = 'Ruta privada: solo la verás tú.';
+                      } else {
+                        // When company info is available, include the company name in the description
+                        String cname = selectedCompanyId != null && myCompanies.isNotEmpty
+                            ? myCompanies.firstWhere((m) => m['id'] == selectedCompanyId, orElse: () => myCompanies.first)['name'] ?? 'la empresa'
+                            : 'la empresa seleccionada';
+                        desc = 'Rutas de $cname: solo los miembros de $cname podrán ver esta ruta.';
+                      }
+                      return Text(desc, style: Theme.of(tCtx).textTheme.bodySmall);
+                    })
                   ],
                 ),
               ],
@@ -304,7 +456,7 @@ class _CreateRouteScreenState extends State<CreateRouteScreen> {
       )),
     );
 
-  if (ok != true) return;
+    if (ok != true) return;
 
     // Require non-empty name
     final name = nameController.text.trim();
@@ -319,12 +471,50 @@ class _CreateRouteScreenState extends State<CreateRouteScreen> {
       return;
     }
 
-  setState(() => _saving = true);
+    setState(() => _saving = true);
     try {
-      final id = await _routeService.createRoute(name: name, description: descController.text.trim(), uid: uid, pdis: _points, isPublicChoice: isPublicChoice);
+      if (widget.routeToEdit != null) {
+        // Edit existing route: call updateRoute with changed fields.
+        await _routeService.updateRoute(
+          widget.routeToEdit!.id,
+          name: name,
+          description: descController.text.trim(),
+          pdis: _points.map((p) => p.toMap()).toList(),
+        );
+        setState(() => _saving = false);
+        messenger.showSnackBar(const SnackBar(content: Text('Ruta actualizada')));
+        // Return true to indicate the route was updated.
+        navigator.pop(true);
+        return;
+      }
+
+      // Create new route path
+      final id = await _routeService.createRoute(
+        name: name,
+        description: descController.text.trim(),
+        uid: uid,
+        pdis: _points,
+        visibility: visibilityChoice,
+        ownerCompanyId: (visibilityChoice == 'team') ? selectedCompanyId : null,
+      );
       setState(() => _saving = false);
       messenger.showSnackBar(SnackBar(content: Text('Ruta guardada: $id')));
-      navigator.pop();
+      // Close the CreateRouteScreen and, if this was a team route, navigate
+      // to the company-specific routes screen so the user lands on the
+      // corresponding "Rutas de <Empresa>" view.
+      navigator.pop(true);
+      if (visibilityChoice == 'team' && selectedCompanyId != null) {
+        String cname = selectedCompanyId!;
+        for (final m in myCompanies) {
+          try {
+            if (m['id'] == selectedCompanyId) {
+              cname = (m['name'] ?? cname);
+              break;
+            }
+          } catch (_) {}
+        }
+        Navigator.push(navigator.context, MaterialPageRoute(builder: (context) => CommunityRoutesScreen(companyId: selectedCompanyId, companyName: cname)));
+      }
     } catch (e) {
       setState(() => _saving = false);
       messenger.showSnackBar(SnackBar(content: Text('Error guardando ruta: $e')));
@@ -334,6 +524,13 @@ class _CreateRouteScreenState extends State<CreateRouteScreen> {
   @override
   void initState() {
     super.initState();
+    // If opened in edit mode, prefill points and center map
+    if (widget.routeToEdit != null) {
+      try {
+        _points.clear();
+        _points.addAll(widget.routeToEdit!.pdis.map((p) => UserRoutePoint(lat: p.lat, lng: p.lng, name: p.name)));
+      } catch (_) {}
+    }
     _rebuildMarkers();
     // Try to center map on user's current location once the map is ready.
     _centerToUserOnStart();
@@ -343,7 +540,7 @@ class _CreateRouteScreenState extends State<CreateRouteScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Crear ruta'),
+        title: Text(widget.routeToEdit != null ? 'Editar ruta' : 'Crear ruta'),
         actions: [
           IconButton(icon: const Icon(Icons.save), onPressed: _saving ? null : _saveRoute),
         ],

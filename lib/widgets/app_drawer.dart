@@ -13,7 +13,10 @@ import 'package:rxdart/rxdart.dart';
 import 'package:myapp/screens/terms_of_use_screen.dart';
 import 'package:myapp/widgets/branding_block.dart';
 import 'package:myapp/screens/create_route_screen.dart';
+import 'package:myapp/services/route_service.dart';
+import 'package:myapp/models/user_route.dart';
 import 'package:myapp/screens/community_routes_screen.dart';
+import 'package:myapp/screens/private_routes_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -27,9 +30,9 @@ import '../screens/user_messages_sent_screen.dart';
 import '../screens/admin_inbox_screen.dart';
 import '../screens/admin_incidencias_screen.dart';
 import '../screens/admin_mass_email_screen.dart';
-import '../screens/admin_pdis_review_screen.dart';
 import '../screens/admin_pushes_sent_screen.dart';
 import '../screens/admin/security_events_screen.dart';
+import '../screens/company_employees_screen.dart';
 
 class AppDrawer extends StatefulWidget {
   const AppDrawer({super.key});
@@ -48,7 +51,34 @@ class _AppDrawerState extends State<AppDrawer> {
   void initState() {
     super.initState();
     _loadPackageInfo();
+    _resolvedCompanyNames = {};
+    _companyOwners = {};
   }
+
+  // Cache for company owner UIDs (companyId -> ownerUid|null)
+  Map<String, String?> _companyOwners = {};
+
+  Future<void> _ensureCompanyOwner(String companyId) async {
+  if (_companyOwners.containsKey(companyId)) return;
+    try {
+      final functions = FirebaseFunctions.instance;
+      final callable = functions.httpsCallable('getCompanyOwners');
+      final res = await callable.call({'companyIds': [companyId]});
+      final data = res.data as Map<String, dynamic>? ?? {};
+  final owners = data['owners'] as Map<String, dynamic>? ?? {};
+  final owner = owners[companyId];
+  _companyOwners[companyId] = owner?.toString();
+      if (mounted) setState(() {});
+      return;
+    } catch (_) {
+      // Fallback: leave as unknown (null) so we don't show management UI.
+      _companyOwners[companyId] = null;
+      if (mounted) setState(() {});
+    }
+  }
+
+  // Cache for server-resolved company display names (id -> name)
+  Map<String, String> _resolvedCompanyNames = {};
 
   // Live badge stream for inbox counts for a given user UID. Uses the same
   // client-side logic as the messages screen: treat `read != true` as unread
@@ -229,6 +259,8 @@ class _AppDrawerState extends State<AppDrawer> {
     return controller.stream;
   }
 
+// admin PDI review screen removed from drawer; related stream helper removed as unused.
+
   Future<void> _loadPackageInfo() async {
     try {
       final info = await PackageInfo.fromPlatform();
@@ -321,11 +353,104 @@ class _AppDrawerState extends State<AppDrawer> {
         builder: (context, snapshot) {
           String? userName = user.email;
           String? role;
-          if (snapshot.connectionState == ConnectionState.active && snapshot.hasData) {
-            final data = snapshot.data?.data();
-            userName = data?['name'] ?? user.email;
-            role = data?['role'];
+          final Map<String, dynamic> userData = (snapshot.connectionState == ConnectionState.active && snapshot.hasData) ? (snapshot.data?.data() ?? {}) : {};
+          if (userData.isNotEmpty) {
+            userName = userData['name'] ?? user.email;
+            role = userData['role'];
           }
+          // Compute a lightweight list of companies the user is associated
+          // with for use in drawer shortcuts. We prefer names available in
+          // the user document to avoid extra Firestore reads here.
+          final List<Map<String, String>> userCompanies = [];
+          try {
+            List<String> cids = [];
+            if (userData['companyIds'] is List) {
+              cids = (userData['companyIds'] as List).map((e) => e.toString()).toList();
+            } else if (userData['companyId'] != null) {
+              cids = [userData['companyId'].toString()];
+            }
+            for (final cid in cids) {
+              String cname = cid;
+              try {
+                if (userData['companyNames'] is Map && (userData['companyNames'] as Map)[cid] != null) {
+                  cname = (userData['companyNames'] as Map)[cid].toString();
+                } else if (userData['companies'] is List) {
+                  for (final item in (userData['companies'] as List)) {
+                    if (item is Map && (item['id']?.toString() == cid || item['companyId']?.toString() == cid)) {
+                      final cand = item['name'] ?? item['companyName'] ?? item['displayName'];
+                      if (cand != null) { cname = cand.toString(); break; }
+                    }
+                  }
+                } else if ((userData['companyName'] ?? userData['company']) != null && cids.length == 1) {
+                  cname = (userData['companyName'] ?? userData['company']).toString();
+                }
+              } catch (_) {}
+              // Prefer a server-resolved name when available in cache
+              final cached = _resolvedCompanyNames[cid];
+              userCompanies.add({'id': cid, 'name': cached ?? cname});
+            }
+          } catch (_) {}
+
+          // If any company id still looks like an id (no readable name),
+          // request server-side names via the callable (only once per id).
+          // Use a post-frame callback so we don't trigger async work during
+          // the build synchronous phase.
+          final idsNeeding = <String>[];
+          for (final c in userCompanies) {
+            final nid = c['id'] ?? '';
+            final nname = c['name'] ?? '';
+            // Heuristic: ids are long alphanumeric strings; if name equals id
+            // we probably need a server resolution.
+            if (nid.isNotEmpty && (nname == nid) && !_resolvedCompanyNames.containsKey(nid)) idsNeeding.add(nid);
+          }
+          if (idsNeeding.isNotEmpty) {
+            WidgetsBinding.instance.addPostFrameCallback((_) async {
+              try {
+                final functions = FirebaseFunctions.instance;
+                final callable = functions.httpsCallable('getCompanyNames');
+                final res = await callable.call({'companyIds': idsNeeding});
+                final data = res.data as Map<String, dynamic>? ?? {};
+                if (data['names'] is Map) {
+                  final Map names = data['names'];
+                  bool changed = false;
+                  names.forEach((k, v) {
+                    final ks = k.toString();
+                    final vs = v?.toString() ?? ks;
+                    if (_resolvedCompanyNames[ks] != vs) {
+                      _resolvedCompanyNames[ks] = vs;
+                      changed = true;
+                    }
+                  });
+                  if (changed && mounted) setState(() {});
+                }
+              } catch (_) {
+                // ignore callable failure; keep fallbacks
+              }
+            });
+          }
+          // Resolve company owner UIDs for companies listed in the drawer so
+          // we can accurately determine if the current user is the true owner.
+          final idsNeedOwner = <String>[];
+          for (final c in userCompanies) {
+            final cid = c['id'] ?? '';
+            if (cid.isNotEmpty && !_companyOwners.containsKey(cid)) idsNeedOwner.add(cid);
+          }
+          if (idsNeedOwner.isNotEmpty) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              for (final cid in idsNeedOwner) {
+                _ensureCompanyOwner(cid);
+              }
+            });
+          }
+          // If the user represents a company account (role == 'company') but
+          // no company ids were detected, add a quick entry using the user's
+          // own uid as the company id so owner accounts can see 'Rutas de mi empresa'.
+          try {
+            if ((role == 'company' || userData['role'] == 'company') && userCompanies.isEmpty) {
+              final cname = (userData['companyName'] ?? userData['company'] ?? userData['name'] ?? 'Mi empresa').toString();
+              userCompanies.insert(0, {'id': user.uid, 'name': cname});
+            }
+          } catch (_) {}
           return ListView(
             padding: EdgeInsets.zero,
             children: [
@@ -363,7 +488,7 @@ class _AppDrawerState extends State<AppDrawer> {
                 },
               ),
 
-              if ((role == 'admin') || user.uid.startsWith('4nQqFTcqnGhOHys44ZCcdMsNrvc2')) ...[
+              if (role == 'admin') ...[
                 StreamBuilder<Map<String, int>>(
                   stream: resilientStream(_pollAdminSummary(), name: 'app_drawer_admin_summary'),
                   builder: (context, snapshot) {
@@ -456,14 +581,7 @@ class _AppDrawerState extends State<AppDrawer> {
                                 Navigator.push(context, MaterialPageRoute(builder: (context) => const SecurityEventsScreen()));
                               },
                             ),
-                            ListTile(
-                              leading: const Icon(Icons.list_alt),
-                              title: const Text('Revisión PDIs (Admin)'),
-                              onTap: () {
-                                Navigator.pop(context);
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => const AdminPdisReviewScreen()));
-                              },
-                            ),
+                            // 'Revisión PDIs (Admin)' removed per UX request
                             // 'Revisión Rutas', 'Crear ruta' and 'Rutas de la comunidad'
                             // removed from the admin messages accordion per UX request.
                             // These actions exist elsewhere in the drawer layout.
@@ -498,6 +616,118 @@ class _AppDrawerState extends State<AppDrawer> {
                             Navigator.push(context, MaterialPageRoute(builder: (context) => const CommunityRoutesScreen()));
                           },
                         ),
+                        // If the admin user represents one or more companies (or
+                        // has been invited), show quick links to view routes for
+                        // each company directly. We prefer names from the user
+                        // doc when available to avoid extra reads.
+                if (userCompanies.isNotEmpty)
+                  Column(
+                    children: userCompanies.map((c) {
+                      final cid = c['id'] ?? '';
+                      final cname = c['name'] ?? cid;
+                      // Determine if current user is the owner: heuristic
+                      // If the user represents the company account (role == 'company' and id == uid)
+                      // we'll consider them the owner. For more accurate checks we could
+                      // fetch the company doc ownerUid, but keep this lightweight here.
+                      final ownerUid = _companyOwners[cid];
+                      final bool likelyOwner = (ownerUid != null && ownerUid == user.uid) || (role == 'company' && cid == user.uid);
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ListTile(
+                            leading: const Text('🚌', style: TextStyle(fontSize: 20)),
+                            title: Text('Rutas de $cname'),
+                            onTap: () {
+                              Navigator.pop(context);
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => CommunityRoutesScreen(companyId: cid, companyName: cname)));
+                            },
+                          ),
+                          // Recent routes stream (limited to 5) for this company. We show
+                          // a compact list; editing/deleting only visible when likelyOwner.
+                          StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                            stream: resilientStream(
+                              FirebaseFirestore.instance.collection('user_routes')
+                                  .where('ownerCompanyId', isEqualTo: cid)
+                                  .orderBy('createdAt', descending: true)
+                                  .limit(5)
+                                  .snapshots(),
+                              name: 'drawer_company_routes_$cid'),
+                            builder: (context, snap) {
+                              if (!snap.hasData) return const SizedBox.shrink();
+                              final docs = snap.data!.docs;
+                              if (docs.isEmpty) return const SizedBox.shrink();
+                              return Column(
+                                children: docs.map((d) {
+                                  final ur = UserRoute.fromDoc(d);
+                                  return ListTile(
+                                    dense: true,
+                                    visualDensity: VisualDensity.compact,
+                                    contentPadding: const EdgeInsets.only(left: 72.0, right: 8.0),
+                                    title: Text(ur.name, maxLines: 1, overflow: TextOverflow.ellipsis),
+                                    trailing: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        if (likelyOwner) IconButton(
+                                          icon: const Icon(Icons.edit, size: 20),
+                                          tooltip: 'Editar',
+                                          onPressed: () async {
+                                            final navigator = Navigator.of(context);
+                                            navigator.pop();
+                                            final res = await navigator.push<bool?>(MaterialPageRoute(builder: (ctx) => CreateRouteScreen(routeToEdit: ur)));
+                                            if (res == true && mounted) setState(() {});
+                                          },
+                                        ),
+                                        if (likelyOwner) IconButton(
+                                          icon: const Icon(Icons.delete, size: 20, color: Colors.redAccent),
+                                          tooltip: 'Eliminar',
+                                          onPressed: () async {
+                                            final messenger = ScaffoldMessenger.of(context);
+                                            final ok = await showDialog<bool>(context: context, builder: (dctx) => AlertDialog(
+                                              title: const Text('Eliminar ruta'),
+                                              content: const Text('¿Eliminar esta ruta de la empresa? Esta acción no se puede deshacer.'),
+                                              actions: [TextButton(onPressed: () => Navigator.of(dctx).pop(false), child: const Text('Cancelar')), ElevatedButton(onPressed: () => Navigator.of(dctx).pop(true), child: const Text('Eliminar'))],
+                                            ));
+                                            if (ok == true) {
+                                              try {
+                                                final rs = RouteService();
+                                                await rs.deleteRoute(ur.id, ownerCompanyId: cid);
+                                                if (!mounted) return;
+                                                messenger.showSnackBar(const SnackBar(content: Text('Ruta eliminada')));
+                                                setState(() {});
+                                              } catch (e) {
+                                                if (!mounted) return;
+                                                messenger.showSnackBar(SnackBar(content: Text('No se pudo eliminar la ruta: $e')));
+                                              }
+                                            }
+                                          },
+                                        ),
+                                        IconButton(
+                                          icon: const Icon(Icons.chevron_right, size: 20),
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                            Navigator.push(context, MaterialPageRoute(builder: (_) => CommunityRoutesScreen(companyId: cid, companyName: cname)));
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }).toList(),
+                              );
+                            },
+                          ),
+                        ],
+                      );
+                    }).toList(),
+                  ),
+                        if (role == 'company')
+                          ListTile(
+                            leading: const Icon(Icons.group),
+                            title: const Text('Gestión de empleados'),
+                            onTap: () {
+                              Navigator.pop(context);
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => const CompanyEmployeesScreen()));
+                            },
+                          ),
                         // 'Mis rutas' removed from admin routes block per UX request
                         // 'Aprobar rutas' moved into Admin Panel per UX request
                       ],
@@ -609,6 +839,35 @@ class _AppDrawerState extends State<AppDrawer> {
                     Navigator.push(context, MaterialPageRoute(builder: (context) => const CommunityRoutesScreen()));
                   },
                 ),
+                ListTile(
+                  leading: const Icon(Icons.lock_outline),
+                  title: const Text('Rutas privadas'),
+                  subtitle: const Text('Tus rutas privadas (solo visibles por ti)'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => const PrivateRoutesScreen()));
+                  },
+                ),
+                if (userCompanies.isNotEmpty)
+                  Column(
+                    children: userCompanies.map((c) => ListTile(
+                      leading: const Text('🚌', style: TextStyle(fontSize: 20)),
+                      title: Text('Rutas de ${c['name']}'),
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => CommunityRoutesScreen(companyId: c['id'], companyName: c['name'])));
+                      },
+                    )).toList(),
+                  ),
+                if (role == 'company')
+                  ListTile(
+                    leading: const Icon(Icons.group),
+                    title: const Text('Gestión de empleados'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const CompanyEmployeesScreen()));
+                    },
+                  ),
                 // 'Mis rutas' removed from main user block per UX request
                 // End rutas block
                 // Bloque de información legal

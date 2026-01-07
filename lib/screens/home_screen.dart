@@ -11,6 +11,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 // dart:convert already imported later in the file; remove duplicate import
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'package:myapp/models/place.dart';
 import 'package:myapp/widgets/app_drawer.dart';
@@ -1117,6 +1118,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     }
   }
   final Completer<GoogleMapController> _mapController = Completer();
+  // Key to control the Scaffold (used to open the drawer reliably)
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   MapType _mapType = MapType.normal;
   final List<String> _orderedCategories = [
     'parada_bus', 'parking', 'parking_de_pago', 'carga_y_descarga', 'zona_espera', 'gasolinera', 'hotel', 'restaurante', 'otros',
@@ -2548,82 +2551,68 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   // ...existing code...
 
   Widget _buildDrawerMenuWithBadge() {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) {
-      return IconButton(
-        icon: const Icon(Icons.menu),
-        onPressed: () => Scaffold.of(context).openDrawer(),
-      );
-    }
-
-    // StreamBuilder para contact_messages
-    return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance
-          .collection('contact_messages')
-          .snapshots(),
-      builder: (context, contactSnapshot) {
-        // StreamBuilder para user_messages
-        return StreamBuilder<QuerySnapshot>(
-          stream: FirebaseFirestore.instance
-              .collection('user_messages')
-              .snapshots(),
-          builder: (context, userSnapshot) {
-            int unreadCount = 0;
-            
-            // Contar no leídos de contact_messages
-            if (contactSnapshot.hasData) {
-              unreadCount += contactSnapshot.data!.docs
-                  .where((doc) {
-                    final data = doc.data() as Map<String, dynamic>;
-                    return data['toUid'] == user.uid && data['read'] != true;
-                  })
-                  .length;
-            }
-            
-            // Contar no leídos de user_messages
-            if (userSnapshot.hasData) {
-              unreadCount += userSnapshot.data!.docs
-                  .where((doc) {
-                    final data = doc.data() as Map<String, dynamic>;
-                    return data['toUid'] == user.uid && data['read'] != true;
-                  })
-                  .length;
-            }
-            
-            return Badge(
-              isLabelVisible: unreadCount > 0,
-              label: Text(
-                unreadCount > 9 ? '9+' : '$unreadCount',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              backgroundColor: Colors.red,
-              child: IconButton(
-                icon: const Icon(Icons.menu),
-                onPressed: () => Scaffold.of(context).openDrawer(),
-              ),
-            );
-          },
-        );
-      },
+    // Use the scaffold key to open the drawer reliably from any context.
+    return IconButton(
+      icon: const Icon(Icons.menu),
+      onPressed: () => _scaffoldKey.currentState?.openDrawer(),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       drawer: const AppDrawer(),
       appBar: AppBar(
         leading: _buildDrawerMenuWithBadge(),
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.directions_bus, color: Colors.white),
-            SizedBox(width: 10),
+            // White icon with a darker outline behind so it remains visible over light backgrounds.
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                Icon(
+                  Icons.directions_bus,
+                  size: 28,
+                  color: Color.fromRGBO(0,0,0,0.85),
+                ),
+                Icon(
+                  Icons.directions_bus,
+                  size: 24,
+                  color: Colors.white,
+                ),
+              ],
+            ),
+            const SizedBox(width: 10),
             Expanded(
-              child: Text('Bus Points', overflow: TextOverflow.ellipsis),
+              child: Stack(
+                alignment: Alignment.centerLeft,
+                children: [
+                  // Stroke (outline)
+                  Text(
+                    'BusPoints',
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.poppins(
+                      textStyle: Theme.of(context).appBarTheme.titleTextStyle?.copyWith(fontSize: 20, fontWeight: FontWeight.w600)
+                          ?? const TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.w600),
+                    ).copyWith(
+                      foreground: Paint()
+                        ..style = PaintingStyle.stroke
+                        ..strokeWidth = 3
+                        ..color = Color.fromRGBO(0,0,0,0.85),
+                    ),
+                  ),
+                  // Fill
+                  Text(
+                    'BusPoints',
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.poppins(
+                      textStyle: Theme.of(context).appBarTheme.titleTextStyle?.copyWith(fontSize: 20, fontWeight: FontWeight.w600)
+                          ?? const TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.w600),
+                    ).copyWith(color: Colors.white),
+                  ),
+                ],
+              ),
             ),
           ],
         ),

@@ -64,7 +64,7 @@ void main() async {
     try {
       // Activate App Check: use debug provider in debug builds so we can
       // generate a debug token and register it in the console for testing.
-      try {
+  try {
         if (kDebugMode) {
           await FirebaseAppCheck.instance.activate(
             providerAndroid: const AndroidDebugProvider(),
@@ -95,6 +95,8 @@ void main() async {
       } catch (e) {
         developer.log('[APP CHECK] Activation failed: $e', name: 'main', error: e);
       }
+  // Debug token auto-fetch removed: we no longer attempt to fetch the
+  // App Check debug token automatically at startup.
       await FirebaseMessaging.instance.requestPermission();
       await FirebaseMessaging.instance.setAutoInitEnabled(true);
       if (kIsWeb) {
@@ -161,6 +163,11 @@ void main() async {
     // Return a tiny, non-blocking widget so the app UI keeps rendering.
     return const SizedBox.shrink();
   };
+
+  // Emit a short build identifier so we can confirm the running binary
+  // actually came from this workspace. Update this value when switching
+  // branches if needed. Short commit: 4528191
+  developer.log('[BUILD] commit=4528191', name: 'main');
 
   runZonedGuarded(() {
     runApp(MyApp(initializationError: initializationError));
@@ -230,6 +237,16 @@ class MyApp extends StatelessWidget {
         ),
         themeMode: ThemeMode.light,
         home: const SplashScreen(),
+        // Display an unobtrusive debug card with the App Check debug token
+        // in debug mode so the developer can copy it to the Firebase Console.
+        // If the token wasn't obtained at startup, the card includes a
+        // button to fetch it on demand.
+        builder: (context, child) {
+          // Simplified builder: previously showed a debug App Check token
+          // banner in debug mode. The banner was removed on request but
+          // App Check initialization and token fetching remain intact.
+          return child ?? const SizedBox.shrink();
+        },
         routes: {
           '/home': (context) => const HomeScreen(),
           '/auth': (context) => const AuthScreen(),

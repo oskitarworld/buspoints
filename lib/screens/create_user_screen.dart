@@ -355,19 +355,29 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                                 filled: true,
                                 fillColor: Colors.grey[50],
                               ),
-                              items: ['user', 'admin'].map((String value) {
+                              items: ['user', 'company', 'employee', 'admin'].map((String value) {
                                 return DropdownMenuItem<String>(
                                   value: value,
                                   child: Row(
                                     children: [
-                                      Icon(
-                                        value == 'user' ? Icons.person : Icons.admin_panel_settings,
-                                        size: 20,
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Text(
-                                        value == 'user' ? 'Usuario' : 'Administrador',
-                                      ),
+                                        Icon(
+                                          value == 'user'
+                                              ? Icons.person
+                                              : value == 'admin'
+                                                  ? Icons.admin_panel_settings
+                                                  : Icons.business,
+                                          size: 20,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          value == 'user'
+                                              ? 'Usuario'
+                                              : value == 'admin'
+                                                  ? 'Administrador'
+                                                  : value == 'company'
+                                                      ? 'Cuenta Empresa'
+                                                      : 'Empleado',
+                                        ),
                                     ],
                                   ),
                                 );

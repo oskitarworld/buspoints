@@ -3,6 +3,7 @@ import 'package:myapp/services/firestore_web_compat.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'create_user_screen.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 
 class ManageUsersScreen extends StatelessWidget {
   const ManageUsersScreen({super.key});
@@ -181,6 +182,7 @@ class UserList extends StatefulWidget {
 class _UserListState extends State<UserList> {
   String _searchQuery = '';
   String _filterRole = 'todos';
+  String _filterCompany = '';
 
   @override
   Widget build(BuildContext context) {
@@ -229,6 +231,23 @@ class _UserListState extends State<UserList> {
                       },
                     ),
                   ),
+                  const SizedBox(width: 12),
+                  SizedBox(
+                    width: 220,
+                    child: TextField(
+                      decoration: InputDecoration(
+                        hintText: 'Filtrar por empresa (nombre o id)',
+                        prefixIcon: const Icon(Icons.business),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                        isDense: true,
+                      ),
+                      onChanged: (v) {
+                        setState(() {
+                          _filterCompany = v.trim().toLowerCase();
+                        });
+                      },
+                    ),
+                  ),
                 ],
               ),
             ],
@@ -263,6 +282,20 @@ class _UserListState extends State<UserList> {
                 users = users.where((doc) {
                   final data = doc.data() as Map<String, dynamic>;
                   return (data['role'] ?? 'user') == _filterRole;
+                }).toList();
+              }
+
+              if (_filterCompany.isNotEmpty) {
+                users = users.where((doc) {
+                  final data = doc.data() as Map<String, dynamic>;
+                  final companyName = (data['companyName'] ?? data['company_name'] ?? '').toString().toLowerCase();
+                  final companyIdField = (data['companyId'] ?? data['company_id'] ?? data['company'] ?? '').toString().toLowerCase();
+                  final companyIdsList = data['companyIds'] is List ? (data['companyIds'] as List).map((e) => e.toString().toLowerCase()).toList() : <String>[];
+                  bool match = false;
+                  if (companyName.contains(_filterCompany)) match = true;
+                  if (companyIdField.contains(_filterCompany)) match = true;
+                  if (companyIdsList.any((c) => c.contains(_filterCompany))) match = true;
+                  return match;
                 }).toList();
               }
 
@@ -338,35 +371,46 @@ class UserListItem extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            name,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        if (role == 'admin')
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.purple[100],
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: const Text(
-                              'ADMIN',
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.purple,
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            name,
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                        // Role badge: show specific badge for admin/company/employee
+                                        if (role == 'admin')
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                            decoration: BoxDecoration(
+                                              color: Colors.purple[100],
+                                              borderRadius: BorderRadius.circular(12),
+                                            ),
+                                            child: const Text('ADMIN', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.purple)),
+                                          )
+                                        else if (role == 'company')
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                            decoration: BoxDecoration(
+                                              color: Colors.blue[50],
+                                              borderRadius: BorderRadius.circular(12),
+                                            ),
+                                            child: const Text('CUENTA EMPRESA', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.blue)),
+                                          )
+                                        else if (role == 'employee')
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                            decoration: BoxDecoration(
+                                              color: Colors.green[50],
+                                              borderRadius: BorderRadius.circular(12),
+                                            ),
+                                            child: const Text('EMPLEADO', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.green)),
+                                          ),
+                                      ],
+                                    ),
                     const SizedBox(height: 4),
                     Text(
                       email,
@@ -545,7 +589,13 @@ class UserListItem extends StatelessWidget {
                         _buildInfoRow(
                           Icons.admin_panel_settings,
                           'Rol',
-                          role == 'admin' ? 'Administrador' : 'Usuario',
+                          role == 'admin'
+                              ? 'Administrador'
+                              : role == 'company'
+                                  ? 'Cuenta Empresa'
+                                  : role == 'employee'
+                                      ? 'Empleado'
+                                      : 'Usuario',
                         ),
                         const Divider(height: 24),
                         _buildInfoRow(
@@ -605,6 +655,23 @@ class UserListItem extends StatelessWidget {
                         },
                       ),
                       const SizedBox(height: 12),
+
+                        // Cambiar rol (admin action)
+                        ElevatedButton.icon(
+                          icon: const Icon(Icons.switch_account),
+                          label: const Text('Cambiar Rol'),
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            backgroundColor: Theme.of(ctx).primaryColor,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                          onPressed: () {
+                            Navigator.of(ctx).pop();
+                            _showChangeRoleDialog(context, userId, data['role'] ?? 'user');
+                          },
+                        ),
+                        const SizedBox(height: 12),
 
                       // Enviar mensaje directo al usuario (desde admin)
                       ElevatedButton.icon(
@@ -1249,6 +1316,51 @@ class UserListItem extends StatelessWidget {
           ],
         );
       },
+    );
+  }
+
+  void _showChangeRoleDialog(BuildContext context, String userId, String currentRole) {
+    final roles = ['user', 'employee', 'company', 'admin'];
+    String selected = currentRole;
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          title: const Text('Cambiar rol del usuario'),
+          content: StatefulBuilder(builder: (c, setState) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                DropdownButtonFormField<String>(
+                  initialValue: selected,
+                  items: roles.map((r) => DropdownMenuItem(value: r, child: Text(r == 'user' ? 'Usuario' : r == 'admin' ? 'Administrador' : r == 'company' ? 'Cuenta Empresa' : 'Empleado'))).toList(),
+                  onChanged: (v) => setState(() => selected = v ?? selected),
+                ),
+              ],
+            );
+          }),
+          actions: [
+            TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Cancelar')),
+            ElevatedButton(onPressed: () async {
+              final messenger = ScaffoldMessenger.of(context);
+              final navigator = Navigator.of(ctx);
+              try {
+                final callable = FirebaseFunctions.instance.httpsCallable('adminSetUserRole');
+                final res = await callable.call({'uid': userId, 'role': selected});
+                if (res.data != null && res.data['status'] == 'ok') {
+                  messenger.showSnackBar(const SnackBar(content: Text('Rol actualizado')));
+                } else {
+                  messenger.showSnackBar(SnackBar(content: Text('Resultado: ${res.data}')));
+                }
+                navigator.pop();
+              } catch (e) {
+                messenger.showSnackBar(SnackBar(content: Text('Error cambiando rol: $e')));
+              }
+            }, child: const Text('Guardar')),
+          ],
+        );
+      }
     );
   }
 

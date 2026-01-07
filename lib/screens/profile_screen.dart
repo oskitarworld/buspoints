@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:myapp/services/firestore_web_compat.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -29,16 +30,8 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   // --- MÉTODOS DE VALORACIONES (antes de build) ---
   Widget _buildUserReviewsTab(BuildContext context, String uid, bool isAdmin) {
-    // Read reviews from the user's personal reviews subcollection. We mirror
-    // reviews under users/{uid}/reviews when the user submits them so the
-    // profile listing is reliable and doesn't depend on collectionGroup queries.
     return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-      stream: resilientStream(
-        querySnapshotsCompat(
-          FirebaseFirestore.instance.collection('users').doc(uid).collection('reviews').orderBy('createdAt', descending: true),
-        ),
-        name: 'profile_user_reviews',
-      ),
+      stream: FirebaseFirestore.instance.collection('users').doc(uid).collection('reviews').orderBy('createdAt', descending: true).snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -57,57 +50,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: ListTile(
                 leading: Icon(Icons.star, color: Colors.amber[700]),
                 title: Text(data['comment'] ?? ''),
-                // Tocar la valoración debe llevar al PDI correspondiente en el mapa
-                onTap: () {
-                  final pdiId = (data['pdiId'] ?? data['pdiId'])?.toString();
-                  final name = (data['pdiName'] ?? data['name'] ?? '')?.toString();
-                  final category = (data['pdiCategory'] ?? data['category'] ?? '')?.toString();
-                  // Navegar a Home y pedir foco en el PDI (si tenemos docId lo pasamos)
-                  Navigator.of(context).pushNamed('/home', arguments: {
-                    'focus': {
-                      if (pdiId != null && pdiId.isNotEmpty) 'docId': pdiId,
-                      if (name != null && name.isNotEmpty) 'name': name,
-                      if (category != null && category.isNotEmpty) 'category': category,
-                    }
-                  });
-                },
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.star, size: 16, color: Colors.amber),
-                        const SizedBox(width: 4),
-                        Text(data['rating']?.toString() ?? '-', style: const TextStyle(fontWeight: FontWeight.bold)),
-                      ],
-                    ),
-                    if (data['createdAt'] != null)
-                      Text('Fecha: ${data['createdAt'] is Timestamp
-                          ? (data['createdAt'] as Timestamp).toDate().toString().substring(0, 16)
-                          : data['createdAt'].toString()}'),
-                    // Show status so users know if their review is pending or rejected
-                    if (data['status'] != null)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 6.0),
-                        child: Text('Estado: ${data['status']}', style: const TextStyle(fontSize: 12, color: Colors.grey)),
-                      ),
+                    Row(children: [const Icon(Icons.star, size: 16, color: Colors.amber), const SizedBox(width: 4), Text(data['rating']?.toString() ?? '-', style: const TextStyle(fontWeight: FontWeight.bold))]),
+                    if (data['createdAt'] != null) Text('Fecha: ${data['createdAt'] is Timestamp ? (data['createdAt'] as Timestamp).toDate().toString().substring(0, 16) : data['createdAt'].toString()}'),
+                    if (data['status'] != null) Padding(padding: const EdgeInsets.only(top: 6.0), child: Text('Estado: ${data['status']}', style: const TextStyle(fontSize: 12, color: Colors.grey))),
                   ],
                 ),
-                    trailing: Row(
+                trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    IconButton(
-                      icon: const Icon(Icons.edit, color: Colors.blue),
-                      tooltip: 'Editar',
-                      onPressed: () => _showEditReviewDialog(context, review),
-                    ),
-                    // Only show delete button to admins
-                    if (isAdmin)
-                      IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
-                        tooltip: 'Borrar',
-                        onPressed: () => _deleteReview(context, review),
-                      ),
+                    IconButton(icon: const Icon(Icons.edit, color: Colors.blue), tooltip: 'Editar', onPressed: () => _showEditReviewDialog(context, review)),
+                    if (isAdmin) IconButton(icon: const Icon(Icons.delete, color: Colors.red), tooltip: 'Borrar', onPressed: () => _deleteReview(context, review)),
                   ],
                 ),
               ),
@@ -369,7 +324,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     children: <Widget>[
-                      _buildProfileHeader(context, user),
+                              _buildProfileHeader(context, user),
+                              const SizedBox(height: 12),
+                              // If this user is a 'company' account, show an editable
+                              // EMPRESA field so the company can set its public name.
+                              if (user.role == 'company')
+                                _buildCompanyNameEditor(context, snapshot.data!, user.uid),
+                              const SizedBox(height: 12),
+                              // Show company membership if present on user doc
+                              _buildCompanyMembershipWidget(context, snapshot.data!),
                       const SizedBox(height: 32),
                       _buildMembershipCard(context, user),
                       const SizedBox(height: 24),
@@ -479,6 +442,134 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  Widget _buildCompanyNameEditor(BuildContext context, DocumentSnapshot userDoc, String uid) {
+    final data = userDoc.data() as Map<String, dynamic>? ?? {};
+    final initial = (data['companyName'] ?? data['name'] ?? '').toString();
+
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('EMPRESA', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                const Icon(Icons.business, color: Colors.blue),
+                const SizedBox(width: 12),
+                Expanded(child: Text(initial.isNotEmpty ? initial : 'Nombre de la empresa', style: const TextStyle(fontSize: 16))),
+                IconButton(
+                  icon: const Icon(Icons.edit, color: Colors.blue),
+                  tooltip: 'Editar nombre de la empresa',
+                  onPressed: () async {
+                    final controller = TextEditingController(text: initial);
+                    final result = await showDialog<bool?>(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                        title: const Text('Editar nombre de la empresa'),
+                        content: TextField(
+                          controller: controller,
+                          decoration: const InputDecoration(labelText: 'Nombre de la empresa'),
+                        ),
+                        actions: [
+                          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Cancelar')),
+                          ElevatedButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('Guardar')),
+                        ],
+                      ),
+                    );
+                    if (result != true) return;
+                    final newVal = controller.text.trim();
+                    if (newVal.isEmpty) {
+                      if (!mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('El nombre de la empresa no puede estar vacío'), backgroundColor: Colors.red));
+                      return;
+                    }
+                    try {
+                      // Update both users/{uid} (company user profile) and companies/{uid} if exists
+                      final batch = FirebaseFirestore.instance.batch();
+                      final userRef = FirebaseFirestore.instance.collection('users').doc(uid);
+                      batch.set(userRef, {'companyName': newVal, 'name': newVal}, SetOptions(merge: true));
+                      final compRef = FirebaseFirestore.instance.collection('companies').doc(uid);
+                      // attempt to update companies doc if present
+                      final compSnap = await compRef.get();
+                      if (compSnap.exists) {
+                        batch.set(compRef, {'name': newVal, 'displayName': newVal}, SetOptions(merge: true));
+                      }
+                      await batch.commit();
+
+                      // Propagate to employees subcollection (update companyName/companyDisplayName)
+                      try {
+                        final empCol = compRef.collection('employees');
+                        final empSnap = await empCol.get();
+                        int updated = 0;
+                        if (empSnap.docs.isNotEmpty) {
+                          // Firestore batch limit is 500; update in chunks
+                          const int chunkSize = 400;
+                          final docs = empSnap.docs;
+                          for (var i = 0; i < docs.length; i += chunkSize) {
+                            final batch2 = FirebaseFirestore.instance.batch();
+                            final end = (i + chunkSize < docs.length) ? i + chunkSize : docs.length;
+                            for (var j = i; j < end; j++) {
+                              final dref = docs[j].reference;
+                              batch2.set(dref, {'companyName': newVal, 'companyDisplayName': newVal}, SetOptions(merge: true));
+                              updated++;
+                            }
+                            await batch2.commit();
+                          }
+                        }
+
+                        // Also propagate to nested invited docs: companies/{cid}/employees_by_inviter/*/invited/*
+                        try {
+                          final invByRef = compRef.collection('employees_by_inviter');
+                          final invitersSnap = await invByRef.get();
+                          if (invitersSnap.docs.isNotEmpty) {
+                            for (final inviterDoc in invitersSnap.docs) {
+                              final invitedCol = inviterDoc.reference.collection('invited');
+                              final invitedSnap = await invitedCol.get();
+                              if (invitedSnap.docs.isEmpty) continue;
+                              // update invited docs in chunks
+                              final invitedDocs = invitedSnap.docs;
+                              for (var i = 0; i < invitedDocs.length; i += 400) {
+                                final batch3 = FirebaseFirestore.instance.batch();
+                                final end = (i + 400 < invitedDocs.length) ? i + 400 : invitedDocs.length;
+                                for (var j = i; j < end; j++) {
+                                  final dref = invitedDocs[j].reference;
+                                  batch3.set(dref, {'companyName': newVal, 'companyDisplayName': newVal}, SetOptions(merge: true));
+                                  updated++;
+                                }
+                                await batch3.commit();
+                              }
+                            }
+                          }
+                        } catch (e) {
+                          // swallow nested invites propagation errors; main update already done
+                          debugPrint('Failed to propagate to employees_by_inviter: $e');
+                        }
+
+                        if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Nombre actualizado y propagado a $updated documentos'), backgroundColor: Colors.green));
+                      } catch (e) {
+                        // If employees propagation fails, still succeed the main update
+                        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Nombre de empresa actualizado (no se pudo propagar por completo)'), backgroundColor: Colors.orange));
+                      }
+
+                      if (mounted) setState(() {}); // refresh UI to show new name
+                    } catch (e) {
+                      if (!mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error al actualizar: $e'), backgroundColor: Colors.red));
+                    }
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildMembershipCard(BuildContext context, UserModel user) {
     final bool isActive = user.isSubscriptionActive;
 
@@ -522,6 +613,264 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildCompanyMembershipWidget(BuildContext context, DocumentSnapshot userDoc) {
+    final data = userDoc.data() as Map<String, dynamic>? ?? {};
+    List<String> cids = [];
+    if (data['companyIds'] is List) {
+      cids = (data['companyIds'] as List).map((e) => e.toString()).toList();
+    } else if (data['companyId'] != null) {
+      cids = [data['companyId'].toString()];
+    }
+
+    if (cids.isEmpty) return const SizedBox.shrink();
+
+    final String uid = userDoc.id;
+    return FutureBuilder<List<Map<String, dynamic>>>(
+      future: Future.wait(cids.map((cid) async {
+        final Map<String, dynamic> result = {'id': cid, 'name': cid, 'inviterName': null, 'role': null, 'status': null};
+        final compRef = FirebaseFirestore.instance.collection('companies').doc(cid);
+
+        // Prefer users/{cid} companyName when present (some projects model companies as user docs)
+        try {
+          final userSnap = await FirebaseFirestore.instance.collection('users').doc(cid).get();
+          if (userSnap.exists) {
+            final ud = userSnap.data() ?? {};
+            final unameCandidates = [ud['companyName'], ud['company_name'], ud['name'], ud['displayName'], ud['display_name']];
+            for (final cand in unameCandidates) {
+              if (cand != null) {
+                final s = cand.toString().trim();
+                if (s.isNotEmpty) {
+                  result['name'] = s;
+                  break;
+                }
+              }
+            }
+            if (result['name'] == cid) {
+              String? firstStringUser(Map m, [int depth = 0]) {
+                if (depth > 2) return null;
+                for (final k in m.keys) {
+                  final v = m[k];
+                  if (v is String && v.trim().isNotEmpty) return v.trim();
+                  if (v is Map) {
+                    final nested = firstStringUser(v, depth + 1);
+                    if (nested != null) return nested;
+                  }
+                }
+                return null;
+              }
+              final found = firstStringUser(ud);
+              if (found != null && found.isNotEmpty) result['name'] = found;
+            }
+          }
+        } catch (_) {}
+
+        // If still not resolved, check companies/{cid}
+        try {
+          final compSnap = await compRef.get();
+          if (compSnap.exists) {
+            final cd = compSnap.data() ?? {};
+            // Prefer common fields that may contain the company display name
+            final nameCandidates = [
+              cd['name'],
+              cd['displayName'],
+              cd['companyName'],
+              cd['display_name'],
+              cd['title'],
+              cd['displayname']
+            ];
+            for (final cand in nameCandidates) {
+              if (cand != null) {
+                final s = cand.toString().trim();
+                if (s.isNotEmpty) {
+                  result['name'] = s;
+                  break;
+                }
+              }
+            }
+
+            // If still not found, search recursively for the first string field
+            if (result['name'] == cid) {
+              String? firstString(Map m, [int depth = 0]) {
+                if (depth > 2) return null;
+                for (final k in m.keys) {
+                  final v = m[k];
+                  if (v is String && v.trim().isNotEmpty) return v.trim();
+                  if (v is Map) {
+                    final nested = firstString(v, depth + 1);
+                    if (nested != null) return nested;
+                  }
+                }
+                return null;
+              }
+              try {
+                final found = firstString(cd);
+                if (found != null && found.isNotEmpty) result['name'] = found;
+              } catch (_) {}
+            }
+          }
+        } catch (_) {}
+
+        // Read employee doc to get inviterName/role/status if available
+        try {
+          final empSnap = await compRef.collection('employees').doc(uid).get();
+          if (empSnap.exists) {
+            final ed = empSnap.data() ?? {};
+            var inviterVal = (ed['inviterName'] ?? ed['invitedByName'] ?? ed['invitedBy']);
+            if (inviterVal != null) {
+              inviterVal = inviterVal.toString();
+              // If inviterVal looks like a UID, try to resolve to a user name
+              final isLikelyUid = RegExp(r"^[A-Za-z0-9_-]{12,}$");
+              if (isLikelyUid.hasMatch(inviterVal)) {
+                try {
+                  final inviterSnap = await FirebaseFirestore.instance.collection('users').doc(inviterVal).get();
+                  if (inviterSnap.exists) {
+                    final idata = inviterSnap.data() ?? {};
+                    inviterVal = (idata['name'] ?? idata['displayName'] ?? idata['companyName'])?.toString() ?? inviterVal;
+                  }
+                } catch (_) {}
+              }
+            }
+            result['inviterName'] = inviterVal?.toString();
+            result['role'] = ed['role']?.toString();
+            result['status'] = ed['status']?.toString() ?? (ed['active'] == true ? 'active' : null);
+
+            // If the company name is still unresolved (shows as CID/UID), try
+            // to pick a readable name from the employee doc which may have been
+            // backfilled by the server migration (invitedByCompanyName or companyName).
+            final currentName = result['name']?.toString() ?? '';
+            final looksLikeUid = RegExp(r"^[A-Za-z0-9_-]{12,}$");
+            if (currentName == cid || looksLikeUid.hasMatch(currentName)) {
+              final candidateFields = [ed['companyName'], ed['companyDisplayName'], ed['company'], ed['invitedByCompanyName']];
+              for (final cand in candidateFields) {
+                if (cand != null) {
+                  final s = cand.toString().trim();
+                  if (s.isNotEmpty) {
+                    result['name'] = s;
+                    break;
+                  }
+                }
+              }
+            }
+          }
+        } catch (_) {}
+
+        // If the resolved company name is still just the CID or looks like a UID,
+        // try a final direct fetch on users/{cid} to pick a readable field.
+        try {
+          final nameCandidate = result['name']?.toString() ?? '';
+          final isLikelyUidName = RegExp(r"^[A-Za-z0-9_-]{12,}$");
+          if (nameCandidate == cid || isLikelyUidName.hasMatch(nameCandidate)) {
+            final retryUserSnap = await FirebaseFirestore.instance.collection('users').doc(cid).get();
+            if (retryUserSnap.exists) {
+              final rdata = retryUserSnap.data() ?? {};
+              final unameCandidates = [rdata['companyName'], rdata['company_name'], rdata['name'], rdata['displayName'], rdata['display_name']];
+              for (final cand in unameCandidates) {
+                if (cand != null) {
+                  final s = cand.toString().trim();
+                  if (s.isNotEmpty) {
+                    result['name'] = s;
+                    break;
+                  }
+                }
+              }
+              if (result['name'] == cid) {
+                // recursive search fallback
+                String? firstStringUser(Map m, [int depth = 0]) {
+                  if (depth > 2) return null;
+                  for (final k in m.keys) {
+                    final v = m[k];
+                    if (v is String && v.trim().isNotEmpty) return v.trim();
+                    if (v is Map) {
+                      final nested = firstStringUser(v, depth + 1);
+                      if (nested != null) return nested;
+                    }
+                  }
+                  return null;
+                }
+                final found = firstStringUser(rdata);
+                if (found != null && found.isNotEmpty) result['name'] = found;
+              }
+            }
+          }
+        } catch (_) {}
+
+        return result;
+      }).toList()),
+      builder: (context, snap) {
+        if (!snap.hasData) return const SizedBox.shrink();
+        final list = snap.data!;
+        if (list.isEmpty) return const SizedBox.shrink();
+
+        return Card(
+          elevation: 2,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          child: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Pertenencia a empresa', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                const SizedBox(height: 8),
+                ...list.map((c) {
+                  final id = c['id'] as String? ?? '';
+                  final name = c['name'] as String? ?? id;
+
+                  return Column(
+                    children: [
+                      ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: const Text('🚌', style: TextStyle(fontSize: 22)),
+                        title: Text(name),
+                        trailing: TextButton(
+                          onPressed: () async {
+                            final confirm = await showDialog<bool>(
+                              context: context,
+                              builder: (ctx) => AlertDialog(
+                                title: const Text('Abandonar empresa'),
+                                content: Text('¿Estás seguro de que quieres abandonar la empresa "$name"? Esta acción no se puede deshacer desde tu perfil.'),
+                                actions: [
+                                  TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Cancelar')),
+                                  ElevatedButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('Abandonar')),
+                                ],
+                              ),
+                            );
+                            if (confirm != true) return;
+                            try {
+                              final functions = FirebaseFunctions.instanceFor(region: 'us-central1');
+                              final res = await functions.httpsCallable('companyLeaveCompany').call({'companyId': id});
+                              final data = res.data as Map<String, dynamic>?;
+                              final status = data != null ? data['status'] as String? : null;
+                              if (status == 'ok' || status == null) {
+                                if (!mounted) return;
+                                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Has abandonado la empresa'), backgroundColor: Colors.green));
+                              } else if (status == 'not_member') {
+                                if (!mounted) return;
+                                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No perteneces a esta empresa'), backgroundColor: Colors.orange));
+                              } else {
+                                if (!mounted) return;
+                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Resultado: $status')));
+                              }
+                            } on FirebaseFunctionsException catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: ${e.message ?? e.code}'), backgroundColor: Colors.red));
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red));
+                            }
+                          },
+                          child: const Text('Abandonar', style: TextStyle(color: Colors.red)),
+                        ),
+                      ),
+                      const Divider(),
+                    ],
+                  );
+                }),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 

@@ -18,6 +18,1234 @@ const crypto = require('crypto');
 
 admin.initializeApp();
 
+// Global helper: getAdminInboxForUid(uid)
+// Returns { contact_messages, user_messages, incidencias } for an admin user
+async function getAdminInboxForUid(uid) {
+  const db = admin.firestore();
+  const userDoc = await db.collection('users').doc(uid).get();
+  const userData = userDoc.exists ? userDoc.data() || {} : {};
+  const role = (userData.role || '').toString();
+  const isAdmin = !!userData.isAdmin || role === 'admin';
+  if (!isAdmin) {
+    throw new functions.https.HttpsError('permission-denied', 'User is not an admin');
+  }
+
+  // Read contact_messages (admin-facing messages)
+  const contactSnap = await db.collection('contact_messages').orderBy('timestamp', 'desc').limit(500).get();
+  const contactMessages = contactSnap.docs
+    .map(d => ({ ref: d.ref, id: d.id, data: d.data() || {} }))
+    .filter(x => {
+      const dd = x.data || {};
+      if (dd.isIncidencia === true) return false;
+      if (dd.pdiId) return false;
+      if (dd.motivo) return false;
+      return true;
+    })
+    .map(x => {
+      const dd = x.data || {};
+      return Object.assign({ id: x.id, sourceCollection: 'contact_messages' }, dd, { timestamp: dd.timestamp ? (dd.timestamp.toMillis ? dd.timestamp.toMillis() : dd.timestamp) : null });
+    });
+
+  // Read user_messages where 'to' is 'admins' OR messages explicitly addressed to admins.
+  let userMessages = [];
+  try {
+    const userSnap = await db.collection('user_messages').where('to', 'in', ['admins','ADMIN','all']).orderBy('timestamp', 'desc').limit(500).get();
+    userMessages = userSnap.docs.map(d => {
+      const dd = d.data() || {};
+      return Object.assign({ id: d.id, sourceCollection: 'user_messages' }, dd, { timestamp: dd.timestamp ? (dd.timestamp.toMillis ? dd.timestamp.toMillis() : dd.timestamp) : null });
+    });
+  } catch (e) {
+    console.warn('getAdminInboxForUid: failed to query user_messages with in-clause', e && e.message);
+    userMessages = [];
+  }
+
+  // Also include incidencias collection recent items
+  const incidenciasSnap = await db.collection('incidencias').orderBy('timestamp', 'desc').limit(500).get();
+  const incidencias = incidenciasSnap.docs.map(d => {
+    const dd = d.data() || {};
+    return Object.assign({ id: d.id, sourceCollection: 'incidencias' }, dd, { timestamp: dd.timestamp ? (dd.timestamp.toMillis ? dd.timestamp.toMillis() : dd.timestamp) : null });
+  });
+
+  return { contact_messages: contactMessages, user_messages: userMessages, incidencias: incidencias };
+}
+
+// Callable: invite an existing user (by email) to become an employee of a company
+// Validations (performed server-side):
+//  - caller must be authenticated and be company owner or company admin
+//  - target email must exist in users collection
+//  - target user must have an active subscription (subscription.active == true)
+//  - if ok, add document companies/{companyId}/employees/{uid}
+exports.companyInviteEmployee = functions.https.onCall(async (data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError('unauthenticated', 'Login requerido');
+  }
+  const callerUid = context.auth.uid;
+  let companyId = (data && data.companyId) ? String(data.companyId) : null;
+  const email = (data && data.email) ? String(data.email).toLowerCase().trim() : null;
+  if (!email) {
+    throw new functions.https.HttpsError('invalid-argument', 'Faltan parámetros companyId o email');
+  }
+
+  // Diagnostic log to help trace issues when clients report 'Empresa no encontrada'
+  console.log('companyInviteEmployee called', { callerUid, companyId, email });
+
+  const db = admin.firestore();
+
+  // If client didn't provide a companyId, try to infer it from caller's user doc
+  // when the caller itself is a 'company' account. This helps cases where the
+  // client-side failed to resolve the company id but the authenticated user
+  // represents the company.
+  let isCallerCompany = false;
+  if (!companyId) {
+    try {
+      const callerUserDoc = await db.collection('users').doc(callerUid).get();
+      if (callerUserDoc.exists) {
+        const cu = callerUserDoc.data() || {};
+        if ((cu.role || '') === 'company') {
+          companyId = callerUid;
+          isCallerCompany = true;
+          console.log('companyInviteEmployee: inferred companyId from caller role company', { inferredCompanyId: companyId });
+        }
+      }
+    } catch (err) {
+      console.warn('companyInviteEmployee: error reading caller user doc for fallback', err && err.message);
+    }
+  }
+
+  // Verify company exists
+  const compRef = db.doc(`companies/${companyId}`);
+  const compSnap = await compRef.get();
+  let comp = {};
+  if (compSnap.exists) {
+    comp = compSnap.data() || {};
+  } else {
+    // Support case where a 'company' account is represented by a users/{uid}
+    // document instead of a companies/{id} doc. If the provided companyId
+    // matches a user whose role is 'company', treat that as the company
+    // (ownerUid will be the user uid). We won't create a companies doc here
+    // automatically but we'll allow creating employees under
+    // companies/{companyId}/employees (subcollections are permitted
+    // even if parent doc doesn't exist). This makes the invite flow work
+    // for 'company' user profiles.
+    try {
+      const possibleCompanyUser = await db.collection('users').doc(companyId).get();
+      if (possibleCompanyUser.exists) {
+        const pu = possibleCompanyUser.data() || {};
+        if ((pu.role || '') === 'company') {
+          comp = { ownerUid: companyId, name: pu.name || null };
+        } else {
+          throw new functions.https.HttpsError('not-found', 'Empresa no encontrada');
+        }
+      } else {
+        throw new functions.https.HttpsError('not-found', 'Empresa no encontrada');
+      }
+    } catch (err) {
+      if (err instanceof functions.https.HttpsError) throw err;
+      throw new functions.https.HttpsError('not-found', 'Empresa no encontrada');
+    }
+  }
+
+  // Check caller is owner or an admin employee of the company
+  let callerIsAllowed = false;
+  if (comp.ownerUid && comp.ownerUid === callerUid) callerIsAllowed = true;
+  if (!callerIsAllowed) {
+    try {
+      const callerEmp = await db.doc(`companies/${companyId}/employees/${callerUid}`).get();
+      if (callerEmp.exists) {
+        const e = callerEmp.data() || {};
+        if (e.role === 'admin' || e.role === 'manager') callerIsAllowed = true;
+      }
+    } catch (err) {
+      console.warn('Error reading caller employee doc', err && err.message);
+    }
+  }
+  if (!callerIsAllowed) {
+    throw new functions.https.HttpsError('permission-denied', 'No tienes permiso para invitar empleados');
+  }
+
+  // Lookup user by email
+  const usersRef = db.collection('users');
+  const q = await usersRef.where('email', '==', email).limit(1).get();
+  // If caller is a company account, require they supplied a name for the invited worker
+  const providedName = (data && data.name) ? String(data.name).trim() : null;
+  if (isCallerCompany && !providedName) {
+    throw new functions.https.HttpsError('invalid-argument', 'Se requiere el nombre del trabajador al invitar desde una cuenta empresa');
+  }
+  if (q.empty) {
+    return { status: 'no_such_user' };
+  }
+  const userDoc = q.docs[0];
+  const uid = userDoc.id;
+  const userData = userDoc.data() || {};
+
+  // Check subscription
+  const subscription = userData.subscription || {};
+  // Ensure target user has an active subscription.
+  // Accept several schema variants that might exist in different user docs:
+  // - user.subscription.active === true
+  // - user.subscription.status === 'active'
+  // - user.subscriptionActive === true
+  // - user.subscription_active === true
+  // - user.subscription.expiresAt in the future (Timestamp or ISO string)
+  let hasActiveSubscription = false;
+  try {
+    if (userData.subscriptionActive === true || userData.subscription_active === true) hasActiveSubscription = true;
+    if (subscription && subscription.active === true) hasActiveSubscription = true;
+    if (subscription && typeof subscription.status === 'string' && subscription.status.toLowerCase() === 'active') hasActiveSubscription = true;
+    if (subscription && subscription.expiresAt) {
+      let exp = subscription.expiresAt;
+      if (exp && typeof exp.toDate === 'function') {
+        exp = exp.toDate();
+      } else if (typeof exp === 'string' || typeof exp === 'number') {
+        exp = new Date(exp);
+      }
+      if (exp instanceof Date && !isNaN(exp.getTime()) && exp > new Date()) {
+        hasActiveSubscription = true;
+      }
+    }
+  } catch (err) {
+    console.warn('companyInviteEmployee: subscription detection error', err && err.message);
+  }
+  console.log('companyInviteEmployee: subscription check', { uid, hasActiveSubscription });
+  if (!hasActiveSubscription) {
+    return { status: 'no_subscription' };
+  }
+
+  // Add or update the employee document under the company
+  try {
+    const empRef = db.collection('companies').doc(companyId).collection('employees').doc(uid);
+    // If an employee doc already exists and is active, report already_member
+    try {
+      const existing = await empRef.get();
+      if (existing.exists) {
+        const ed = existing.data() || {};
+        if (ed.status === 'active' || ed.active === true) {
+          return { status: 'already_member' };
+        }
+      }
+    } catch (err) {
+      console.warn('companyInviteEmployee: error checking existing employee doc', err && err.message);
+    }
+
+    // Resolve inviter/caller display names so we can store a human-readable
+    // inviter name inside employee docs. This avoids clients needing to read
+    // users/{inviterUid} which may be blocked by security rules.
+    let callerDisplayName = callerUid;
+    let inviterDisplayName = callerUid;
+    try {
+      const callerUserDoc2 = await db.collection('users').doc(callerUid).get();
+      if (callerUserDoc2.exists) {
+        const cud2 = callerUserDoc2.data() || {};
+        callerDisplayName = cud2.companyName || cud2.displayName || cud2.name || callerUid;
+        inviterDisplayName = cud2.displayName || cud2.name || callerUid;
+      }
+    } catch (e) {
+      // ignore resolution errors and fall back to UID
+    }
+
+    // Prepare employee payload with helpful fields for client display
+    const empPayload = {
+      role: 'employee',
+      invitedBy: callerUid,
+      invitedByName: inviterDisplayName,
+      invitedByCompanyName: callerDisplayName,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      status: 'active',
+      active: true,
+      email: userData.email || email,
+      // Prefer provided name when inviter is a company account, otherwise use existing user data
+      displayName: providedName || userData.displayName || userData.name || null,
+    };
+
+    await empRef.set(empPayload, { merge: true });
+    // Also write a copy into the nested invites structure so we keep invites
+    // grouped by inviter. This helps UIs that want to list invites per inviter.
+    try {
+      const nestedRef = db.collection('companies').doc(companyId)
+        .collection('employees_by_inviter').doc(callerUid)
+        .collection('invited').doc(uid);
+      // Use a lighter invite payload for the nested location (status may be 'invited')
+  const nestedPayload = Object.assign({}, empPayload, { status: empPayload.status || 'invited', invitedAt: admin.firestore.FieldValue.serverTimestamp() });
+      await nestedRef.set(nestedPayload, { merge: true });
+    } catch (err) {
+      console.warn('companyInviteEmployee: failed to write nested invite copy', err && err.message);
+    }
+  } catch (err) {
+    console.error('companyInviteEmployee: failed to write employee doc', err && err.message);
+    throw new functions.https.HttpsError('internal', 'Failed to add employee');
+  }
+
+  // Create an internal user message (in-app notification)
+  try {
+    // Resolve caller (inviter) info and prefer an explicit inviter name
+    let callerName = callerUid; // used previously for company display fallback
+    let inviterName = callerUid; // the human who performed the invite
+    try {
+      const callerUserDoc = await db.collection('users').doc(callerUid).get();
+      if (callerUserDoc.exists) {
+        const cud = callerUserDoc.data() || {};
+        // callerName: if inviter is a company account prefer its companyName
+        callerName = cud.companyName || cud.displayName || cud.name || callerUid;
+        // inviterName: the actual person who initiated the invite (displayName/name)
+        inviterName = cud.displayName || cud.name || callerUid;
+      }
+    } catch (e) {
+      // ignore and fall back to uid
+    }
+
+    // Determine company display name (prefer companyName then companies.name)
+    let companyDisplay = (comp && comp.name) ? comp.name : companyId;
+    try {
+      const companyUserDoc = await db.collection('users').doc(companyId).get();
+      if (companyUserDoc.exists) {
+        const cu = companyUserDoc.data() || {};
+        if (cu.companyName) companyDisplay = cu.companyName;
+      }
+    } catch (e) {
+      // ignore
+    }
+
+    const inviteMessage = `${inviterName} te ha añadido a la empresa ${companyDisplay}`;
+    await db.collection('user_messages').add({
+      to: uid,
+      toUid: uid,
+      // Backwards-compatible fields used by the client UI
+      title: `Has sido invitado a la Cuenta Empresa ${companyDisplay}`,
+      message: inviteMessage,
+      body: inviteMessage,
+      timestamp: admin.firestore.FieldValue.serverTimestamp(),
+      type: 'company_invite',
+      companyId: companyId,
+      fromUid: companyId, // sender is the company
+      fromName: companyDisplay,
+      fromEmail: null,
+      // provide metadata about the inviter
+      inviterUid: callerUid,
+      inviterName: inviterName,
+    });
+  } catch (err) {
+    console.warn('companyInviteEmployee: failed to create user message', err && err.message);
+  }
+
+  // Attempt to update custom claims to include companyId
+  try {
+    const userRecord = await admin.auth().getUser(uid);
+    const currentClaims = userRecord.customClaims || {};
+    const companyIds = Array.isArray(currentClaims.companyIds) ? currentClaims.companyIds.slice() : [];
+    if (!companyIds.includes(companyId)) companyIds.push(companyId);
+    const newClaims = Object.assign({}, currentClaims, { companyIds: companyIds });
+    await admin.auth().setCustomUserClaims(uid, newClaims);
+  } catch (err) {
+    console.warn('companyInviteEmployee: failed to set custom claims', err && err.message);
+  }
+  // Also update the user's Firestore document to reflect company membership
+  try {
+    await db.collection('users').doc(uid).set({ companyIds: admin.firestore.FieldValue.arrayUnion(companyId) }, { merge: true });
+  } catch (err) {
+    console.warn('companyInviteEmployee: failed to update user doc companyIds', err && err.message);
+  }
+
+  return { status: 'added' };
+});
+
+
+// Callable: admin can change a user's role (user | company | employee | admin)
+exports.adminSetUserRole = functions.https.onCall(async (data, context) => {
+  if (!context.auth) throw new functions.https.HttpsError('unauthenticated', 'Login requerido');
+  const callerUid = context.auth.uid;
+  const targetUid = (data && data.uid) ? String(data.uid) : null;
+  const newRole = (data && data.role) ? String(data.role) : null;
+  if (!targetUid || !newRole) throw new functions.https.HttpsError('invalid-argument', 'Faltan parámetros uid o role');
+
+  const db = admin.firestore();
+  // Verify caller is an admin (role in Firestore users or admin claim)
+  let callerIsAdmin = false;
+  try {
+    const callerRec = await db.collection('users').doc(callerUid).get();
+    if (callerRec.exists) {
+      const r = callerRec.data() || {};
+      if (r.role === 'admin') callerIsAdmin = true;
+    }
+    const callerAuth = await admin.auth().getUser(callerUid);
+    if (callerAuth.customClaims && callerAuth.customClaims.admin === true) callerIsAdmin = true;
+  } catch (err) {
+    console.warn('adminSetUserRole: error checking caller admin status', err && err.message);
+  }
+  if (!callerIsAdmin) throw new functions.https.HttpsError('permission-denied', 'No tienes permiso para cambiar roles');
+
+  // Update Firestore user doc
+  try {
+    await db.collection('users').doc(targetUid).update({ role: newRole });
+  } catch (err) {
+    throw new functions.https.HttpsError('internal', 'No se pudo actualizar el documento de usuario: ' + (err && err.message));
+  }
+
+  // Update Auth custom claims (merge existing)
+  try {
+    const userRecord = await admin.auth().getUser(targetUid);
+    const currentClaims = userRecord.customClaims || {};
+    const newClaims = Object.assign({}, currentClaims);
+    // role claim mirrors Firestore role for faster rules checks
+    newClaims.role = newRole;
+    if (newRole === 'admin') {
+      newClaims.admin = true;
+    } else {
+      if (newClaims.admin) delete newClaims.admin;
+    }
+    await admin.auth().setCustomUserClaims(targetUid, newClaims);
+  } catch (err) {
+    console.warn('adminSetUserRole: failed to set custom claims', err && err.message);
+  }
+
+  return { status: 'ok', role: newRole };
+});
+
+// Callable: create a route on behalf of a company member (team route)
+// Validations:
+//  - caller must be authenticated
+//  - ownerCompanyId must be provided
+//  - caller must be company owner or an active employee of the company
+// If valid, the server writes to 'user_routes' using Admin SDK and returns the new id.
+exports.createCompanyRoute = functions.https.onCall(async (data, context) => {
+  if (!context.auth) throw new functions.https.HttpsError('unauthenticated', 'Login requerido');
+  const callerUid = context.auth.uid;
+  const name = (data && data.name) ? String(data.name) : null;
+  const description = (data && data.description) ? String(data.description) : '';
+  const pdis = (data && data.pdis) ? data.pdis : [];
+  const visibility = (data && data.visibility) ? String(data.visibility) : 'team';
+  const ownerCompanyId = (data && data.ownerCompanyId) ? String(data.ownerCompanyId) : null;
+  if (!ownerCompanyId) throw new functions.https.HttpsError('invalid-argument', 'ownerCompanyId requerido');
+
+  const db = admin.firestore();
+
+  // Resolve company doc or fallback to users/{companyId} if that user has role 'company'
+  let comp = null;
+  try {
+    const compSnap = await db.collection('companies').doc(ownerCompanyId).get();
+    if (compSnap.exists) comp = compSnap.data() || {};
+    else {
+      const userSnap = await db.collection('users').doc(ownerCompanyId).get();
+      if (userSnap.exists) {
+        const ud = userSnap.data() || {};
+        if ((ud.role || '') === 'company') comp = { ownerUid: ownerCompanyId, name: ud.companyName || ud.name || null };
+      }
+    }
+  } catch (err) {
+    console.warn('createCompanyRoute: failed to resolve company', err && err.message);
+  }
+  if (!comp) throw new functions.https.HttpsError('not-found', 'Empresa no encontrada');
+
+  // Check caller membership: ownerUid or companies/{companyId}/employees/{callerUid} exists and active
+  let callerIsAllowed = false;
+  try {
+    if (comp.ownerUid && comp.ownerUid === callerUid) callerIsAllowed = true;
+    if (!callerIsAllowed) {
+      const empSnap = await db.collection('companies').doc(ownerCompanyId).collection('employees').doc(callerUid).get();
+      if (empSnap.exists) {
+        const ed = empSnap.data() || {};
+        if (ed.status === 'active' || ed.active === true) callerIsAllowed = true;
+      }
+    }
+  } catch (err) {
+    console.warn('createCompanyRoute: membership check failed', err && err.message);
+  }
+  if (!callerIsAllowed) throw new functions.https.HttpsError('permission-denied', 'No tienes permiso para crear rutas para esta empresa');
+
+  // Build route doc
+  const route = {
+    name: name || '(sin nombre)',
+    description: description || '',
+    createdBy: callerUid,
+    pdis: Array.isArray(pdis) ? pdis : [],
+    visibility: visibility,
+    ownerCompanyId: ownerCompanyId,
+    approved: true,
+    isPublic: false,
+    needsApproval: false,
+    createdAt: admin.firestore.FieldValue.serverTimestamp(),
+  };
+
+  try {
+    const ref = await db.collection('user_routes').add(route);
+    return { status: 'ok', id: ref.id };
+  } catch (err) {
+    console.error('createCompanyRoute: failed to write route', err && err.message);
+    throw new functions.https.HttpsError('internal', 'No se pudo crear la ruta');
+  }
+});
+
+// Callable: create a company/team route on behalf of a user who is a member of the company.
+// This allows invited employees (who may not have certain custom claims populated yet)
+// to create routes for their company without relying on client-side write permissions.
+exports.createCompanyRoute = functions.https.onCall(async (data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError('unauthenticated', 'Login requerido');
+  }
+  const callerUid = context.auth.uid;
+  const db = admin.firestore();
+
+  // Basic validation of inputs
+  const name = data && data.name ? String(data.name).trim() : '';
+  const description = data && data.description ? String(data.description).trim() : '';
+  const pdis = Array.isArray(data && data.pdis) ? data.pdis : null;
+  const visibility = data && data.visibility ? String(data.visibility) : 'team';
+  const ownerCompanyId = data && data.ownerCompanyId ? String(data.ownerCompanyId) : null;
+
+  if (!name || name.length === 0) throw new functions.https.HttpsError('invalid-argument', 'Nombre de ruta requerido');
+  if (!pdis || !Array.isArray(pdis) || pdis.length < 2 || pdis.length > 20) throw new functions.https.HttpsError('invalid-argument', 'Pdis inválidos (deben ser entre 2 y 20)');
+  if (!ownerCompanyId) throw new functions.https.HttpsError('invalid-argument', 'ownerCompanyId requerido');
+
+  // Authorization: allow if caller is company owner, or has an active employee doc in companies/{companyId}/employees/{uid},
+  // or if caller has companyOwners claim for the company, or is admin.
+  let callerAllowed = false;
+  try {
+    // 1) company document owner check
+    try {
+      const compSnap = await db.collection('companies').doc(ownerCompanyId).get();
+      if (compSnap.exists) {
+        const comp = compSnap.data() || {};
+        if (comp.ownerUid && comp.ownerUid === callerUid) callerAllowed = true;
+      } else {
+        // also support case where the company is represented by a users/{uid} doc
+        const possibleUser = await db.collection('users').doc(ownerCompanyId).get();
+        if (possibleUser.exists) {
+          const pu = possibleUser.data() || {};
+          if ((pu.role || '') === 'company' && ownerCompanyId === callerUid) callerAllowed = true;
+        }
+      }
+    } catch (err) {
+      console.warn('createCompanyRoute: error reading company doc', err && err.message);
+    }
+
+    // 2) employee document check
+    if (!callerAllowed) {
+      try {
+        const empSnap = await db.collection('companies').doc(ownerCompanyId).collection('employees').doc(callerUid).get();
+        if (empSnap.exists) {
+          const emp = empSnap.data() || {};
+          if (emp.status === 'active' || emp.active === true) callerAllowed = true;
+        }
+      } catch (err) {
+        console.warn('createCompanyRoute: error reading employee doc', err && err.message);
+      }
+    }
+
+    // 3) custom claims fallback (companyOwners/admin)
+    if (!callerAllowed) {
+      try {
+        const callerAuth = await admin.auth().getUser(callerUid);
+        const cc = callerAuth.customClaims || {};
+        if (cc.admin === true) callerAllowed = true;
+        if (Array.isArray(cc.companyOwners) && cc.companyOwners.includes(ownerCompanyId)) callerAllowed = true;
+        if (Array.isArray(cc.companyIds) && cc.companyIds.includes(ownerCompanyId)) callerAllowed = true; // member via claim
+      } catch (err) {
+        console.warn('createCompanyRoute: error reading caller auth record', err && err.message);
+      }
+    }
+
+    if (!callerAllowed) {
+      throw new functions.https.HttpsError('permission-denied', 'No tienes permiso para crear rutas para esta empresa');
+    }
+  } catch (err) {
+    if (err instanceof functions.https.HttpsError) throw err;
+    console.error('createCompanyRoute: authorization check failed unexpectedly', err && err.message);
+    throw new functions.https.HttpsError('internal', 'Error de autorización');
+  }
+
+  // Construct route document server-side to ensure fields are valid and timestamps come from server
+  const routeDoc = {
+    name: name,
+    description: description || '',
+    createdBy: callerUid,
+    pdis: pdis,
+    visibility: visibility,
+    ownerCompanyId: ownerCompanyId,
+    createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    // Internal routes: mark as approved immediately and not public
+    approved: true,
+    isPublic: false,
+    needsApproval: false,
+  };
+
+  try {
+    const ref = await db.collection('user_routes').add(routeDoc);
+    return { status: 'ok', id: ref.id };
+  } catch (err) {
+    console.error('createCompanyRoute: failed to write route', err && err.message);
+    throw new functions.https.HttpsError('internal', 'No se pudo crear la ruta');
+  }
+});
+
+// Callable: update a company route. Only company owner or active employee (admin/manager) may update.
+exports.updateCompanyRoute = functions.https.onCall(async (data, context) => {
+  if (!context.auth) throw new functions.https.HttpsError('unauthenticated', 'Login requerido');
+  const callerUid = context.auth.uid;
+  const routeId = data && data.routeId ? String(data.routeId) : null;
+  if (!routeId) throw new functions.https.HttpsError('invalid-argument', 'routeId requerido');
+
+  const db = admin.firestore();
+  // Read route
+  let routeSnap;
+  try {
+    routeSnap = await db.collection('user_routes').doc(routeId).get();
+  } catch (err) {
+    console.error('updateCompanyRoute: failed to read route', err && err.message);
+    throw new functions.https.HttpsError('internal', 'Error leyendo la ruta');
+  }
+  if (!routeSnap.exists) throw new functions.https.HttpsError('not-found', 'Ruta no encontrada');
+  const route = routeSnap.data() || {};
+  const ownerCompanyId = route.ownerCompanyId || null;
+  if (!ownerCompanyId) throw new functions.https.HttpsError('invalid-argument', 'La ruta no pertenece a una empresa');
+
+  // Authorization: only company owner or active employee (admin/manager) or platform admin
+  let callerAllowed = false;
+  try {
+    const compSnap = await db.collection('companies').doc(ownerCompanyId).get();
+    if (compSnap.exists) {
+      const comp = compSnap.data() || {};
+      if (comp.ownerUid && comp.ownerUid === callerUid) callerAllowed = true;
+    } else {
+      const possibleUser = await db.collection('users').doc(ownerCompanyId).get();
+      if (possibleUser.exists) {
+        const pu = possibleUser.data() || {};
+        if ((pu.role || '') === 'company' && ownerCompanyId === callerUid) callerAllowed = true;
+      }
+    }
+  } catch (err) {
+    console.warn('updateCompanyRoute: error reading company doc', err && err.message);
+  }
+  if (!callerAllowed) {
+    try {
+      const empSnap = await db.collection('companies').doc(ownerCompanyId).collection('employees').doc(callerUid).get();
+      if (empSnap.exists) {
+        const ed = empSnap.data() || {};
+        if (ed.status === 'active' || ed.active === true) {
+          // allow active employees
+          callerAllowed = true;
+        }
+      }
+      // Also allow users who have the company referenced in their user document
+      if (!callerAllowed) {
+        try {
+          const userSnap = await db.collection('users').doc(callerUid).get();
+          if (userSnap.exists) {
+            const ud = userSnap.data() || {};
+            if (ud.companyId === ownerCompanyId) callerAllowed = true;
+            if (!callerAllowed && Array.isArray(ud.companyIds) && ud.companyIds.includes(ownerCompanyId)) callerAllowed = true;
+          }
+        } catch (e) {
+          console.warn('updateCompanyRoute: error reading caller user doc', e && e.message);
+        }
+      }
+    } catch (err) {
+      console.warn('updateCompanyRoute: error reading employee doc', err && err.message);
+    }
+  }
+  if (!callerAllowed) {
+    try {
+      const callerAuth = await admin.auth().getUser(callerUid);
+      const cc = callerAuth.customClaims || {};
+      if (cc && cc.admin === true) callerAllowed = true;
+    } catch (err) {
+      console.warn('updateCompanyRoute: error reading caller auth', err && err.message);
+    }
+  }
+  if (!callerAllowed) throw new functions.https.HttpsError('permission-denied', 'No tienes permiso para modificar rutas de esta empresa');
+
+  // Build patch from allowed fields: name, description, pdis
+  const patch = {};
+  if (data && typeof data.name === 'string') patch.name = String(data.name);
+  if (data && typeof data.description === 'string') patch.description = String(data.description);
+  if (data && Array.isArray(data.pdis)) patch.pdis = data.pdis;
+  if (Object.keys(patch).length === 0) throw new functions.https.HttpsError('invalid-argument', 'No hay campos para actualizar');
+  patch.updatedAt = admin.firestore.FieldValue.serverTimestamp();
+
+  try {
+    await db.collection('user_routes').doc(routeId).update(patch);
+    return { status: 'ok' };
+  } catch (err) {
+    console.error('updateCompanyRoute: failed to update route', err && err.message);
+    throw new functions.https.HttpsError('internal', 'No se pudo actualizar la ruta');
+  }
+});
+
+// Callable: delete a company route. Only company owner or active employee (admin/manager) may delete.
+exports.deleteCompanyRoute = functions.https.onCall(async (data, context) => {
+  if (!context.auth) throw new functions.https.HttpsError('unauthenticated', 'Login requerido');
+  const callerUid = context.auth.uid;
+  const routeId = data && data.routeId ? String(data.routeId) : null;
+  if (!routeId) throw new functions.https.HttpsError('invalid-argument', 'routeId requerido');
+
+  const db = admin.firestore();
+  let routeSnap;
+  try {
+    routeSnap = await db.collection('user_routes').doc(routeId).get();
+  } catch (err) {
+    console.error('deleteCompanyRoute: failed to read route', err && err.message);
+    throw new functions.https.HttpsError('internal', 'Error leyendo la ruta');
+  }
+  if (!routeSnap.exists) throw new functions.https.HttpsError('not-found', 'Ruta no encontrada');
+  const route = routeSnap.data() || {};
+  const ownerCompanyId = route.ownerCompanyId || null;
+  if (!ownerCompanyId) throw new functions.https.HttpsError('invalid-argument', 'La ruta no pertenece a una empresa');
+
+  // Authorization (same checks as update)
+  let callerAllowed = false;
+  try {
+    const compSnap = await db.collection('companies').doc(ownerCompanyId).get();
+    if (compSnap.exists) {
+      const comp = compSnap.data() || {};
+      if (comp.ownerUid && comp.ownerUid === callerUid) callerAllowed = true;
+    } else {
+      const possibleUser = await db.collection('users').doc(ownerCompanyId).get();
+      if (possibleUser.exists) {
+        const pu = possibleUser.data() || {};
+        if ((pu.role || '') === 'company' && ownerCompanyId === callerUid) callerAllowed = true;
+      }
+    }
+  } catch (err) {
+    console.warn('deleteCompanyRoute: error reading company doc', err && err.message);
+  }
+  if (!callerAllowed) {
+    try {
+      const empSnap = await db.collection('companies').doc(ownerCompanyId).collection('employees').doc(callerUid).get();
+      if (empSnap.exists) {
+        const ed = empSnap.data() || {};
+        if (ed.status === 'active' || ed.active === true) callerAllowed = true;
+      }
+      // Also allow users who have the company referenced in their user document
+      if (!callerAllowed) {
+        try {
+          const userSnap = await db.collection('users').doc(callerUid).get();
+          if (userSnap.exists) {
+            const ud = userSnap.data() || {};
+            if (ud.companyId === ownerCompanyId) callerAllowed = true;
+            if (!callerAllowed && Array.isArray(ud.companyIds) && ud.companyIds.includes(ownerCompanyId)) callerAllowed = true;
+          }
+        } catch (e) {
+          console.warn('deleteCompanyRoute: error reading caller user doc', e && e.message);
+        }
+      }
+    } catch (err) {
+      console.warn('deleteCompanyRoute: error reading employee doc', err && err.message);
+    }
+  }
+  if (!callerAllowed) {
+    try {
+      const callerAuth = await admin.auth().getUser(callerUid);
+      const cc = callerAuth.customClaims || {};
+      if (cc && cc.admin === true) callerAllowed = true;
+    } catch (err) {
+      console.warn('deleteCompanyRoute: error reading caller auth', err && err.message);
+    }
+  }
+  if (!callerAllowed) throw new functions.https.HttpsError('permission-denied', 'No tienes permiso para eliminar rutas de esta empresa');
+
+  try {
+    await db.collection('user_routes').doc(routeId).delete();
+    return { status: 'ok' };
+  } catch (err) {
+    console.error('deleteCompanyRoute: failed to delete route', err && err.message);
+    throw new functions.https.HttpsError('internal', 'No se pudo eliminar la ruta');
+  }
+});
+
+// Callable: return the employees list for a company using admin privileges.
+// This is useful when client-side security rules prevent direct reads from
+// the `companies/{companyId}/employees` path. The function enforces the same
+// permission model server-side: only admins, company owners or company admins/managers
+// may retrieve the employees list.
+exports.companyListEmployees = functions.https.onCall(async (data, context) => {
+  if (!context.auth) throw new functions.https.HttpsError('unauthenticated', 'Login requerido');
+  const callerUid = context.auth.uid;
+  const companyId = (data && data.companyId) ? String(data.companyId) : null;
+  if (!companyId) throw new functions.https.HttpsError('invalid-argument', 'Falta companyId');
+
+  const db = admin.firestore();
+
+  // Resolve company doc or accept a 'company' user document as company owner
+  let comp = null;
+  try {
+    const compRef = db.doc(`companies/${companyId}`);
+    const compSnap = await compRef.get();
+    if (compSnap.exists) {
+      comp = compSnap.data() || {};
+    } else {
+      // accept users/{companyId} with role 'company' as canonical owner
+      const possibleCompanyUser = await db.collection('users').doc(companyId).get();
+      if (possibleCompanyUser.exists) {
+        const pu = possibleCompanyUser.data() || {};
+        if ((pu.role || '') === 'company') {
+          comp = { ownerUid: companyId, name: pu.name || null };
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('companyListEmployees: error resolving company', err && err.message);
+    throw new functions.https.HttpsError('internal', 'Error resolviendo la empresa');
+  }
+  if (!comp) throw new functions.https.HttpsError('not-found', 'Empresa no encontrada');
+
+  // Check caller privileges: admin OR company owner OR company admin/manager employee
+  let callerIsAdmin = false;
+  try {
+    if (context.auth.token && (context.auth.token.admin === true || context.auth.token.role === 'admin')) {
+      callerIsAdmin = true;
+    } else {
+      // double-check Firestore user doc / custom claims as fallback
+      const callerUserDoc = await db.collection('users').doc(callerUid).get();
+      if (callerUserDoc.exists) {
+        const ru = callerUserDoc.data() || {};
+        if (ru.role === 'admin') callerIsAdmin = true;
+      }
+      try {
+        const callerAuth = await admin.auth().getUser(callerUid);
+        if (callerAuth.customClaims && callerAuth.customClaims.admin === true) callerIsAdmin = true;
+      } catch (e) {
+        // ignore
+      }
+    }
+  } catch (err) {
+    console.warn('companyListEmployees: error checking admin status', err && err.message);
+  }
+
+  let callerAllowed = false;
+  if (callerIsAdmin) callerAllowed = true;
+  if (!callerAllowed) {
+    // owner
+    if (comp.ownerUid && comp.ownerUid === callerUid) callerAllowed = true;
+  }
+  if (!callerAllowed) {
+    // check employee role under company
+    try {
+      const empSnap = await db.doc(`companies/${companyId}/employees/${callerUid}`).get();
+      if (empSnap.exists) {
+        const ed = empSnap.data() || {};
+        if (ed.role === 'admin' || ed.role === 'manager') callerAllowed = true;
+      }
+    } catch (err) {
+      console.warn('companyListEmployees: error reading caller employee doc', err && err.message);
+    }
+  }
+  if (!callerAllowed) throw new functions.https.HttpsError('permission-denied', 'No tienes permiso para ver los empleados');
+
+  // Read employees with admin privileges
+  try {
+    const empSnap = await db.collection('companies').doc(companyId).collection('employees').get();
+    const employees = empSnap.docs.map(d => ({ id: d.id, data: d.data() || {} }));
+    return { status: 'ok', employees };
+  } catch (err) {
+    console.error('companyListEmployees: failed to read employees', err && err.message);
+    throw new functions.https.HttpsError('internal', 'No se pudo leer la lista de empleados');
+  }
+});
+
+// Callable: allow a user to leave a company they belong to.
+// Removes the employee document under companies/{companyId}/employees/{uid}
+// and removes the companyId from users/{uid}.companyIds. Also notifies
+// the company owner (if present) with an in-app message.
+exports.companyLeaveCompany = functions.https.onCall(async (data, context) => {
+  if (!context.auth) throw new functions.https.HttpsError('unauthenticated', 'Login requerido');
+  const uid = context.auth.uid;
+  const companyId = (data && data.companyId) ? String(data.companyId) : null;
+  if (!companyId) throw new functions.https.HttpsError('invalid-argument', 'Falta companyId');
+
+  const db = admin.firestore();
+  try {
+    const empRef = db.collection('companies').doc(companyId).collection('employees').doc(uid);
+    const empSnap = await empRef.get();
+    if (!empSnap.exists) {
+      return { status: 'not_member' };
+    }
+
+    // Delete the employee doc (soft-delete could be used instead)
+    await empRef.delete();
+
+    // Remove companyId from user's companyIds array
+    try {
+      await db.collection('users').doc(uid).set({ companyIds: admin.firestore.FieldValue.arrayRemove(companyId) }, { merge: true });
+    } catch (e) {
+      console.warn('companyLeaveCompany: failed to update user doc', e && e.message);
+    }
+
+    // Notify company owner if available
+    try {
+      const compRef = db.collection('companies').doc(companyId);
+      const compSnap = await compRef.get();
+      let ownerUid = null;
+      let companyName = companyId;
+      if (compSnap.exists) {
+        const comp = compSnap.data() || {};
+        ownerUid = comp.ownerUid || null;
+        companyName = comp.name || companyId;
+      } else {
+        // fallback: maybe the company is represented by a users/{companyId} doc
+        const possibleUser = await db.collection('users').doc(companyId).get();
+        if (possibleUser.exists) {
+          const pu = possibleUser.data() || {};
+          if ((pu.role || '') === 'company') {
+            ownerUid = companyId;
+            companyName = pu.companyName || pu.name || companyId;
+          }
+        }
+      }
+
+      // Compose notification to owner
+      if (ownerUid) {
+        const userRec = await db.collection('users').doc(uid).get();
+        const userData = userRec.exists ? userRec.data() || {} : {};
+        const userName = userData.displayName || userData.name || uid;
+        const msg = `${userName} ha abandonado la empresa ${companyName}`;
+        await db.collection('user_messages').add({
+          to: ownerUid,
+          toUid: ownerUid,
+          title: 'Miembro abandonó la empresa',
+          message: msg,
+          body: msg,
+          timestamp: admin.firestore.FieldValue.serverTimestamp(),
+          type: 'company_left',
+          companyId: companyId,
+          fromUid: uid,
+          fromName: userName,
+        });
+      }
+    } catch (e) {
+      console.warn('companyLeaveCompany: notify owner failed', e && e.message);
+    }
+
+    return { status: 'ok' };
+  } catch (err) {
+    console.error('companyLeaveCompany: unexpected error', err && err.message);
+    throw new functions.https.HttpsError('internal', 'No se pudo procesar la petición');
+  }
+});
+
+// Callable: allow an owner/manager/admin to remove a specific employee from a company.
+// Parameters: { companyId: string, uid: string }
+exports.companyRemoveEmployee = functions.https.onCall(async (data, context) => {
+  if (!context.auth) throw new functions.https.HttpsError('unauthenticated', 'Login requerido');
+  const callerUid = context.auth.uid;
+  const companyId = (data && data.companyId) ? String(data.companyId) : null;
+  const targetUid = (data && data.uid) ? String(data.uid) : null;
+  if (!companyId || !targetUid) throw new functions.https.HttpsError('invalid-argument', 'Falta companyId o uid');
+
+  const db = admin.firestore();
+  try {
+    // Basic permission checks: admin token, company owner, or employee with admin/manager role
+    let callerIsAdmin = false;
+    try {
+      if (context.auth.token && (context.auth.token.admin === true || context.auth.token.role === 'admin')) {
+        callerIsAdmin = true;
+      }
+    } catch (e) {}
+
+    let callerAllowed = false;
+    if (callerIsAdmin) callerAllowed = true;
+
+    // Check owner
+    try {
+      const compSnap = await db.collection('companies').doc(companyId).get();
+      if (compSnap.exists) {
+        const comp = compSnap.data() || {};
+        if (comp.ownerUid && comp.ownerUid === callerUid) callerAllowed = true;
+      } else {
+        // fallback: maybe company represented by users/{companyId}
+        const possibleUser = await db.collection('users').doc(companyId).get();
+        if (possibleUser.exists) {
+          const pu = possibleUser.data() || {};
+          if ((pu.role || '') === 'company' && companyId === callerUid) {
+            // a company account removing members of its own account
+            callerAllowed = true;
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('companyRemoveEmployee: error checking owner', e && e.message);
+    }
+
+    // Check if caller is an employee with manager/admin role
+    if (!callerAllowed) {
+      try {
+        const empSnap = await db.collection('companies').doc(companyId).collection('employees').doc(callerUid).get();
+        if (empSnap.exists) {
+          const ed = empSnap.data() || {};
+          if (ed.role === 'admin' || ed.role === 'manager') callerAllowed = true;
+        }
+      } catch (e) {
+        console.warn('companyRemoveEmployee: error checking caller employee doc', e && e.message);
+      }
+    }
+
+    if (!callerAllowed) throw new functions.https.HttpsError('permission-denied', 'No tienes permiso para eliminar empleados');
+
+    // Check target membership
+    const targetRef = db.collection('companies').doc(companyId).collection('employees').doc(targetUid);
+    const targetSnap = await targetRef.get();
+    if (!targetSnap.exists) {
+      return { status: 'not_member' };
+    }
+
+    // Do delete
+    await targetRef.delete();
+
+    // Also remove any nested invite copies under employees_by_inviter/*/invited/{uid}
+    try {
+      const invitersCol = db.collection('companies').doc(companyId).collection('employees_by_inviter');
+      const invitersSnap = await invitersCol.get();
+      for (const invDoc of invitersSnap.docs) {
+        try {
+          const invitedRef = db.collection('companies').doc(companyId).collection('employees_by_inviter').doc(invDoc.id).collection('invited').doc(targetUid);
+          const invitedSnap = await invitedRef.get();
+          if (invitedSnap.exists) {
+            await invitedRef.delete();
+          }
+        } catch (e) {
+          console.warn('companyRemoveEmployee: failed to delete nested invited for inviter', invDoc.id, e && e.message);
+        }
+      }
+    } catch (e) {
+      console.warn('companyRemoveEmployee: error listing employees_by_inviter', e && e.message);
+    }
+
+    // Remove companyId from user's companyIds array
+    try {
+      await db.collection('users').doc(targetUid).set({ companyIds: admin.firestore.FieldValue.arrayRemove(companyId) }, { merge: true });
+    } catch (e) {
+      console.warn('companyRemoveEmployee: failed to update user doc', e && e.message);
+    }
+
+    // Notify target user
+    try {
+      const userRec = await db.collection('users').doc(targetUid).get();
+      const userData = userRec.exists ? userRec.data() || {} : {};
+      const targetName = userData.displayName || userData.name || targetUid;
+
+      // Determine company display name
+      let companyName = companyId;
+      try {
+        const compSnap2 = await db.collection('companies').doc(companyId).get();
+        if (compSnap2.exists) {
+          const cdata = compSnap2.data() || {};
+          companyName = cdata.name || companyId;
+        } else {
+          const poss = await db.collection('users').doc(companyId).get();
+          if (poss.exists) {
+            const pd = poss.data() || {};
+            companyName = pd.companyName || pd.name || companyId;
+          }
+        }
+      } catch (e) {}
+
+      const msg = `Has sido eliminado de la empresa ${companyName}`;
+      await db.collection('user_messages').add({
+        to: targetUid,
+        toUid: targetUid,
+        title: 'Eliminado de la empresa',
+        message: msg,
+        body: msg,
+        timestamp: admin.firestore.FieldValue.serverTimestamp(),
+        type: 'company_removed',
+        companyId: companyId,
+        fromUid: callerUid,
+        fromName: callerUid,
+      });
+    } catch (e) {
+      console.warn('companyRemoveEmployee: notify target failed', e && e.message);
+    }
+
+    return { status: 'ok' };
+  } catch (err) {
+    console.error('companyRemoveEmployee: unexpected error', err && err.message);
+    throw new functions.https.HttpsError('internal', 'No se pudo procesar la petición');
+  }
+});
+
+// Callable: migrate existing employee/invite documents into the nested
+// structure companies/{companyId}/employees_by_inviter/{inviterId}/invited/{uid}
+// Options:
+//  - deleteOld: boolean (default: false) -> delete the original employees/* docs after copying
+// This callable is restricted to admin users (Firestore role 'admin' or custom claim admin=true)
+exports.migrateInvitesToNested = functions.https.onCall(async (data, context) => {
+  if (!context.auth) throw new functions.https.HttpsError('unauthenticated', 'Login requerido');
+  const callerUid = context.auth.uid;
+  const companyId = (data && data.companyId) ? String(data.companyId) : null;
+  const deleteOld = !!(data && data.deleteOld);
+  if (!companyId) throw new functions.https.HttpsError('invalid-argument', 'Falta companyId');
+
+  const db = admin.firestore();
+
+  // Check caller is admin (fast path via token) or Firestore role
+  let callerIsAdmin = false;
+  try {
+    if (context.auth.token && (context.auth.token.admin === true || context.auth.token.role === 'admin')) {
+      callerIsAdmin = true;
+    } else {
+      const callerUserDoc = await db.collection('users').doc(callerUid).get();
+      if (callerUserDoc.exists) {
+        const ru = callerUserDoc.data() || {};
+        if (ru.role === 'admin') callerIsAdmin = true;
+      }
+      try {
+        const callerAuth = await admin.auth().getUser(callerUid);
+        if (callerAuth.customClaims && callerAuth.customClaims.admin === true) callerIsAdmin = true;
+      } catch (e) {
+        // ignore
+      }
+    }
+  } catch (err) {
+    console.warn('migrateInvitesToNested: error checking admin status', err && err.message);
+  }
+  if (!callerIsAdmin) throw new functions.https.HttpsError('permission-denied', 'No tienes permiso para ejecutar esta migración');
+
+  try {
+    const empColRef = db.collection('companies').doc(companyId).collection('employees');
+    const snapshot = await empColRef.get();
+    if (snapshot.empty) {
+      return { status: 'no_employees', migrated: 0 };
+    }
+
+    const results = { migrated: 0, errors: [] };
+    // We'll perform writes in batches of up to 450 (reserve some room)
+    let batch = db.batch();
+    let opsInBatch = 0;
+
+    for (const doc of snapshot.docs) {
+      const uid = doc.id;
+      const dataDoc = doc.data() || {};
+      // Determine inviterId if available
+      const inviterId = dataDoc.invitedBy ? String(dataDoc.invitedBy) : 'unknown_inviter';
+
+      // Attempt to resolve a human-readable inviter name to store in the
+      // migrated document so clients don't need cross-doc reads.
+      let inviterNameResolved = inviterId;
+      let inviterCompanyResolved = null;
+      try {
+        if (inviterId && inviterId !== 'unknown_inviter') {
+          const invSnap = await db.collection('users').doc(inviterId).get();
+          if (invSnap.exists) {
+            const invData = invSnap.data() || {};
+            inviterNameResolved = invData.displayName || invData.name || inviterId;
+            inviterCompanyResolved = invData.companyName || null;
+          }
+        }
+      } catch (e) {
+        console.warn('migrateInvitesToNested: failed to resolve inviter name', e && e.message);
+      }
+
+      const targetRef = db.collection('companies').doc(companyId)
+        .collection('employees_by_inviter').doc(inviterId)
+        .collection('invited').doc(uid);
+
+      const toWrite = Object.assign({}, dataDoc, {
+        migratedAt: admin.firestore.FieldValue.serverTimestamp(),
+        invitedByName: inviterNameResolved,
+        invitedByCompanyName: inviterCompanyResolved,
+      });
+
+      batch.set(targetRef, toWrite, { merge: true });
+      opsInBatch++;
+
+      if (deleteOld) {
+        batch.delete(empColRef.doc(uid));
+        opsInBatch++;
+      }
+
+      // commit if near limit
+      if (opsInBatch >= 450) {
+        await batch.commit();
+        batch = db.batch();
+        opsInBatch = 0;
+      }
+
+      results.migrated++;
+    }
+
+    if (opsInBatch > 0) {
+      await batch.commit();
+    }
+
+    return { status: 'ok', migrated: results.migrated };
+  } catch (err) {
+    console.error('migrateInvitesToNested: unexpected error', err && err.message);
+    throw new functions.https.HttpsError('internal', 'Error durante la migración: ' + (err && err.message));
+  }
+});
+
+// Callable: resolve a list of companyIds to human-readable display names.
+// Runs with admin privileges so clients that cannot read `companies/{id}`
+// or `users/{id}` due to rules can still display friendly names.
+exports.getCompanyNames = functions.https.onCall(async (data, context) => {
+  if (!context.auth) throw new functions.https.HttpsError('unauthenticated', 'Login requerido');
+  const companyIds = Array.isArray(data && data.companyIds) ? data.companyIds.map(String) : [];
+  const db = admin.firestore();
+  const result = {};
+  for (const cid of companyIds) {
+    let name = cid;
+    try {
+      const compRef = db.collection('companies').doc(cid);
+      const compSnap = await compRef.get();
+      if (compSnap.exists) {
+        const cd = compSnap.data() || {};
+        name = cd.name || cd.displayName || cd.companyName || name;
+      } else {
+        // fallback to users/{cid} if companies/{cid} not present
+        try {
+          const userSnap = await db.collection('users').doc(cid).get();
+          if (userSnap.exists) {
+            const ud = userSnap.data() || {};
+            name = ud.companyName || ud.name || ud.displayName || name;
+          }
+        } catch (e) {
+          // ignore
+        }
+      }
+    } catch (e) {
+      console.warn('getCompanyNames: error resolving', cid, e && e.message);
+    }
+    result[cid] = name || cid;
+  }
+  return { status: 'ok', names: result };
+});
+
+// Callable: resolve a list of companyIds to their ownerUid (if any).
+// Runs with admin privileges so clients that cannot read `companies/{id}`
+// due to rules can still determine the owner for permission checks in the UI.
+exports.getCompanyOwners = functions.https.onCall(async (data, context) => {
+  if (!context.auth) throw new functions.https.HttpsError('unauthenticated', 'Login requerido');
+  const companyIds = Array.isArray(data && data.companyIds) ? data.companyIds.map(String) : [];
+  const db = admin.firestore();
+  const result = {};
+  for (const cid of companyIds) {
+    let owner = null;
+    try {
+      const compRef = db.collection('companies').doc(cid);
+      const compSnap = await compRef.get();
+      if (compSnap.exists) {
+        const cd = compSnap.data() || {};
+        owner = cd.ownerUid || null;
+      } else {
+        // fallback to users/{cid} if companies/{cid} not present
+        try {
+          const userSnap = await db.collection('users').doc(cid).get();
+          if (userSnap.exists) {
+            const ud = userSnap.data() || {};
+            if ((ud.role || ud['role']) === 'company') {
+              owner = cid;
+            }
+          }
+        } catch (e) {
+          // ignore
+        }
+      }
+    } catch (e) {
+      console.warn('getCompanyOwners: error resolving', cid, e && e.message);
+    }
+    result[cid] = owner;
+  }
+  return { status: 'ok', owners: result };
+});
+
+
 // Secret Manager client will be required dynamically inside accessSecretValue
 // so the code still works if the dependency isn't installed yet.
 
@@ -978,8 +2206,8 @@ exports.getAdminSummary = functions.https.onCall(async (data, context) => {
       console.warn('getAdminSummary: failed to read system_notifications count', e && e.message);
     }
 
-    // Also reuse existing inbox callable counts for messages/incidencias to keep parity
-    const inbox = await exports.getAdminInbox({}, { auth: context.auth });
+  // Also reuse existing inbox helper counts for messages/incidencias to keep parity
+  const inbox = await getAdminInboxForUid(uid);
     const contactMessages = Array.isArray(inbox.contact_messages) ? inbox.contact_messages.length : 0;
     const userMessages = Array.isArray(inbox.user_messages) ? inbox.user_messages.length : 0;
     const incidencias = Array.isArray(inbox.incidencias) ? inbox.incidencias.length : 0;
@@ -1526,8 +2754,7 @@ exports.adminListPdis = functions.https.onCall(async (data, context) => {
     const userData = userDoc.exists ? userDoc.data() || {} : {};
     const role = (userData.role || '').toString().toLowerCase();
     const isAdmin = !!userData.isAdmin || role === 'admin';
-    const specialPrefix = '4nQqFTcqnGhOHys44ZCcdMsNrvc2';
-    if (!isAdmin && !uid.startsWith(specialPrefix)) {
+    if (!isAdmin) {
       throw new functions.https.HttpsError('permission-denied', 'User is not an admin');
     }
 
@@ -1578,8 +2805,7 @@ exports.adminUpdatePdi = functions.https.onCall(async (data, context) => {
     const userData = userDoc.exists ? userDoc.data() || {} : {};
     const role = (userData.role || '').toString().toLowerCase();
     const isAdmin = !!userData.isAdmin || role === 'admin';
-    const specialPrefix = '4nQqFTcqnGhOHys44ZCcdMsNrvc2';
-    if (!isAdmin && !uid.startsWith(specialPrefix)) {
+    if (!isAdmin) {
       throw new functions.https.HttpsError('permission-denied', 'User is not an admin');
     }
 

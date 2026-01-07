@@ -105,6 +105,27 @@
         { "fieldPath": "__name__", "mode": "DESCENDING" }
       ]
     }
+    ,
+    {
+      "collectionGroup": "user_routes",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "ownerCompanyId", "mode": "ASCENDING" },
+        { "fieldPath": "visibility", "mode": "ASCENDING" },
+        { "fieldPath": "createdAt", "mode": "DESCENDING" },
+        { "fieldPath": "__name__", "mode": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "user_routes",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "visibility", "mode": "ASCENDING" },
+        { "fieldPath": "createdBy", "mode": "ASCENDING" },
+        { "fieldPath": "createdAt", "mode": "DESCENDING" },
+        { "fieldPath": "__name__", "mode": "DESCENDING" }
+      ]
+    }
   ],
   "fieldOverrides": []
 }

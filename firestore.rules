@@ -6,11 +6,7 @@ service cloud.firestore {
     // Function to check if the user is an administrator.
     function isAdmin() {
       // Check if the user is authenticated and has role 'admin'
-      return request.auth != null &&
-             (request.auth.token.admin == true ||
-             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-             (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
-              get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true));
+      return request.auth != null && (request.auth.token.admin == true || request.auth.token.role == 'admin');
     }
 
     // Rules for the 'users' collection.
@@ -258,23 +254,61 @@ service cloud.firestore {
       // - routes must start as not approved and not public
       // - name must be a non-empty string
       // - pdis must be an array with between 2 and 20 entries
-      allow create: if request.auth != null
-        && request.resource.data.createdBy == request.auth.uid
-        && request.resource.data.approved == false
-        && request.resource.data.isPublic == false
-        && (request.resource.data.name is string)
-        && (request.resource.data.name.size() > 0)
-        && (request.resource.data.pdis is list)
-        && (request.resource.data.pdis.size() >= 2)
-        && (request.resource.data.pdis.size() <= 20);
+        allow create: if request.auth != null
+          && request.resource.data.createdBy == request.auth.uid
+          // For public routes require they start unapproved and not-public.
+          // For internal routes (team/private) the client may set approved=true
+          // to show them immediately; require isPublic == false in all cases.
+          && (
+            (request.resource.data.visibility == 'public' && request.resource.data.approved == false && request.resource.data.isPublic == false)
+            ||
+            (request.resource.data.visibility != 'public' && request.resource.data.isPublic == false)
+          )
+          && (request.resource.data.name is string)
+          && (request.resource.data.name.size() > 0)
+          && (request.resource.data.pdis is list)
+          && (request.resource.data.pdis.size() >= 2)
+          && (request.resource.data.pdis.size() <= 20)
+          && (
+            // personal route (no company) OR
+            // caller is company owner for the given company OR
+            // company member may create team-visibility routes (members are listed in custom claim companyIds)
+            (request.resource.data.ownerCompanyId == null) ||
+            (
+              request.resource.data.ownerCompanyId != null && (
+                (request.auth.token.companyOwners != null && request.resource.data.ownerCompanyId in request.auth.token.companyOwners)
+                ||
+                (request.auth.token.companyIds != null && request.resource.data.ownerCompanyId in request.auth.token.companyIds && request.resource.data.visibility == 'team')
+              )
+            )
+          );
 
       // Reading: public routes are visible to authenticated users; the
       // creator and admins can read their own / all routes respectively.
-      allow read: if request.auth != null && (
-        resource.data.isPublic == true ||
-        request.auth.uid == resource.data.createdBy ||
-        isAdmin()
-      );
+        allow read: if request.auth != null && (
+          resource.data.isPublic == true ||
+          request.auth.uid == resource.data.createdBy ||
+          // team visibility: user must belong to ownerCompanyId OR be the company owner
+          (
+            resource.data.visibility == 'team' && (
+              // Company member via custom claims
+              (request.auth.token.companyIds != null && resource.data.ownerCompanyId in request.auth.token.companyIds)
+              // OR the caller is the owner of the company document (companies/{ownerCompanyId}.ownerUid)
+              || (
+                // Try to read companies/{ownerCompanyId} and compare ownerUid to the caller
+                exists(/databases/$(database)/documents/companies/$(resource.data.ownerCompanyId)) &&
+                get(/databases/$(database)/documents/companies/$(resource.data.ownerCompanyId)).data.ownerUid == request.auth.uid
+              )
+              // OR fallback: company represented as a users/{ownerCompanyId} with role 'company' and owner id equals caller
+              || (
+                exists(/databases/$(database)/documents/users/$(resource.data.ownerCompanyId)) &&
+                get(/databases/$(database)/documents/users/$(resource.data.ownerCompanyId)).data.role == 'company' &&
+                resource.data.ownerCompanyId == request.auth.uid
+              )
+            )
+          ) ||
+          isAdmin()
+        );
 
       // Listing queries must be executed by authenticated users. Note: Firestore
       // will reject queries that would return documents the caller cannot read.
@@ -291,6 +325,72 @@ service cloud.firestore {
 
       // Deletion: owners can delete their own routes; admins can delete any.
       allow delete: if request.auth != null && (isAdmin() || request.auth.uid == resource.data.createdBy);
+    }
+
+    // New collection for company-managed routes (shared team/private/public)
+    match /routes/{routeId} {
+      // Public routes visible to any authenticated user
+      allow read: if request.auth != null && resource.data.visibility == 'public'
+        // Private routes: only the company owner can read (check custom claims)
+        || (request.auth != null && resource.data.visibility == 'private' &&
+            request.auth.token.companyOwners != null && resource.data.ownerCompanyId in request.auth.token.companyOwners)
+        // Team routes: company members (owner or employees) can read (check custom claims)
+        || (request.auth != null && resource.data.visibility == 'team' &&
+            request.auth.token.companyIds != null && resource.data.ownerCompanyId in request.auth.token.companyIds)
+        // The creator (ownerUid) can always read
+        || (request.auth != null && resource.data.ownerUid == request.auth.uid);
+
+      // Creation: authenticated users can create; if setting ownerCompanyId ensure caller is company owner (custom claims)
+      allow create: if request.auth != null && (
+        // creating a personal route (no ownerCompanyId)
+        (request.resource.data.ownerCompanyId == null)
+        // or creating a company route only if caller has owner claim for that company
+        || (request.resource.data.ownerCompanyId != null && request.auth.token.companyOwners != null && request.resource.data.ownerCompanyId in request.auth.token.companyOwners)
+      );
+
+      // Updates/deletes: only the route owner or the company owner may modify
+      allow update, delete: if request.auth != null && (
+        resource.data.ownerUid == request.auth.uid ||
+        (resource.data.ownerCompanyId != null && request.auth.token.companyOwners != null && resource.data.ownerCompanyId in request.auth.token.companyOwners)
+      );
+    }
+
+    // Rules for companies and their employees subcollection
+    match /companies/{companyId} {
+      // Allow basic read of company doc to authenticated users who are company owners or members (via custom claims) or admins
+      allow read: if request.auth != null && (
+        isAdmin()
+        || (request.auth.token.companyOwners != null && companyId in request.auth.token.companyOwners)
+        || (request.auth.token.companyIds != null && companyId in request.auth.token.companyIds)
+      );
+
+      // Company documents should only be created/modified by admins or service processes
+      allow create, update, delete: if isAdmin();
+
+      // Subcollection 'employees' — allow company members and owners (claims) and admins to read the list
+      match /employees/{employeeId} {
+        // Listing and reading employees allowed for admins, company owners/members
+        // or when the calling user already has an employee document under this company.
+        // The additional get() check helps in development when custom claims are not
+        // yet populated on the client (it is a temporary, low-risk fallback).
+        allow read, list: if request.auth != null && (
+          isAdmin() ||
+          (request.auth.token.companyOwners != null && companyId in request.auth.token.companyOwners) ||
+          (request.auth.token.companyIds != null && companyId in request.auth.token.companyIds) ||
+          // Fallback: allow if the caller has an employee document in this company
+          get(/databases/$(database)/documents/companies/$(companyId)/employees/$(request.auth.uid)).exists()
+        );
+
+        // Creating (adding an employee) should be restricted to the company owner(s) or admins
+        allow create: if request.auth != null && (
+          isAdmin() || (request.auth.token.companyOwners != null && companyId in request.auth.token.companyOwners)
+        );
+
+        // Updating or deleting employee entries restricted to company owners or admins
+        allow update, delete: if request.auth != null && (
+          isAdmin() || (request.auth.token.companyOwners != null && companyId in request.auth.token.companyOwners)
+        );
+      }
     }
   }
 }
