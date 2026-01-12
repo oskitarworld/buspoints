@@ -58,7 +58,7 @@ class _BrandingBlockState extends State<BrandingBlock> {
                     const SizedBox(height: 2),
                     Text('By OskitarWorld', style: TextStyle(fontSize: 12, color: Colors.grey[800], fontWeight: FontWeight.w600)),
                     const SizedBox(height: 2),
-                    const Text('Versión Tester', style: TextStyle(fontSize: 11, color: Colors.red, fontWeight: FontWeight.w600)),
+                    // Removed 'Versión Tester' label for release builds.
                   ],
                 ),
               ),
