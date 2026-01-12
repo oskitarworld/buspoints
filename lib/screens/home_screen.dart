@@ -22,6 +22,7 @@ import 'package:myapp/services/firestore_service.dart';
 import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:myapp/widgets/native_streetview.dart';
+import 'package:myapp/widgets/bus_spinner.dart';
 import 'package:myapp/services/web_places_autocomplete.dart';
 import 'package:http/http.dart' as http;
 import 'package:firebase_storage/firebase_storage.dart';
@@ -126,24 +127,23 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     'lista_negra': 'assets/icons/lista_negra.png',
   };
 
-  Future<BitmapDescriptor?> _loadAssetIcon(String assetPath) async {
-    if (_iconCache.containsKey(assetPath)) return _iconCache[assetPath];
+  Future<BitmapDescriptor?> _loadAssetIcon(String assetPath, {int? size}) async {
+    // Use provided size or compute from current zoom so the icon scales with the map.
+    final int useSize = size ?? _sizeForZoom(_currentZoom);
+    final key = '$assetPath|$useSize';
+    if (_iconCache.containsKey(key)) return _iconCache[key];
     try {
-      // Increase requested asset size so markers are rendered larger on high-DPI devices.
-      // Use the newer `asset` constructor instead of the deprecated `fromAssetImage`.
-      // Note: BitmapDescriptor.asset may ignore ImageConfiguration; keep a try/catch
-      // to fall back gracefully.
-    final bd = await BitmapDescriptor.asset(const ImageConfiguration(size: Size(320, 320)), assetPath);
-        _iconCache[assetPath] = bd;
-        return bd;
-      } catch (e) {
+      final bd = await BitmapDescriptor.asset(ImageConfiguration(size: Size(useSize.toDouble(), useSize.toDouble())), assetPath);
+      _iconCache[key] = bd;
+      return bd;
+    } catch (e) {
       developer.log('[HomeScreen] Failed to load asset icon $assetPath: $e', name: 'HomeScreen');
       return null;
     }
   }
 
   // Create a BitmapDescriptor from raw image bytes, scaling to [size] px width.
-  Future<BitmapDescriptor> _bitmapDescriptorFromBytes(Uint8List data, {int size = 320}) async {
+  Future<BitmapDescriptor> _bitmapDescriptorFromBytes(Uint8List data, {int size = 96}) async {
     try {
       final codec = await ui.instantiateImageCodec(data, targetWidth: size);
       final frame = await codec.getNextFrame();
@@ -159,8 +159,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     }
   }
 
-  Future<BitmapDescriptor?> _loadStorageIcon(String filename) async {
-    final key = 'storage://pdis_icons/$filename';
+  Future<BitmapDescriptor?> _loadStorageIcon(String filename, {int? size}) async {
+    final useSize = size ?? _sizeForZoom(_currentZoom);
+    final key = 'storage://pdis_icons/$filename|$useSize';
     if (_iconCache.containsKey(key)) return _iconCache[key];
     // We'll try multiple access strategies and also try an alternate
     // bucket name (some tooling/uploaders used the `*.firebasestorage.app`
@@ -173,7 +174,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     // downloading the icons once and embedding them in the app.
     try {
       final assetPath = 'assets/pdis_icons/$filename';
-      final assetBd = await _loadAssetIcon(assetPath);
+      final assetBd = await _loadAssetIcon(assetPath, size: useSize);
       if (assetBd != null) {
         _iconCache[key] = assetBd;
         developer.log('[HomeScreen] loaded icon from bundled asset $assetPath', name: 'HomeScreen');
@@ -191,7 +192,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       try {
         final bytes = await ref.getData(256 * 1024);
         if (bytes != null && bytes.isNotEmpty) {
-          final bd = await _bitmapDescriptorFromBytes(bytes, size: 192);
+          final bd = await _bitmapDescriptorFromBytes(bytes, size: useSize);
           _iconCache[key] = bd;
           developer.log('[HomeScreen] loaded storage icon from SDK getData for $filename', name: 'HomeScreen');
           return bd;
@@ -206,8 +207,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         developer.log('[HomeScreen] getDownloadURL (default) for $filename -> $url', name: 'HomeScreen');
         final resp = await http.get(Uri.parse(url));
         developer.log('[HomeScreen] HTTP GET $url returned ${resp.statusCode} for $filename (default)', name: 'HomeScreen');
-        if (resp.statusCode == 200 && resp.bodyBytes.isNotEmpty) {
-          final bd = await _bitmapDescriptorFromBytes(resp.bodyBytes, size: 192);
+          if (resp.statusCode == 200 && resp.bodyBytes.isNotEmpty) {
+          final bd = await _bitmapDescriptorFromBytes(resp.bodyBytes, size: useSize);
           _iconCache[key] = bd;
           developer.log('[HomeScreen] loaded storage icon via HTTP fallback for $filename', name: 'HomeScreen');
           return bd;
@@ -226,7 +227,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         try {
           final bytes = await altRef.getData(256 * 1024);
           if (bytes != null && bytes.isNotEmpty) {
-            final bd = await _bitmapDescriptorFromBytes(bytes, size: 192);
+            final bd = await _bitmapDescriptorFromBytes(bytes, size: 96);
             _iconCache[key] = bd;
             developer.log('[HomeScreen] loaded storage icon from SDK getData for $filename (alt)', name: 'HomeScreen');
             return bd;
@@ -239,8 +240,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           developer.log('[HomeScreen] getDownloadURL (alt) for $filename -> $url', name: 'HomeScreen');
           final resp = await http.get(Uri.parse(url));
           developer.log('[HomeScreen] HTTP GET $url returned ${resp.statusCode} for $filename (alt)', name: 'HomeScreen');
-          if (resp.statusCode == 200 && resp.bodyBytes.isNotEmpty) {
-            final bd = await _bitmapDescriptorFromBytes(resp.bodyBytes, size: 192);
+            if (resp.statusCode == 200 && resp.bodyBytes.isNotEmpty) {
+          final bd = await _bitmapDescriptorFromBytes(resp.bodyBytes, size: 96);
             _iconCache[key] = bd;
             developer.log('[HomeScreen] loaded storage icon via HTTP fallback for $filename (alt)', name: 'HomeScreen');
             return bd;
@@ -261,7 +262,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         final r1 = await http.get(Uri.parse(public1));
         developer.log('[HomeScreen] HTTP GET public1 returned ${r1.statusCode} for $filename', name: 'HomeScreen');
         if (r1.statusCode == 200 && r1.bodyBytes.isNotEmpty) {
-            final bd = await _bitmapDescriptorFromBytes(r1.bodyBytes, size: 192);
+            final bd = await _bitmapDescriptorFromBytes(r1.bodyBytes, size: 96);
           _iconCache[key] = bd;
           developer.log('[HomeScreen] loaded storage icon via public1 for $filename', name: 'HomeScreen');
           return bd;
@@ -278,7 +279,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         final r2 = await http.get(Uri.parse(public2));
         developer.log('[HomeScreen] HTTP GET public2 returned ${r2.statusCode} for $filename', name: 'HomeScreen');
         if (r2.statusCode == 200 && r2.bodyBytes.isNotEmpty) {
-          final bd = await _bitmapDescriptorFromBytes(r2.bodyBytes, size: 192);
+          final bd = await _bitmapDescriptorFromBytes(r2.bodyBytes, size: 96);
           _iconCache[key] = bd;
           developer.log('[HomeScreen] loaded storage icon via public2 for $filename', name: 'HomeScreen');
           return bd;
@@ -619,14 +620,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                RotationTransition(
-                  turns: _loadingIconController,
-                  child: CircleAvatar(
-                    radius: 22,
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    child: const Icon(Icons.location_on, color: Colors.white, size: 28),
-                  ),
-                ),
+                // Animated bus spinner driven by the existing controller.
+                BusSpinner(animation: _loadingIconController, size: 44),
                 const SizedBox(width: 16),
                 Column(
                   mainAxisSize: MainAxisSize.min,
@@ -665,7 +660,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         // the `pois` collection). We append results into pdisDocs.
         final List<QueryDocumentSnapshot<Map<String, dynamic>>> agg = [];
         try {
-          final q1 = FirebaseFirestore.instance.collection('pdis_v2').where('category', isEqualTo: effectiveCategoryKey).limit(2000);
+          final q1 = FirebaseFirestore.instance.collection('pdis_v2').where('category', isEqualTo: effectiveCategoryKey);
           final snap1 = await q1.get();
           agg.addAll(snap1.docs.cast<QueryDocumentSnapshot<Map<String, dynamic>>>());
           developer.log('[HomeScreen] pdis_v2 fetched: ${snap1.docs.length} docs for category $effectiveCategoryKey', name: 'HomeScreen');
@@ -673,7 +668,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           developer.log('[HomeScreen] Failed to fetch pdis_v2 for category $effectiveCategoryKey: $e', name: 'HomeScreen');
         }
         try {
-          final q2 = FirebaseFirestore.instance.collection('Pdis_full').where('category', isEqualTo: effectiveCategoryKey).limit(2000);
+          final q2 = FirebaseFirestore.instance.collection('Pdis_full').where('category', isEqualTo: effectiveCategoryKey);
           final snap2 = await q2.get();
           agg.addAll(snap2.docs.cast<QueryDocumentSnapshot<Map<String, dynamic>>>());
           developer.log('[HomeScreen] Pdis_full fetched: ${snap2.docs.length} docs for category $effectiveCategoryKey', name: 'HomeScreen');
@@ -681,7 +676,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           developer.log('[HomeScreen] Failed to fetch Pdis_full for category $effectiveCategoryKey: $e', name: 'HomeScreen');
         }
         try {
-          final q3 = FirebaseFirestore.instance.collection('pois').where('category', isEqualTo: effectiveCategoryKey).limit(2000);
+          final q3 = FirebaseFirestore.instance.collection('pois').where('category', isEqualTo: effectiveCategoryKey);
           final snap3 = await q3.get();
           agg.addAll(snap3.docs.cast<QueryDocumentSnapshot<Map<String, dynamic>>>());
           developer.log('[HomeScreen] pois fetched: ${snap3.docs.length} docs for category $effectiveCategoryKey', name: 'HomeScreen');
@@ -1135,6 +1130,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   LatLng? _startingPosition;
   final Set<Marker> _markers = {};
   bool _isCategoryListVisible = false;
+  double _currentZoom = 12.0;
+  List<Place> _lastPlaces = [];
+  double _lastAppliedZoom = 12.0;
   // When true, after the user selects a category the map will auto-refresh
   // POIs on camera movements (onCameraIdle). This is enabled when a
   // category is actively selected and disabled when the user clears selection
@@ -1269,6 +1267,15 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     }
   }
 
+  int _sizeForZoom(double zoom) {
+    // base size tuned for zoom 15
+    const int base = 96;
+    final int s = (base * (zoom / 15.0)).round();
+    if (s < 24) return 24;
+    if (s > 256) return 256;
+    return s;
+  }
+
   // Adding POIs is done via long-press on the map. The previous helper that
   // opened the AddPoiScreen from a FAB was removed to avoid duplicate entry
   // points in the UI.
@@ -1308,6 +1315,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     setState(() {
       _markers.clear();
     });
+    // Remember last places so we can rebuild markers when zoom changes.
+    _lastPlaces = places;
+    final int iconSize = _sizeForZoom(_currentZoom);
 
     // Build a serializable list for the isolate and a map to lookup Place by id.
     final List<Map<String, dynamic>> placeMaps = <Map<String, dynamic>>[];
@@ -1408,23 +1418,25 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       // in parallel but catch errors individually so marker rendering still
       // proceeds with defaults.
       (() async {
-        // Load assets first (fast, bundled)
+        // Load assets first (fast, bundled) with size-aware cache keys
         for (final asset in assetsToLoad) {
-          if (!_iconCache.containsKey(asset)) {
+          final assetKey = '$asset|$iconSize';
+          if (!_iconCache.containsKey(assetKey)) {
             await _loadAssetIcon(asset);
           }
         }
 
         // Then fetch remote URLs if allowed
         for (final url in urlsToFetch) {
-          if (!_iconCache.containsKey(url)) {
+          final urlKey = '$url|$iconSize';
+          if (!_iconCache.containsKey(urlKey)) {
             try {
               final resp = await http.get(Uri.parse(url));
               if (resp.statusCode == 200) {
                 final bytes = resp.bodyBytes;
                 try {
-                  final bd = await _bitmapDescriptorFromBytes(bytes, size: 192);
-                  _iconCache[url] = bd;
+                  final bd = await _bitmapDescriptorFromBytes(bytes, size: iconSize);
+                  _iconCache[urlKey] = bd;
                 } catch (e) {
                   developer.log('Failed to create BitmapDescriptor from $url: $e', name: 'HomeScreen');
                 }
@@ -1437,9 +1449,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
         // Try loading icons from Firebase Storage (pdis_icons/<filename>) if present
         for (final filename in storageFilesToLoad) {
-          final key = 'storage://pdis_icons/$filename';
+          final key = 'storage://pdis_icons/$filename|$iconSize';
           if (!_iconCache.containsKey(key)) {
-            await _loadStorageIcon(filename);
+            await _loadStorageIcon(filename, size: iconSize);
           }
         }
 
@@ -1498,11 +1510,11 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
         if (chosenAsset != null) {
           // try storage key first
-          final storageKey = 'storage://pdis_icons/$chosenAsset';
-          final assetKeyPdis = 'assets/pdis_icons/$chosenAsset';
-          final assetKeyLegacy = chosenAsset.startsWith('assets/') ? chosenAsset : 'assets/icons/$chosenAsset';
+          final storageKey = 'storage://pdis_icons/$chosenAsset|$iconSize';
+          final assetKeyPdis = 'assets/pdis_icons/$chosenAsset|$iconSize';
+          final assetKeyLegacy = '${chosenAsset.startsWith('assets/') ? chosenAsset : 'assets/icons/$chosenAsset'}|$iconSize';
           // Diagnostic log: show which keys we will check and whether they exist
-          developer.log('[HomeScreen] Marker diagnostic: catKey=$catKey chosenAsset=$chosenAsset storageKeyPresent=${_iconCache.containsKey(storageKey)} assetKeyPdisPresent=${_iconCache.containsKey(assetKeyPdis)} assetKeyLegacyPresent=${_iconCache.containsKey(assetKeyLegacy)} ipPresent=${ip != null && _iconCache.containsKey(ip)}', name: 'HomeScreen');
+          developer.log('[HomeScreen] Marker diagnostic: catKey=$catKey chosenAsset=$chosenAsset storageKeyPresent=${_iconCache.containsKey(storageKey)} assetKeyPdisPresent=${_iconCache.containsKey(assetKeyPdis)} assetKeyLegacyPresent=${_iconCache.containsKey(assetKeyLegacy)} ipPresent=${ip != null && _iconCache.containsKey('$ip|$iconSize')}', name: 'HomeScreen');
           if (_iconCache.containsKey(storageKey)) {
             icon = _iconCache[storageKey]!;
           } else if (_iconCache.containsKey(assetKeyPdis)) {
@@ -1511,9 +1523,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             icon = _iconCache[assetKeyLegacy]!;
           }
         }
-        if (icon == BitmapDescriptor.defaultMarker && place?.iconPath != null && _iconCache.containsKey(place!.iconPath!)) {
-          // fallback to remote iconPath if available
-          icon = _iconCache[place.iconPath!]!;
+        if (icon == BitmapDescriptor.defaultMarker && ip != null && _iconCache.containsKey('$ip|$iconSize')) {
+          // fallback to remote iconPath if available (size-aware key)
+          icon = _iconCache['$ip|$iconSize']!;
         }
         final marker = Marker(
           markerId: markerId,
@@ -2125,7 +2137,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   },
                 ),
                 TextButton(
-                  child: const Text('Reportar incidencia'),
+                  child: const Text('Enviar incidencias'),
                   onPressed: () {
                     showDialog(
                       context: context,
@@ -2135,7 +2147,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         return StatefulBuilder(
                           builder: (context, setState) {
                             return AlertDialog(
-                              title: const Text('Reportar incidencia'),
+                              title: const Text('Enviar incidencias'),
                               content: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
@@ -2651,18 +2663,27 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       onLongPress: _onMapLongPress,
                       onCameraMove: (CameraPosition pos) {
                         _cameraMoved = true;
+                        _currentZoom = pos.zoom;
                       },
-                      onCameraIdle: () {
+                      onCameraIdle: () async {
                         if (_cameraMoved) {
                           _cameraMoved = false;
                           if (_autoSyncAfterCategorySelected && _activeCategoryKey != null) {
                             developer.log('[HomeScreen] camera moved, auto-syncing category=$_activeCategoryKey', name: 'HomeScreen');
                             _loadPlacesByCategory(_activeCategoryKey!);
                           } else {
-                            // Auto-load disabled: POIs are only loaded on explicit
-                            // user actions (selecting a category or tapping 'Mostrar todos').
                             developer.log('[HomeScreen] camera moved but auto-load is disabled', name: 'HomeScreen');
                           }
+                        }
+                        // If we have places loaded and zoom changed enough, rebuild markers with new icon sizes.
+                        try {
+                          if (_lastPlaces.isNotEmpty && (_currentZoom - _lastAppliedZoom).abs() >= 0.5) {
+                            _lastAppliedZoom = _currentZoom;
+                            developer.log('[HomeScreen] zoom changed to $_currentZoom -> rebuilding markers with new icon size', name: 'HomeScreen');
+                            await _updateMarkersFromPlaces(_lastPlaces, skipIconCacheClear: true);
+                          }
+                        } catch (e) {
+                          developer.log('[HomeScreen] failed rebuilding markers after zoom change: $e', name: 'HomeScreen');
                         }
                       },
                   ),

@@ -28,6 +28,7 @@ class _CreateRouteScreenState extends State<CreateRouteScreen> {
   final RouteService _routeService = RouteService();
   final List<UserRoutePoint> _points = [];
   final Map<MarkerId, Marker> _markers = {};
+  final Map<MarkerId, Marker> _pdiMarkers = {};
   final Completer<GoogleMapController> _controller = Completer();
   bool _saving = false;
   MapType _mapType = MapType.normal;
@@ -35,6 +36,7 @@ class _CreateRouteScreenState extends State<CreateRouteScreen> {
   List<Map<String, dynamic>> _searchResults = [];
 
   static const CameraPosition _initial = CameraPosition(target: LatLng(-34.0, -58.0), zoom: 12);
+  late CameraPosition _cameraInitial;
 
   void _onMapTap(LatLng latLng) {
     // Prompt for a name when adding a new point. Default value is the
@@ -44,7 +46,7 @@ class _CreateRouteScreenState extends State<CreateRouteScreen> {
 
   Future<void> _promptAndAddPoint(LatLng latLng) async {
     if (_points.length >= 20) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Máximo 20 puntos por ruta')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('⚠️ Máximo 20 puntos por ruta')));
       return;
     }
 
@@ -155,7 +157,7 @@ class _CreateRouteScreenState extends State<CreateRouteScreen> {
       final point = _points[i];
       final id = MarkerId('p_$i');
       try {
-        final bmp = await createNumberedMarker(i + 1, size: 120, color: Colors.blue);
+    final bmp = await createNumberedMarker(i + 1, size: 44, color: Colors.blue);
         final marker = Marker(
           markerId: id,
           position: LatLng(point.lat, point.lng),
@@ -180,7 +182,139 @@ class _CreateRouteScreenState extends State<CreateRouteScreen> {
         ..clear()
         ..addAll(newMarkers);
     });
+    // keep PDI markers as well (they live in _pdiMarkers)
   }
+
+  Future<void> _loadNearbyPdis(LatLng center, {double delta = 0.05}) async {
+    // delta ~ degrees latitude/longitude (~0.05 ≈ 5km); conservative default
+    try {
+      final minLat = center.latitude - delta;
+      final maxLat = center.latitude + delta;
+      final minLng = center.longitude - delta;
+      final maxLng = center.longitude + delta;
+
+      final Map<MarkerId, Marker> pdis = {};
+
+      // Helper to query a collection reference and add markers. This is
+      // flexible about coordinate fields (position, latitude/longitude,
+      // geometry.coordinates, geopoint, nested geo) to match canonical
+      // POI document shapes.
+      Future<void> queryRefAndAdd(CollectionReference colRef, String tag, {int limit = 500}) async {
+        try {
+          // try bounding queries when possible (position.latitude exists)
+          Query q = colRef;
+          try {
+            q = colRef.where('position.latitude', isGreaterThanOrEqualTo: minLat).where('position.latitude', isLessThanOrEqualTo: maxLat).limit(limit);
+          } catch (_) {
+            // if the composite index doesn't exist or field missing, fall back
+            q = colRef.limit(limit);
+          }
+          final snap = await q.get();
+          for (final doc in snap.docs) {
+            final data = doc.data() as Map<String, dynamic>;
+            double? lat;
+            double? lng;
+            try {
+              // Common shapes
+              if (data['position'] != null && data['position'] is Map) {
+                final pos = Map<String, dynamic>.from(data['position'] as Map);
+                final rawLat = pos['latitude'] ?? pos['lat'];
+                final rawLng = pos['longitude'] ?? pos['lng'];
+                if (rawLat != null && rawLng != null) {
+                  lat = (rawLat is num) ? rawLat.toDouble() : double.tryParse(rawLat.toString());
+                  lng = (rawLng is num) ? rawLng.toDouble() : double.tryParse(rawLng.toString());
+                }
+              }
+              if ((lat == null || lng == null) && data['latitude'] != null && data['longitude'] != null) {
+                final rawLat = data['latitude'];
+                final rawLng = data['longitude'];
+                lat = (rawLat is num) ? rawLat.toDouble() : double.tryParse(rawLat.toString());
+                lng = (rawLng is num) ? rawLng.toDouble() : double.tryParse(rawLng.toString());
+              }
+              // GeoJSON geometry.coordinates: [lng, lat]
+              if ((lat == null || lng == null) && data['geometry'] is Map) {
+                try {
+                  final geom = Map<String, dynamic>.from(data['geometry'] as Map);
+                  final coords = geom['coordinates'];
+                  if (coords is List && coords.length >= 2) {
+                    final rawLng = coords[0];
+                    final rawLat = coords[1];
+                    lat = (rawLat is num) ? rawLat.toDouble() : double.tryParse(rawLat.toString());
+                    lng = (rawLng is num) ? rawLng.toDouble() : double.tryParse(rawLng.toString());
+                  }
+                } catch (_) {}
+              }
+              // geopoint objects
+              if ((lat == null || lng == null) && data['geopoint'] != null) {
+                final gp = data['geopoint'];
+                if (gp is GeoPoint) {
+                  lat = gp.latitude;
+                  lng = gp.longitude;
+                } else if (gp is Map) {
+                  final rawLat = gp['latitude'] ?? gp['lat'];
+                  final rawLng = gp['longitude'] ?? gp['lng'];
+                  lat = (rawLat is num) ? rawLat.toDouble() : double.tryParse(rawLat.toString());
+                  lng = (rawLng is num) ? rawLng.toDouble() : double.tryParse(rawLng.toString());
+                }
+              }
+              // nested geo fields (geo.geopoint etc)
+              if ((lat == null || lng == null) && data['geo'] is Map) {
+                try {
+                  final geo = Map<String, dynamic>.from(data['geo'] as Map);
+                  final maybeGp = geo['geopoint'] ?? geo['position'] ?? geo['location'];
+                  if (maybeGp is GeoPoint) {
+                    lat = maybeGp.latitude;
+                    lng = maybeGp.longitude;
+                  } else if (maybeGp is Map) {
+                    final rawLat = maybeGp['latitude'] ?? maybeGp['lat'];
+                    final rawLng = maybeGp['longitude'] ?? maybeGp['lng'];
+                    lat = (rawLat is num) ? rawLat.toDouble() : double.tryParse(rawLat.toString());
+                    lng = (rawLng is num) ? rawLng.toDouble() : double.tryParse(rawLng.toString());
+                  }
+                } catch (_) {}
+              }
+            } catch (_) {}
+            if (lat == null || lng == null) continue;
+            if (lng < minLng || lng > maxLng) continue; // client-side lng filter
+
+            final id = MarkerId('pdi_${tag}_${doc.id}');
+            if (pdis.containsKey(id)) continue;
+            final title = (data['name'] ?? data['title'] ?? doc.id).toString();
+            final marker = Marker(
+              markerId: id,
+              position: LatLng(lat, lng),
+              icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
+              infoWindow: InfoWindow(title: title),
+            );
+            pdis[id] = marker;
+          }
+        } catch (e) {
+          // ignore collection errors (security rules / missing fields)
+        }
+      }
+
+      // Query canonical collections and also a potential nested path where
+      // some imports store PDIs under firestore/database/pdis_v2
+      await queryRefAndAdd(FirebaseFirestore.instance.collection('pdis_v2'), 'pdis_v2');
+      await queryRefAndAdd(FirebaseFirestore.instance.collection('Pdis_full'), 'Pdis_full');
+      await queryRefAndAdd(FirebaseFirestore.instance.collection('pois'), 'pois');
+      // Also try nested path: collection('firestore').doc('database').collection('pdis_v2')
+      try {
+        final nested = FirebaseFirestore.instance.collection('firestore').doc('database').collection('pdis_v2');
+        await queryRefAndAdd(nested, 'firestore_database_pdis_v2');
+      } catch (_) {}
+
+      setState(() {
+        _pdiMarkers
+          ..clear()
+          ..addAll(pdis);
+      });
+    } catch (_) {}
+  }
+
+  // _togglePdis removed: PDI markers are always shown in create-route mode.
+
+  // _togglePdis removed: PDI markers are always shown in create-route mode.
 
   void _removePoint(int index) {
     setState(() {
@@ -202,17 +336,17 @@ class _CreateRouteScreenState extends State<CreateRouteScreen> {
               ListTile(title: Text('Punto ${index + 1}')),
               ListTile(
                 leading: const Icon(Icons.delete),
-                title: const Text('Eliminar punto'),
+                title: const Text('🗑 Eliminar punto'),
                 onTap: () => Navigator.of(ctx).pop('delete'),
               ),
               ListTile(
                 leading: const Icon(Icons.edit),
-                title: const Text('Editar nombre'),
+                title: const Text('✏️ Editar nombre'),
                 onTap: () => Navigator.of(ctx).pop('edit'),
               ),
               ListTile(
                 leading: const Icon(Icons.close),
-                title: const Text('Cerrar'),
+                title: const Text('❌ Cerrar'),
                 onTap: () => Navigator.of(ctx).pop('close'),
               ),
             ],
@@ -247,7 +381,7 @@ class _CreateRouteScreenState extends State<CreateRouteScreen> {
 
   Future<void> _saveRoute() async {
     if (_points.length < 2) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Debes seleccionar al menos 2 puntos')));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('⚠️ Debes seleccionar al menos 2 puntos (una ruta con uno no es ruta, es un sitio 😅)')));
       return;
     }
 
@@ -374,21 +508,21 @@ class _CreateRouteScreenState extends State<CreateRouteScreen> {
                       // updates when the company selector changes.
                       selectedItemBuilder: (ctx) {
                         final List<Widget> widgets = [];
-                        widgets.add(const Text('Pública'));
-                        widgets.add(const Text('Privada (solo yo)'));
+                        widgets.add(const Text('🌍 Pública'));
+                        widgets.add(const Text('🔒 Privada (solo yo)'));
                         if (myCompanies.isNotEmpty) {
                           final cname = selectedCompanyId != null
                               ? myCompanies.firstWhere((m) => m['id'] == selectedCompanyId, orElse: () => myCompanies.first)['name']
                               : null;
-                          widgets.add(Text(cname != null ? 'Rutas de $cname' : 'Rutas de la empresa'));
+                          widgets.add(Text(cname != null ? '🏢 Rutas de $cname' : '🏢 Rutas de la empresa'));
                         }
                         return widgets;
                       },
                       items: <DropdownMenuItem<String>>[
-                        const DropdownMenuItem(value: 'public', child: Text('Pública')),
-                        DropdownMenuItem(value: 'private', child: Text('Privada (solo yo)')),
+                        const DropdownMenuItem(value: 'public', child: Text('🌍 Pública')),
+                        DropdownMenuItem(value: 'private', child: Text('🔒 Privada (solo yo)')),
                         if (myCompanies.isNotEmpty)
-                          DropdownMenuItem(value: 'team', child: const Text('Rutas de la empresa')),
+                          DropdownMenuItem(value: 'team', child: const Text('🏢 Rutas de la empresa')),
                       ],
                       onChanged: (v) {
                         setState(() => visibilityChoice = v ?? 'public');
@@ -402,16 +536,16 @@ class _CreateRouteScreenState extends State<CreateRouteScreen> {
                     Builder(builder: (labelCtx) {
                       String selLabel;
                       if (visibilityChoice == 'public') {
-                        selLabel = 'Pública';
+                        selLabel = '🌍 Pública';
                       } else if (visibilityChoice == 'private') {
-                        selLabel = 'Privada (solo yo)';
+                        selLabel = '🔒 Privada (solo yo)';
                       } else {
                         String cname = selectedCompanyId != null && myCompanies.isNotEmpty
                             ? myCompanies.firstWhere((m) => m['id'] == selectedCompanyId, orElse: () => myCompanies.first)['name'] ?? 'la empresa'
                             : 'la empresa seleccionada';
                         // Force a safe, short string to avoid UI embedding
                         if (cname.length > 40) cname = '${cname.substring(0, 37)}...';
-                        selLabel = 'Rutas de $cname';
+                        selLabel = '🏢 Rutas de $cname';
                       }
                       return Text(selLabel, style: Theme.of(labelCtx).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600));
                     }),
@@ -431,15 +565,15 @@ class _CreateRouteScreenState extends State<CreateRouteScreen> {
                     Builder(builder: (tCtx) {
                       String desc;
                       if (visibilityChoice == 'public') {
-                        desc = 'Ruta pública: será revisada por administración y, si se aprueba, se mostrará públicamente.';
+                        desc = '🌍 Pública: se revisa y, si pasa el filtro, se publica.';
                       } else if (visibilityChoice == 'private') {
-                        desc = 'Ruta privada: solo la verás tú.';
+                        desc = '🔒 Privada: solo la verás tú.';
                       } else {
                         // When company info is available, include the company name in the description
                         String cname = selectedCompanyId != null && myCompanies.isNotEmpty
                             ? myCompanies.firstWhere((m) => m['id'] == selectedCompanyId, orElse: () => myCompanies.first)['name'] ?? 'la empresa'
                             : 'la empresa seleccionada';
-                        desc = 'Rutas de $cname: solo los miembros de $cname podrán ver esta ruta.';
+                        desc = '🏢 Rutas de $cname: solo los miembros de $cname podrán ver esta ruta.';
                       }
                       return Text(desc, style: Theme.of(tCtx).textTheme.bodySmall);
                     })
@@ -461,7 +595,7 @@ class _CreateRouteScreenState extends State<CreateRouteScreen> {
     // Require non-empty name
     final name = nameController.text.trim();
     if (name.isEmpty) {
-      messenger.showSnackBar(const SnackBar(content: Text('La ruta necesita un nombre (por ejemplo: "Visita Barcelona")')));
+      messenger.showSnackBar(const SnackBar(content: Text('La ruta necesita un nombre (obligatorio, sin nombre no hay gloria)')));
       return;
     }
 
@@ -532,8 +666,40 @@ class _CreateRouteScreenState extends State<CreateRouteScreen> {
       } catch (_) {}
     }
     _rebuildMarkers();
-    // Try to center map on user's current location once the map is ready.
-    _centerToUserOnStart();
+    // Setup initial camera: center on the route's first point when editing,
+    // otherwise use the user-location centering flow.
+    if (widget.routeToEdit != null && _points.isNotEmpty) {
+      _cameraInitial = CameraPosition(target: LatLng(_points.first.lat, _points.first.lng), zoom: 13);
+    } else {
+      _cameraInitial = _initial;
+      // Try to center map on user's current location once the map is ready.
+      _centerToUserOnStart();
+    }
+    // Show an introductory popup describing how to create a route when
+    // opening the screen in "create" mode (not editing). Use a post-frame
+    // callback to avoid using BuildContext synchronously during initState.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && widget.routeToEdit == null) {
+        _showCreateIntroIfNeeded();
+      }
+    });
+  }
+
+  bool _introShown = false;
+
+  void _showCreateIntroIfNeeded() {
+    if (_introShown) return;
+    _introShown = true;
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Crear ruta'),
+        content: const Text('Cómo crear una ruta:\n• Toca el mapa para añadir un punto.\n• Puedes buscar una dirección y añadirla.\n• Máximo 20 puntos por ruta.\n• Mantén pulsado un punto para ver más opciones.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Entendido')),
+        ],
+      ),
+    );
   }
 
   @override
@@ -548,11 +714,38 @@ class _CreateRouteScreenState extends State<CreateRouteScreen> {
       body: Stack(
         children: [
           GoogleMap(
-            initialCameraPosition: _initial,
-            onMapCreated: (c) => _controller.complete(c),
+            initialCameraPosition: _cameraInitial,
+            onMapCreated: (c) async {
+              // Complete the controller future and, if editing an existing
+              // route, ensure the camera is placed over the first point.
+              _controller.complete(c);
+              if (widget.routeToEdit != null && _points.isNotEmpty) {
+                try {
+                  await c.animateCamera(CameraUpdate.newLatLng(LatLng(_points.first.lat, _points.first.lng)));
+                } catch (_) {}
+              }
+              // Load PDIs for the current visible region so the user can pick
+              // points from nearby POIs while creating the route.
+              try {
+                final bounds = await c.getVisibleRegion();
+                final center = LatLng((bounds.northeast.latitude + bounds.southwest.latitude) / 2,
+                    (bounds.northeast.longitude + bounds.southwest.longitude) / 2);
+                _loadNearbyPdis(center);
+              } catch (_) {}
+            },
             onTap: _onMapTap,
+            onCameraIdle: () async {
+              try {
+                final controller = await _controller.future;
+                final bounds = await controller.getVisibleRegion();
+                final center = LatLng((bounds.northeast.latitude + bounds.southwest.latitude) / 2,
+                    (bounds.northeast.longitude + bounds.southwest.longitude) / 2);
+                // small debounce not implemented; this runs on camera idle only
+                _loadNearbyPdis(center);
+              } catch (_) {}
+            },
             mapType: _mapType,
-            markers: Set<Marker>.of(_markers.values),
+            markers: Set<Marker>.of(_markers.values)..addAll(_pdiMarkers.values),
             polylines: {
               Polyline(polylineId: const PolylineId('route'), points: _points.map((p) => LatLng(p.lat, p.lng)).toList(), color: Colors.blue)
             },
@@ -574,11 +767,25 @@ class _CreateRouteScreenState extends State<CreateRouteScreen> {
                     child: TextField(
                       controller: _searchCtrl,
                       textInputAction: TextInputAction.search,
-                      decoration: const InputDecoration(hintText: 'Buscar lugar...', border: InputBorder.none, contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 14)),
+                      decoration: const InputDecoration(hintText: 'Buscar lugar…', border: InputBorder.none, contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 14)),
                       onSubmitted: (v) => _performSearch(v),
                     ),
                   ),
                   IconButton(icon: const Icon(Icons.search), onPressed: () => _performSearch(_searchCtrl.text)),
+                  IconButton(
+                    icon: const Icon(Icons.my_location),
+                    tooltip: 'Mi ubicación',
+                    onPressed: _locateMe,
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.layers),
+                    tooltip: 'Cambiar vista',
+                    onPressed: () {
+                      setState(() {
+                        _mapType = _mapType == MapType.normal ? MapType.satellite : MapType.normal;
+                      });
+                    },
+                  ),
                 ],
               ),
             ),
@@ -627,19 +834,7 @@ class _CreateRouteScreenState extends State<CreateRouteScreen> {
                 ),
               ),
             ),
-          // Small aesthetic banner at bottom
-          Positioned(
-            left: 16,
-            right: 16,
-            bottom: 16,
-            child: Center(
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: BoxDecoration(color: Colors.white.withAlpha((0.95 * 255).round()), borderRadius: BorderRadius.circular(24), boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 6)]),
-                child: const Text('Toca el mapa para añadir puntos • Mantén pulsado un marcador para más opciones', style: TextStyle(fontSize: 13), textAlign: TextAlign.center),
-              ),
-            ),
-          ),
+          // (instructions banner removed; intro dialog is shown on screen open)
           // Floating action buttons: save (icon-only), locate and satellite toggle.
           // Positioned to avoid overlapping the bottom banner and points card.
           Positioned(
@@ -652,40 +847,19 @@ class _CreateRouteScreenState extends State<CreateRouteScreen> {
               child: const Icon(Icons.check),
             ),
           ),
-          Positioned(
-            left: 16,
-            bottom: 80,
-            child: FloatingActionButton(
-              heroTag: 'locate',
-              onPressed: _locateMe,
-              tooltip: 'Mi ubicación',
-              child: const Icon(Icons.my_location),
-            ),
-          ),
-          Positioned(
-            right: 16,
-            bottom: 150,
-            child: FloatingActionButton(
-              heroTag: 'maptype',
-              onPressed: () {
-                setState(() {
-                  _mapType = _mapType == MapType.normal ? MapType.satellite : MapType.normal;
-                });
-              },
-              tooltip: 'Cambiar vista',
-              child: Icon(_mapType == MapType.normal ? Icons.satellite : Icons.map),
-            ),
-          ),
+          // locate FAB moved to top search frame
+          // PDI toggle FAB removed (PDIs shown by default)
+          // maptype FAB moved to top search frame
           if (_saving)
-            const Center(
-              child: CircularProgressIndicator(),
-            )
-        ],
-      ),
-      // Replace the previous FAB layout with three floating circular buttons
-      // placed over the map: save (icon-only), locate, and satellite toggle.
-      // They are positioned so they don't overlap the bottom banner and the
-      // points card.
-    );
+              const Center(
+                child: CircularProgressIndicator(),
+              )
+          ],
+        ),
+        // Replace the previous FAB layout with three floating circular buttons
+        // placed over the map: save (icon-only), locate, and satellite toggle.
+        // They are positioned so they don't overlap the bottom banner and the
+        // points card.
+      );
   }
 }
